@@ -19,13 +19,15 @@ export function computeStrengths(board, dead = []) {
   const draw = new Float32Array(COMBO_COUNT);
   const eff = new Float32Array(COMBO_COUNT);
 
-  // Score every combo that can exist on this board.
+  // Score every combo that can exist on this board. (Reused buffers: this runs tens of thousands of times.)
   const order = [];
+  const extended = [...board, 0];
   for (let i = 0; i < COMBO_COUNT; i++) {
-    const [a, b] = COMBOS[i].cards;
+    const hole = COMBOS[i].cards;
+    const [a, b] = hole;
     if (blocked.has(a) || blocked.has(b)) continue;
     valid[i] = 1;
-    scores[i] = evaluate([a, b, ...board]);
+    scores[i] = evaluate(hole, board, board.length);
     category[i] = categoryOf(scores[i]);
     order.push(i);
   }
@@ -48,13 +50,15 @@ export function computeStrengths(board, dead = []) {
     for (let c = 0; c < 52; c++) if (!blocked.has(c)) deck.push(c);
     const topBoardRank = Math.max(...board.map(rankOf));
     for (const i of order) {
-      const [a, b] = COMBOS[i].cards;
+      const hole = COMBOS[i].cards;
+      const [a, b] = hole;
       const current = category[i];
       if (current >= 4) continue; // already a straight or better
       let outs = 0;
       for (const card of deck) {
         if (card === a || card === b) continue;
-        const next = categoryOf(evaluate([a, b, ...board, card]));
+        extended[board.length] = card;
+        const next = categoryOf(evaluate(hole, extended, board.length + 1));
         const hitsHoleCard = rankOf(card) === rankOf(a) || rankOf(card) === rankOf(b);
         if (next >= 4) outs += 1; // straight, flush or better
         else if (current <= 1 && next === 3 && hitsHoleCard) outs += 0.7; // set / trips with a hole card

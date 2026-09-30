@@ -29,7 +29,7 @@ function describeHeroHand(heroCards, board, strengths) {
     const entry = PREFLOP_BY_CLASS[cls];
     return { name: CLASS_NAMES[cls], text: `Top ${Math.round(((entry.start + entry.end) / 2) * 100)}% starting hand` };
   }
-  const score = evaluate([...heroCards, ...board]);
+  const score = evaluate(heroCards, board, board.length);
   const percentile = percentileOf(strengths, score);
   return {
     name: HAND_NAMES[categoryOf(score)],
