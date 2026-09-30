@@ -1,0 +1,62 @@
+/* Traits step: player tabs and the meter stack. */
+
+.traits-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px;
+}
+.traits-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.traits-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 8px 12px 8px 8px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  text-align: left;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.traits-tab.is-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.traits-tab-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.traits-tab-name {
+  font-weight: 800;
+  font-size: 14px;
+}
+.traits-tab-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.traits-description {
+  margin-top: -4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.traits-meters {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--bg);
+}

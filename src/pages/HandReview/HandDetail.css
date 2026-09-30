@@ -1,0 +1,211 @@
+/* Hand detail pane: header, felt table, action replay and review form. */
+
+.hand-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.hand-detail-back {
+  align-self: flex-start;
+  margin-left: -10px;
+}
+@media (min-width: 1100px) {
+  .hand-detail-back {
+    display: none;
+  }
+}
+
+.hand-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.hand-detail-meta {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.hand-detail-title {
+  margin-top: 4px;
+  font-size: clamp(22px, 5vw, 30px);
+}
+
+/* Felt table. It is a size container so the cards scale with the available width. */
+.hand-detail-table {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  border-radius: var(--radius);
+  background: var(--felt);
+  color: var(--snow);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), var(--shadow);
+}
+.hand-detail-table .playing-card-lg {
+  --card-w: min(64px, 15cqi);
+}
+
+.hand-detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hand-detail-label {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+.hand-detail-cards {
+  display: flex;
+  gap: 8px;
+}
+
+/* Your hand next to the villains' hands; wraps when there are several villains */
+.hand-detail-hands {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+}
+.hand-detail-row.is-folded {
+  opacity: 0.5;
+}
+.hand-detail-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.hand-detail-allin,
+.hand-detail-folded {
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+.hand-detail-allin {
+  background: var(--negative);
+  color: #fff;
+}
+.hand-detail-folded {
+  background: rgba(246, 251, 251, 0.2);
+}
+
+/* Pot and result under the hands */
+.hand-detail-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.hand-detail-numbers {
+  display: flex;
+  gap: 24px;
+  margin: 0;
+}
+.hand-detail-numbers dt {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.75;
+}
+.hand-detail-numbers dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+}
+/* On felt, wins use the bright teal and losses a light coral for contrast */
+.hand-detail-result.is-positive {
+  color: var(--teal);
+}
+.hand-detail-result.is-negative {
+  color: #f2a39a;
+}
+
+/* Sections below the table */
+.hand-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.hand-detail-section-title {
+  font-size: 18px;
+}
+
+.hand-detail-note-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+.hand-detail-note {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  resize: vertical;
+  line-height: 1.5;
+}
+.hand-detail-note:focus {
+  outline: 0;
+  border-color: var(--accent);
+}
+
+.hand-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.hand-detail-tag {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+@media (min-width: 768px) {
+  .hand-detail-table {
+    padding: 28px;
+  }
+  .hand-detail-section {
+    padding: 24px;
+  }
+}
+
+.hand-detail-header-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.hand-detail-coach-score {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent-text);
+}
+.hand-detail-coach {
+  align-self: flex-start;
+}
+
+.hand-detail-coach-off {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}

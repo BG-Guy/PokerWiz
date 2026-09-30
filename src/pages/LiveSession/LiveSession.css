@@ -1,0 +1,6 @@
+/* Play page wrapper: keeps the session content at a comfortable reading width. */
+
+.live-session-page {
+  max-width: 1100px;
+  margin: 0 auto;
+}

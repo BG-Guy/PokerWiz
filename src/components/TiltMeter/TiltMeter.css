@@ -1,0 +1,80 @@
+/* Tilt scale: five faces over a calm-to-hot color bar. */
+
+.tilt-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tilt-meter-faces {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+/* Unselected faces are muted; the chosen one pops */
+.tilt-meter-face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 2px;
+  border-radius: 16px;
+  opacity: 0.5;
+  filter: saturate(0.6);
+  transition: opacity 0.2s ease, filter 0.2s ease, background-color 0.2s ease;
+}
+.tilt-meter-face svg {
+  transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.tilt-meter-face:hover {
+  opacity: 0.85;
+}
+.tilt-meter-face.is-selected {
+  opacity: 1;
+  filter: none;
+  background: color-mix(in srgb, var(--face-color) 20%, transparent);
+}
+.tilt-meter-face.is-selected svg {
+  transform: scale(1.18);
+}
+
+.tilt-meter-face-label {
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.tilt-meter-bar {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #7fc8c2, #a9d6a0, #e9c46a, #ee9b5b, #e06456);
+}
+.tilt-meter-marker {
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 3px solid var(--text);
+  transform: translate(-50%, -50%);
+  transition: left 0.3s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+.tilt-meter-description {
+  min-height: 1.5em;
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* Compact read-only badge */
+.tilt-meter-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+}

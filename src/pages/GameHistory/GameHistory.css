@@ -1,0 +1,50 @@
+/* Game History page layout. */
+
+.game-history-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.game-history-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+@media (min-width: 900px) {
+  .game-history-summary {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+/* Month group heading with the month's net result */
+.game-history-month {
+  margin-bottom: 28px;
+}
+.game-history-month-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+.game-history-month-head h2 {
+  font-size: 20px;
+}
+
+.game-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.game-history-empty {
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 700;
+}

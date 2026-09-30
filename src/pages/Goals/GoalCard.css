@@ -1,0 +1,117 @@
+/* Goal card. */
+
+.goal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  min-width: 0;
+}
+
+.goal-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.goal-card-category {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+}
+
+/* Status pill colors follow the progress bar tones */
+.goal-card-status {
+  --status-color: var(--accent-text);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--status-color);
+  background: color-mix(in srgb, var(--status-color) 15%, transparent);
+}
+.goal-card-status.is-close {
+  --status-color: var(--warning);
+}
+.goal-card-status.is-behind {
+  --status-color: var(--negative);
+}
+
+.goal-card-title {
+  font-size: 20px;
+}
+
+/* Value on the left, sparkline on the right */
+.goal-card-values {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.goal-card-current {
+  display: block;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+.goal-card-target {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.goal-card-trend {
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.goal-card-legend {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+
+/* Insight bullets */
+.goal-card-insights {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+.goal-card-insights li {
+  display: flex;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.goal-card-insights svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent-text);
+}
+
+.goal-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+@media (min-width: 768px) {
+  .goal-card {
+    padding: 24px;
+  }
+}

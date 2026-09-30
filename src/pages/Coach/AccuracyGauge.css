@@ -1,0 +1,60 @@
+/* Accuracy ring: fills up on mount. */
+
+.accuracy-gauge {
+  --tone: var(--teal);
+  position: relative;
+  width: 156px;
+  height: 156px;
+  flex-shrink: 0;
+}
+.accuracy-gauge.is-warn {
+  --tone: #e9c46a;
+}
+.accuracy-gauge.is-bad {
+  --tone: #ec8c82;
+}
+
+.accuracy-gauge svg {
+  width: 100%;
+  height: 100%;
+}
+.accuracy-gauge-track {
+  fill: none;
+  stroke: rgba(246, 251, 251, 0.15);
+  stroke-width: 12;
+}
+.accuracy-gauge-value {
+  fill: none;
+  stroke: var(--tone);
+  stroke-width: 12;
+  stroke-linecap: round;
+  animation: accuracy-gauge-fill 1.1s cubic-bezier(0.3, 1, 0.4, 1);
+}
+@keyframes accuracy-gauge-fill {
+  from {
+    stroke-dashoffset: var(--circumference);
+  }
+}
+
+.accuracy-gauge-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.accuracy-gauge-number {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--tone);
+}
+.accuracy-gauge-number small {
+  font-size: 20px;
+}
+.accuracy-gauge-label {
+  margin-top: 4px;
+  font-weight: 800;
+  font-size: 14px;
+}

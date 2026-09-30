@@ -1,0 +1,84 @@
+/* Playing card faces. Cards stay light in both themes, like real cards. */
+
+.playing-card {
+  --card-w: 44px;
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: var(--card-w);
+  aspect-ratio: 5 / 7;
+  padding: calc(var(--card-w) * 0.08) calc(var(--card-w) * 0.1);
+  border-radius: calc(var(--card-w) * 0.14);
+  background: #fdfefe;
+  color: var(--ink);
+  border: 1px solid rgba(18, 24, 27, 0.12);
+  box-shadow: 0 2px 6px rgba(18, 24, 27, 0.15);
+  flex-shrink: 0;
+}
+
+.playing-card.is-red {
+  color: #c0514a;
+}
+
+/* Sizes */
+.playing-card-xs {
+  --card-w: 24px;
+}
+.playing-card-sm {
+  --card-w: 30px;
+}
+.playing-card-lg {
+  --card-w: 58px;
+}
+@media (min-width: 768px) {
+  .playing-card-lg {
+    --card-w: 70px;
+  }
+}
+
+/* Rank in the top-left corner, suit large in the bottom-right */
+.playing-card-rank {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: calc(var(--card-w) * 0.42);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.playing-card-suit {
+  align-self: flex-end;
+  width: calc(var(--card-w) * 0.5);
+  height: calc(var(--card-w) * 0.5);
+}
+
+/* Card back: slate with a teal diamond lattice and the spade logo */
+.playing-card-back {
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--card-w) * 0.08);
+  background:
+    repeating-linear-gradient(45deg, rgba(127, 200, 194, 0.22) 0 2px, transparent 2px 7px),
+    repeating-linear-gradient(-45deg, rgba(127, 200, 194, 0.22) 0 2px, transparent 2px 7px),
+    var(--slate);
+  border: calc(var(--card-w) * 0.06) solid #fdfefe;
+}
+.playing-card-back-logo {
+  display: grid;
+  place-items: center;
+  width: calc(var(--card-w) * 0.55);
+  height: calc(var(--card-w) * 0.55);
+  border-radius: 30%;
+  background: var(--teal);
+  color: var(--ink);
+}
+.playing-card-back-logo svg {
+  width: 72%;
+  height: 72%;
+}
+
+/* Empty board slot (street not dealt yet) */
+.playing-card-empty {
+  background: transparent;
+  border: 2px dashed rgba(246, 251, 251, 0.3);
+  box-shadow: none;
+}

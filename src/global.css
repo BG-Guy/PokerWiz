@@ -1,0 +1,169 @@
+/* Global styles: theme color tokens, resets and base typography shared by every page.
+   Component-specific styles live next to each component instead. */
+
+/* Light theme (default). Brand palette first, then semantic tokens the components use. */
+:root {
+  --ink: #12181b;
+  --slate: #3f5a60;
+  --teal: #7fc8c2;
+  --mist: #d9f0ee;
+  --snow: #f6fbfb;
+
+  --bg: var(--snow);
+  --surface: #ffffff;
+  --surface-2: var(--mist);
+  --border: #d3e6e4;
+  --text: var(--ink);
+  --text-muted: var(--slate);
+  --text-faint: #6f8a8f;
+  --accent: var(--teal);
+  --accent-soft: rgba(127, 200, 194, 0.3);
+  --accent-text: #2c6e68;
+  --on-accent: var(--ink);
+  --positive: #2c7f74;
+  --negative: #c0514a;
+  --warning: #a86c14;
+  --felt: radial-gradient(ellipse at 50% 0%, #52757c 0%, var(--slate) 55%, #2f454a 100%);
+  --shadow: 0 1px 2px rgba(18, 24, 27, 0.04), 0 8px 24px rgba(18, 24, 27, 0.06);
+
+  --radius: 20px;
+  --radius-sm: 12px;
+  --font-display: 'Fredoka', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+  color-scheme: light;
+}
+
+/* Dark theme: ink background, teal accents. */
+:root[data-theme='dark'] {
+  --bg: var(--ink);
+  --surface: #1a2327;
+  --surface-2: #233238;
+  --border: #2b3b41;
+  --text: var(--snow);
+  --text-muted: #a9c3c5;
+  --text-faint: #7b9498;
+  --accent-soft: rgba(127, 200, 194, 0.15);
+  --accent-text: var(--teal);
+  --positive: var(--teal);
+  --negative: #ec8c82;
+  --warning: #e6b35a;
+  --felt: radial-gradient(ellipse at 50% 0%, #4a6a71 0%, #34494e 55%, #1f2d31 100%);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+  color-scheme: dark;
+}
+
+/* Minimal reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol {
+  margin: 0;
+}
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+img,
+svg {
+  display: block;
+}
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Base typography: playful display font for headings, readable body font for text */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+
+/* Numbers use the display font with fixed-width digits so columns line up */
+.num {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Keyboard focus ring, visible in both themes */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Shared button styles used across pages */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+  background: var(--accent);
+  color: var(--on-accent);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.btn:hover {
+  filter: brightness(1.05);
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--accent-text);
+  padding: 0 10px;
+}
+.btn-ghost:hover {
+  background: var(--accent-soft);
+}
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}

@@ -1,0 +1,49 @@
+/* Hands area tabs: a segmented pill row that scrolls sideways on narrow phones. */
+
+.hands-tabs {
+  display: flex;
+  gap: 6px;
+  margin: -6px 0 16px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+  width: max-content;
+  max-width: 100%;
+}
+.hands-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.hands-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-muted);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.hands-tab:hover {
+  color: var(--text);
+}
+.hands-tab.is-active {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.hands-tab.is-tool {
+  color: var(--accent-text);
+}
+
+/* Desktop shows insights inside Highlights, so the separate tab goes away */
+@media (min-width: 1100px) {
+  .hands-tab.is-compact-only {
+    display: none;
+  }
+}

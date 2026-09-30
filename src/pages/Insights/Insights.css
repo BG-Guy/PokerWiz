@@ -1,0 +1,58 @@
+/* Insights page layout. */
+
+.insights {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.insights-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (min-width: 900px) {
+  .insights-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+.insights-leak-list {
+  display: grid;
+  gap: 12px;
+}
+@media (min-width: 900px) {
+  .insights-leak-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.insights-breakdowns {
+  display: grid;
+  gap: 16px;
+  margin-top: 4px;
+}
+@media (min-width: 900px) {
+  .insights-breakdowns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.insights-panel-note {
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+.insights-panel-note-spaced {
+  margin-top: 20px;
+}
+
+.insights-empty {
+  padding: 16px 0;
+  color: var(--text-muted);
+  font-weight: 600;
+}

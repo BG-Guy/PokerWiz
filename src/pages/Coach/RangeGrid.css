@@ -1,0 +1,25 @@
+/* 13x13 range grid. Cell color = accent mixed in proportion to the weight. */
+
+.range-grid {
+  display: grid;
+  grid-template-columns: repeat(13, minmax(0, 1fr));
+  gap: 2px;
+  width: 100%;
+  max-width: 460px;
+}
+
+.range-grid-cell {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--accent) calc(var(--weight) * 100%), var(--surface-2));
+  color: var(--text-faint);
+  font-size: clamp(6px, 1.9vw, 10px);
+  font-weight: 800;
+  line-height: 1;
+  overflow: hidden;
+}
+.range-grid-cell.is-in {
+  color: var(--ink);
+}

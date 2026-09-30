@@ -1,0 +1,116 @@
+/* Session timeline: icon dots on a vertical line; new entries slide in. */
+
+.session-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.session-timeline-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 12px;
+  padding-bottom: 18px;
+  animation: session-timeline-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+@keyframes session-timeline-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* Connecting line between icons */
+.session-timeline-item::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: 34px;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+.session-timeline-item:last-child {
+  padding-bottom: 0;
+}
+.session-timeline-item:last-child::before {
+  display: none;
+}
+
+.session-timeline-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+.is-start .session-timeline-icon,
+.is-hand .session-timeline-icon {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.is-rebuy .session-timeline-icon {
+  background: color-mix(in srgb, var(--warning) 22%, transparent);
+  color: var(--warning);
+}
+
+.session-timeline-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding-top: 6px;
+}
+.session-timeline-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-faint);
+}
+.session-timeline-offset {
+  color: var(--accent-text);
+}
+
+.session-timeline-text {
+  font-weight: 600;
+}
+.session-timeline-text.is-note {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  white-space: pre-wrap;
+  font-weight: 500;
+}
+
+/* Saved hand row */
+.session-timeline-hand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-weight: 700;
+  transition: border-color 0.15s ease;
+}
+.session-timeline-hand:hover {
+  border-color: var(--accent);
+}
+.session-timeline-hand > span:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.session-timeline-empty {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  border: 2px dashed var(--border);
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 700;
+}

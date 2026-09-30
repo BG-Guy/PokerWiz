@@ -1,0 +1,189 @@
+/* Hand list pane: search, filters, and clickable hand rows. */
+
+.hand-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Search box with a leading icon */
+.hand-list-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  min-height: 46px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-faint);
+}
+.hand-list-search:focus-within {
+  border-color: var(--accent);
+}
+.hand-list-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Session filter pill */
+.hand-list-session {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 8px 8px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  font-size: 14px;
+  font-weight: 700;
+}
+.hand-list-session button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+.hand-list-session button:hover {
+  background: var(--surface);
+}
+
+.hand-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* One hand row: the card holds the hand link (cards | title + meta | result + verdict) and a Coach button */
+.hand-list-row {
+  display: flex;
+  align-items: stretch;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+.hand-list-row:hover {
+  border-color: var(--accent);
+}
+
+.hand-list-item {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  transition: transform 0.15s ease;
+}
+.hand-list-item:active {
+  transform: scale(0.99);
+}
+
+/* Only highlight the selected row where the detail is visible next to it */
+@media (min-width: 1100px) {
+  .hand-list-row.is-selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+}
+
+/* Coach button: a slim column on the right edge of the row */
+.hand-list-coach {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex-shrink: 0;
+  width: 58px;
+  border-left: 1px solid var(--border);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: 11px;
+  font-weight: 800;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.hand-list-coach:hover {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.hand-list-coach.is-disabled {
+  background: var(--bg);
+  color: var(--text-faint);
+  cursor: not-allowed;
+}
+
+.hand-list-coach-score {
+  margin-left: 4px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* Cards overlap a little so four-card PLO hands still fit */
+.hand-list-cards {
+  display: flex;
+}
+.hand-list-cards .playing-card + .playing-card {
+  margin-left: -8px;
+}
+
+.hand-list-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.hand-list-title {
+  font-weight: 700;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.hand-list-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.hand-list-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.hand-list-empty {
+  padding: 24px 8px;
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Rating and tilt peek */
+.hand-list-feel {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.hand-list-feel .star-rating.is-readonly {
+  --star: 13px;
+}

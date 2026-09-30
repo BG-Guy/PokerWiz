@@ -1,0 +1,64 @@
+/* Leak card. Severity sets the accent color. */
+
+.leak-card {
+  --severity-color: var(--accent-text);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--severity-color);
+}
+.leak-card.is-high {
+  --severity-color: var(--negative);
+}
+.leak-card.is-medium {
+  --severity-color: var(--warning);
+}
+.leak-card.is-strength {
+  --severity-color: var(--positive);
+}
+
+.leak-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--severity-color);
+}
+.leak-card-icon {
+  display: grid;
+  place-items: center;
+}
+.leak-card-severity {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.leak-card-title {
+  font-size: 18px;
+}
+
+.leak-card-detail {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.leak-card-action {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  font-size: 14px;
+  font-weight: 700;
+}
+.leak-card-action svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent-text);
+}

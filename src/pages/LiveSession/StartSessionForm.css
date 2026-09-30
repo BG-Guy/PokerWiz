@@ -1,0 +1,132 @@
+/* Start-session form and its felt preview card. */
+
+.start-session-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+@media (min-width: 1000px) {
+  .start-session-layout {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+}
+
+.start-session-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 20px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.start-session-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.start-session-label {
+  padding: 0;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+/* Big money input with a $ prefix */
+.start-session-money {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 18px;
+  min-height: 60px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.start-session-money:focus-within {
+  border-color: var(--accent);
+}
+.start-session-money input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 28px;
+  font-weight: 600;
+  font-family: var(--font-display);
+  color: var(--text);
+}
+
+.start-session-quick {
+  display: flex;
+  gap: 8px;
+}
+
+.start-session-error {
+  color: var(--negative);
+  font-weight: 700;
+}
+
+.start-session-submit {
+  min-height: 56px;
+  font-size: 17px;
+}
+
+/* Felt preview; hidden on phones where it would just repeat the form */
+.start-session-preview {
+  display: none;
+}
+@media (min-width: 1000px) {
+  .start-session-preview {
+    position: sticky;
+    top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 28px;
+    border-radius: var(--radius);
+    background: var(--felt);
+    color: var(--snow);
+    box-shadow: var(--shadow);
+  }
+}
+.start-session-preview-kicker {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--teal);
+}
+.start-session-preview-game {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+}
+.start-session-preview-venue {
+  opacity: 0.8;
+  font-weight: 700;
+}
+.start-session-preview-buyin {
+  margin-top: 24px;
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--teal);
+  line-height: 1;
+}
+.start-session-preview-depth {
+  opacity: 0.8;
+  font-weight: 700;
+}

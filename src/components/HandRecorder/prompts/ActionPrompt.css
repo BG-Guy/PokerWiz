@@ -1,0 +1,164 @@
+/* Action prompt: big action buttons and the bet-sizing panel. */
+
+.action-prompt-pot {
+  margin-left: auto;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text);
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.action-prompt-position {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+/* All options on one row (up to four: fold, call, raise, all in) */
+.action-prompt-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+  gap: 8px;
+}
+.action-prompt-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 60px;
+  border-radius: 16px;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 600;
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+.action-prompt-btn .num {
+  font-size: 14px;
+  opacity: 0.85;
+}
+.action-prompt-btn:active {
+  transform: scale(0.96);
+}
+.action-prompt-btn:hover {
+  filter: brightness(1.05);
+}
+.action-prompt-btn.is-fold {
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+.action-prompt-btn.is-passive {
+  background: var(--accent-soft);
+  color: var(--text);
+  border: 1px solid var(--accent);
+}
+.action-prompt-btn.is-aggressive {
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 6px 16px rgba(127, 200, 194, 0.35);
+}
+
+/* All-in: red, so it never gets pressed by accident */
+.action-prompt-btn.is-allin {
+  background: var(--negative);
+  color: #fff;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--negative) 35%, transparent);
+}
+.action-prompt-allin-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.action-prompt-allin-chip.is-active {
+  background: var(--negative);
+  border-color: var(--negative);
+  color: #fff;
+}
+.btn.action-prompt-allin-confirm {
+  background: var(--negative);
+  color: #fff;
+}
+
+.action-prompt-stack {
+  color: var(--text-faint);
+}
+
+.action-prompt-sizing {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: action-prompt-open 0.25s ease;
+}
+@keyframes action-prompt-open {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* Stepper row: [-] [$ amount] [+] */
+.action-prompt-amount {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) 52px;
+  gap: 8px;
+}
+.action-prompt-step {
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--surface-2);
+  color: var(--text);
+}
+.action-prompt-step:active {
+  transform: scale(0.94);
+}
+.action-prompt-input {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 14px;
+  min-height: 54px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.action-prompt-input:focus-within {
+  border-color: var(--accent);
+}
+.action-prompt-input input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--text);
+  text-align: center;
+}
+
+.action-prompt-hint {
+  color: var(--warning);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.action-prompt-skip {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--accent-text);
+}

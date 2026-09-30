@@ -1,0 +1,87 @@
+/* Goals page: summary banner on top, goal cards in a responsive grid. */
+
+/* Summary banner uses the slate felt so it stands out in both themes */
+.goals-summary {
+  display: grid;
+  gap: 20px;
+  padding: 22px;
+  margin-bottom: 20px;
+  border-radius: var(--radius);
+  background: var(--felt);
+  color: var(--snow);
+  box-shadow: var(--shadow);
+}
+@media (min-width: 768px) {
+  .goals-summary {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 36px;
+    padding: 28px 32px;
+  }
+}
+
+.goals-summary-score {
+  display: flex;
+  flex-direction: column;
+}
+.goals-summary-number {
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--teal);
+}
+.goals-summary-total {
+  font-size: 28px;
+  color: var(--snow);
+  opacity: 0.6;
+}
+.goals-summary-caption {
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.goals-summary-focus {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+@media (min-width: 768px) {
+  .goals-summary-focus {
+    padding-left: 32px;
+    border-left: 1px solid rgba(246, 251, 251, 0.2);
+  }
+}
+.goals-summary-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--teal);
+}
+.goals-summary-focus-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+}
+.goals-summary-focus-text {
+  opacity: 0.85;
+  max-width: 56ch;
+}
+.goals-summary-action {
+  margin-top: 8px;
+}
+
+.goals-grid {
+  display: grid;
+  gap: 16px;
+}
+@media (min-width: 900px) {
+  .goals-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+}

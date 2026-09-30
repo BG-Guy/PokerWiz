@@ -1,0 +1,239 @@
+/* Seat styles. --avatar sets the size; phones get smaller seats so 9-max still fits. */
+
+.seat {
+  --avatar: 40px;
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.25s ease;
+}
+.is-9-max .seat {
+  --avatar: 34px;
+}
+@media (min-width: 640px) {
+  .seat {
+    --avatar: 54px;
+  }
+  .is-9-max .seat {
+    --avatar: 46px;
+  }
+}
+
+/* While someone is on the clock, everyone else steps back a little */
+.has-active .seat:not(.is-active):not(.is-empty) {
+  opacity: 0.75;
+}
+.seat.is-folded {
+  opacity: 0.35 !important;
+}
+
+/* Cards peek out above the avatar */
+.seat-cards {
+  display: flex;
+  gap: 2px;
+  margin-bottom: -10px;
+  z-index: 1;
+}
+.seat-cards .playing-card:first-child {
+  transform: rotate(-6deg);
+}
+.seat-cards .playing-card:last-child {
+  transform: rotate(6deg);
+}
+@media (min-width: 640px) {
+  .seat-cards .playing-card-xs {
+    --card-w: 28px;
+  }
+}
+
+.seat-avatar {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--avatar);
+  height: var(--avatar);
+  border-radius: 50%;
+  border: 3px solid var(--surface);
+  box-shadow: 0 4px 12px rgba(18, 24, 27, 0.3);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.is-hero .seat-avatar {
+  background: var(--teal);
+  color: var(--ink);
+}
+.is-villain .seat-avatar {
+  background: var(--slate);
+  color: #f6c1ba;
+}
+.is-empty .seat-avatar {
+  width: calc(var(--avatar) * 0.72);
+  height: calc(var(--avatar) * 0.72);
+  background: var(--surface-2);
+  color: var(--text-faint);
+  border-style: dashed;
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+/* Name + position pill under the avatar */
+.seat-label {
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: -6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.seat-name {
+  display: none;
+}
+.seat-position {
+  color: var(--text-muted);
+}
+/* Chips behind (or ALL IN in red) */
+.seat-stack {
+  color: var(--text);
+}
+.seat-stack.is-allin {
+  color: var(--negative);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+@media (min-width: 640px) {
+  .seat-label {
+    font-size: 12px;
+  }
+  .seat-name {
+    display: inline;
+  }
+}
+
+/* Selectable seats (setup steps) bob and glow on hover */
+.seat.is-selectable {
+  cursor: pointer;
+}
+.seat.is-selectable .seat-avatar {
+  animation: seat-invite 2s ease-in-out infinite;
+}
+.seat.is-selectable:hover .seat-avatar {
+  transform: scale(1.12);
+  box-shadow: 0 0 0 4px var(--accent-soft), 0 4px 12px rgba(18, 24, 27, 0.3);
+}
+@keyframes seat-invite {
+  50% {
+    box-shadow: 0 0 0 5px var(--accent-soft);
+  }
+}
+
+/* Player on the clock: pulsing teal ring and a "To act" flag */
+.seat.is-active .seat-avatar {
+  transform: scale(1.12);
+  animation: seat-turn 1.4s ease-out infinite;
+}
+@keyframes seat-turn {
+  0% {
+    box-shadow: 0 0 0 0 rgba(127, 200, 194, 0.9), 0 4px 12px rgba(18, 24, 27, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(127, 200, 194, 0), 0 4px 12px rgba(18, 24, 27, 0.3);
+  }
+}
+.seat-flag,
+.seat-bubble {
+  position: absolute;
+  top: 100%;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+  animation: seat-pop 0.3s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.seat-flag {
+  background: var(--teal);
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.seat-bubble {
+  background: var(--ink);
+  color: var(--snow);
+}
+:root[data-theme='dark'] .seat-bubble {
+  background: var(--snow);
+  color: var(--ink);
+}
+.seat-bubble.is-allin,
+:root[data-theme='dark'] .seat-bubble.is-allin {
+  background: var(--negative);
+  color: #fff;
+}
+@keyframes seat-pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* Winner glow after the hand */
+.seat.is-winner .seat-avatar {
+  box-shadow: 0 0 0 4px var(--teal), 0 0 24px rgba(127, 200, 194, 0.8);
+}
+
+/* Bet chips toward the center */
+.seat-bet {
+  position: absolute;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px 2px 3px;
+  border-radius: 999px;
+  background: rgba(18, 24, 27, 0.55);
+  color: var(--snow);
+  font-size: 11px;
+  font-weight: 600;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  animation: seat-pop 0.3s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.seat-bet-chip {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e9c46a;
+  border: 2px dashed #fff8e6;
+}
+
+/* Coach read badge above the seat */
+.seat-badge {
+  position: absolute;
+  bottom: 100%;
+  margin-bottom: 2px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 9px;
+  font-weight: 800;
+  white-space: nowrap;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (min-width: 640px) {
+  .seat-badge {
+    font-size: 11px;
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "pokerwiz",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n web,api -c cyan,magenta \"npm:dev:web\" \"npm:dev:api\"",
+    "dev:web": "vite",
+    "dev:api": "node --disable-warning=ExperimentalWarning --watch server/index.js",
+    "build": "vite build",
+    "start": "node --disable-warning=ExperimentalWarning server/index.js",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "concurrently": "^10.0.5",
+    "vite": "^8.3.1"
+  }
+}

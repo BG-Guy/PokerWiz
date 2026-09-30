@@ -1,0 +1,47 @@
+/* Hand Review page layout: single pane below 1100px, list + detail side by side above. */
+
+/* Phones and tablets: show the list, or the opened hand, never both */
+.hand-review.has-selection .hand-review-header,
+.hand-review.has-selection .hand-review-list {
+  display: none;
+}
+.hand-review:not(.has-selection) .hand-review-detail {
+  display: none;
+}
+
+.hand-review-error {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--negative) 14%, transparent);
+  color: var(--negative);
+  font-weight: 700;
+}
+
+.hand-review-empty {
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+/* Desktop: two panes; the list stays in view while scrolling the hand */
+@media (min-width: 1100px) {
+  .hand-review.has-selection .hand-review-header,
+  .hand-review.has-selection .hand-review-list,
+  .hand-review:not(.has-selection) .hand-review-detail {
+    display: block;
+  }
+
+  .hand-review-layout {
+    display: grid;
+    grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  .hand-review-list {
+    position: sticky;
+    top: 24px;
+  }
+}

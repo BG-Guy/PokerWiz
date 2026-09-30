@@ -1,0 +1,45 @@
+/* Hand recorder layout: table above the question on phones; table left, questions right on desktop. */
+
+.hand-recorder {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+@media (min-width: 1100px) {
+  .hand-recorder {
+    grid-template-columns: minmax(0, 1.5fr) minmax(340px, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+  .hand-recorder-table {
+    position: sticky;
+    top: 24px;
+  }
+}
+
+.hand-recorder-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Collapsible list of every recorded step */
+.hand-recorder-log {
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.hand-recorder-log summary {
+  cursor: pointer;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+.hand-recorder-log ol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 14px;
+}

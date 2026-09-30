@@ -1,0 +1,28 @@
+/* Verdict badge colors. Tints are mixed from the theme tokens so they work in both themes. */
+
+.verdict-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.verdict-badge.is-good {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.verdict-badge.is-mistake {
+  background: color-mix(in srgb, var(--negative) 16%, transparent);
+  color: var(--negative);
+}
+.verdict-badge.is-cooler {
+  background: color-mix(in srgb, var(--slate) 22%, transparent);
+  color: var(--text-muted);
+}
+.verdict-badge.is-review {
+  background: color-mix(in srgb, var(--warning) 18%, transparent);
+  color: var(--warning);
+}

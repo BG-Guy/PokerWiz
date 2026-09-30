@@ -1,0 +1,159 @@
+/* Dashboard layout: stat row on top, then a grid of panels (stacked on phones, 2 columns on desktop). */
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .dashboard-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+}
+
+/* Desktop: chart and sessions on the left, goals and hand on the right */
+@media (min-width: 1100px) {
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 20px;
+  }
+}
+
+.dashboard-empty {
+  padding: 32px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+/* Goal snapshot */
+.dashboard-goal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.dashboard-goal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dashboard-goal-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 700;
+}
+.dashboard-goal-pct {
+  color: var(--text-muted);
+}
+.dashboard-goal-status {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent-text);
+}
+.dashboard-goal-status.is-close {
+  color: var(--warning);
+}
+.dashboard-goal-status.is-behind {
+  color: var(--negative);
+}
+
+/* Recent sessions list */
+.dashboard-session-list {
+  display: flex;
+  flex-direction: column;
+}
+.dashboard-session {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+.dashboard-session:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.dashboard-session-date {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+.dashboard-session-date .num {
+  font-size: 15px;
+  color: var(--text);
+}
+.dashboard-session-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.dashboard-session-game {
+  font-weight: 700;
+}
+.dashboard-session-meta {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Hand-to-review card on felt */
+.dashboard-hand-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border-radius: var(--radius-sm);
+  background: var(--felt);
+  color: var(--snow);
+  transition: transform 0.2s ease;
+}
+.dashboard-hand-card:hover {
+  transform: translateY(-2px);
+}
+.dashboard-hand-cards {
+  display: flex;
+  gap: 8px;
+}
+.dashboard-hand-cards .playing-card:nth-child(odd) {
+  transform: rotate(-4deg);
+}
+.dashboard-hand-cards .playing-card:nth-child(even) {
+  transform: rotate(4deg);
+}
+.dashboard-hand-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.dashboard-hand-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.dashboard-hand-meta {
+  font-size: 13px;
+  opacity: 0.8;
+}
+.dashboard-hand-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--teal);
+}

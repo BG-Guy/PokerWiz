@@ -1,0 +1,98 @@
+/* Modal: bottom sheet that slides up on phones, centered pop-in card from 640px. */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(18, 24, 27, 0.55);
+  backdrop-filter: blur(3px);
+  animation: modal-fade 0.2s ease;
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 88dvh;
+  border-radius: 24px 24px 0 0;
+  background: var(--surface);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.25);
+  padding-bottom: env(safe-area-inset-bottom);
+  outline: none;
+  animation: modal-sheet-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+
+/* Drag-handle look at the top of the sheet */
+.modal-grabber {
+  align-self: center;
+  width: 40px;
+  height: 5px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: var(--border);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px 8px;
+}
+.modal-title {
+  font-size: 20px;
+}
+.modal-close {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface-2);
+}
+
+.modal-body {
+  padding: 8px 20px 20px;
+  overflow-y: auto;
+}
+
+@media (min-width: 640px) {
+  .modal-backdrop {
+    align-items: center;
+    padding: 24px;
+  }
+  .modal {
+    max-width: 560px;
+    border-radius: var(--radius);
+    animation: modal-pop-in 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  }
+  .modal-grabber {
+    display: none;
+  }
+  .modal-header {
+    padding: 20px 24px 8px;
+  }
+  .modal-body {
+    padding: 8px 24px 24px;
+  }
+}
+
+@keyframes modal-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes modal-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes modal-pop-in {
+  from {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+}

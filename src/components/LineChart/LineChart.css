@@ -1,0 +1,72 @@
+/* Line chart and sparkline styles. */
+
+.line-chart-plot {
+  position: relative;
+  width: 100%;
+}
+.line-chart-plot svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Keep the stroke width constant no matter how far the SVG stretches */
+.line-chart-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.is-compact .line-chart-line {
+  stroke-width: 2;
+}
+
+.line-chart-zero {
+  stroke: var(--border);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Latest-value marker */
+.line-chart-dot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid var(--surface);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+.is-compact .line-chart-dot {
+  width: 8px;
+  height: 8px;
+  border-width: 2px;
+  box-shadow: none;
+}
+
+/* Y-axis labels float over the plot corners */
+.line-chart-y {
+  position: absolute;
+  left: 0;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+.line-chart-y-max {
+  top: 0;
+}
+.line-chart-y-min {
+  bottom: 0;
+}
+
+.line-chart-x {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-faint);
+}

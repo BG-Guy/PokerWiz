@@ -1,0 +1,12 @@
+/* Win/loss coloring for money amounts. */
+
+.money {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.money.is-positive {
+  color: var(--positive);
+}
+.money.is-negative {
+  color: var(--negative);
+}

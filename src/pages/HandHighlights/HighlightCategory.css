@@ -1,0 +1,102 @@
+/* Highlight award card. Each category gets its own icon color. */
+
+.highlight-category {
+  --tone: var(--accent-text);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.highlight-category.is-worst,
+.highlight-category.is-bigLoss,
+.highlight-category.is-allin {
+  --tone: var(--negative);
+}
+.highlight-category.is-tilt,
+.highlight-category.is-preflop {
+  --tone: var(--warning);
+}
+
+.highlight-category-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.highlight-category-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--tone) 16%, transparent);
+  color: var(--tone);
+}
+.highlight-category-title {
+  font-size: 19px;
+}
+.highlight-category-subtitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.highlight-category-empty {
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 2px dashed var(--border);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+
+.highlight-category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.highlight-entry {
+  display: grid;
+  grid-template-columns: 22px auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: var(--bg);
+  color: var(--text);
+  transition: background-color 0.15s ease;
+}
+.highlight-entry:hover {
+  background: var(--accent-soft);
+}
+.highlight-entry-rank {
+  font-weight: 700;
+  color: var(--tone);
+  text-align: center;
+}
+.highlight-entry-cards {
+  display: flex;
+  gap: 2px;
+}
+.highlight-entry-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.highlight-entry-title {
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.highlight-entry-stat {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}

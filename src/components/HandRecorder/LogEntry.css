@@ -1,0 +1,36 @@
+/* A single hand-log line. */
+
+.log-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-weight: 700;
+}
+.log-entry-icon {
+  flex-shrink: 0;
+}
+.log-entry.is-hero .log-entry-icon {
+  color: var(--accent-text);
+}
+.log-entry.is-villain .log-entry-icon {
+  color: var(--negative);
+}
+.log-entry-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.log-entry-cards {
+  display: inline-flex;
+  gap: 3px;
+}
+
+/* All-in steps are called out in red */
+.log-entry.is-allin .log-entry-text {
+  color: var(--negative);
+}
+.log-entry-allin {
+  flex-shrink: 0;
+  color: var(--negative);
+}

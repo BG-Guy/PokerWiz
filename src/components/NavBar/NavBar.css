@@ -1,0 +1,175 @@
+/* Navigation styles for all three layouts (phone tabs, tablet rail, desktop sidebar). */
+
+/* Phone: fixed bottom tab bar */
+.navbar {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 30;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.navbar-brand,
+.navbar-footer,
+.navbar-item-wide {
+  display: none;
+}
+
+.navbar-links {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.navbar-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 4px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-faint);
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+/* Pill behind the icon marks the current tab */
+.navbar-link-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 30px;
+  border-radius: 999px;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.navbar-link.active {
+  color: var(--accent-text);
+}
+.navbar-link.active .navbar-link-icon {
+  background: var(--accent-soft);
+}
+
+/* Phone: the Play button is a raised teal circle in the middle of the bar */
+.navbar-link.is-primary .navbar-link-icon,
+.navbar-link.is-primary.active .navbar-link-icon {
+  width: 54px;
+  height: 54px;
+  margin-top: -26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 6px 18px rgba(127, 200, 194, 0.45), 0 0 0 5px var(--surface);
+}
+.navbar-link.is-primary:active .navbar-link-icon {
+  transform: scale(0.94);
+}
+
+/* Tablet: sticky vertical icon rail with every section */
+@media (min-width: 768px) {
+  .navbar {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding: 24px 14px;
+    border-top: 0;
+    border-right: 1px solid var(--border);
+  }
+
+  .navbar-brand {
+    display: flex;
+    justify-content: center;
+  }
+  .navbar-brand .brand-name {
+    display: none;
+  }
+
+  .navbar-links {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .navbar-item-wide {
+    display: block;
+  }
+  .navbar-item-more {
+    display: none;
+  }
+
+  .navbar-link {
+    flex-direction: row;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  .navbar-link:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .navbar-link.active {
+    background: var(--accent-soft);
+  }
+  .navbar-link-icon,
+  .navbar-link.active .navbar-link-icon {
+    width: auto;
+    height: auto;
+    background: none;
+  }
+  .navbar-link-label {
+    display: none;
+  }
+
+  /* Play becomes a solid accent button in the rail/sidebar */
+  .navbar-link.is-primary,
+  .navbar-link.is-primary:hover {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .navbar-link.is-primary .navbar-link-icon,
+  .navbar-link.is-primary.active .navbar-link-icon {
+    width: auto;
+    height: auto;
+    margin: 0;
+    background: none;
+    box-shadow: none;
+    color: inherit;
+  }
+
+  .navbar-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: auto;
+  }
+}
+
+/* Desktop: full-width sidebar with labels */
+@media (min-width: 1100px) {
+  .navbar {
+    padding: 28px 18px;
+  }
+  .navbar-brand {
+    justify-content: flex-start;
+    padding: 0 10px;
+  }
+  .navbar-brand .brand-name {
+    display: inline;
+  }
+  .navbar-link {
+    justify-content: flex-start;
+    padding: 12px 14px;
+  }
+  .navbar-link-label {
+    display: inline;
+  }
+  .navbar-footer {
+    justify-content: flex-start;
+  }
+}

@@ -1,0 +1,104 @@
+/* Saved-hand review header: title, assumptions and read chips. */
+
+.review-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 880px;
+  margin: 0 auto 16px;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: opacity 0.2s ease;
+}
+.review-setup.is-busy {
+  opacity: 0.75;
+}
+
+.review-setup-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+.review-setup-kicker {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-text);
+}
+.review-setup-title {
+  font-size: 20px;
+}
+
+.review-setup-assumptions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--warning) 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--warning) 35%, transparent);
+}
+.review-setup-assumptions li {
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.review-setup-assumptions svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--warning);
+}
+
+.review-setup-reads {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.review-setup-read {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.review-setup-read-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 800;
+}
+.review-setup-chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px;
+}
+.review-setup-chips::-webkit-scrollbar {
+  display: none;
+}
+.review-setup-chips .filter-chip {
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.review-setup-status {
+  min-height: 1.4em;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-text);
+}
+
+@media (min-width: 768px) {
+  .review-setup {
+    padding: 22px 24px;
+  }
+}

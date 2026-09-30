@@ -1,0 +1,75 @@
+/* Highlights peek on the home page. */
+
+.highlights-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.highlights-preview-item {
+  --tone: var(--accent-text);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--bg);
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.highlights-preview-item:hover {
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+.highlights-preview-item.is-bigLoss,
+.highlights-preview-item.is-worst,
+.highlights-preview-item.is-allin {
+  --tone: var(--negative);
+}
+.highlights-preview-item.is-tilt {
+  --tone: var(--warning);
+}
+
+.highlights-preview-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--tone) 16%, transparent);
+  color: var(--tone);
+}
+.highlights-preview-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.highlights-preview-award {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--tone);
+}
+.highlights-preview-title {
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.highlights-preview-stat {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.highlights-preview-cards {
+  display: flex;
+  gap: 2px;
+}
+
+.highlights-preview-empty {
+  padding: 20px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 700;
+}

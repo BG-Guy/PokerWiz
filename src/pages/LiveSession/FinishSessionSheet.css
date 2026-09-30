@@ -1,0 +1,88 @@
+/* Finish-session form inside the modal. */
+
+.finish-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.finish-sheet-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.finish-sheet-label {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.finish-sheet-money {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 18px;
+  min-height: 62px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.finish-sheet-money:focus-within {
+  border-color: var(--accent);
+}
+.finish-sheet-money input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--text);
+}
+
+.finish-sheet-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.finish-sheet-net {
+  font-size: 22px;
+}
+
+.finish-sheet-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  resize: vertical;
+}
+.finish-sheet-input:focus {
+  outline: 0;
+  border-color: var(--accent);
+}
+
+.finish-sheet-error {
+  color: var(--negative);
+  font-weight: 700;
+}
+
+.finish-sheet-submit {
+  min-height: 54px;
+  font-size: 16px;
+}
+
+.finish-sheet-hands {
+  margin-top: -10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}

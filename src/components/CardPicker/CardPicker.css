@@ -1,0 +1,91 @@
+/* Card picker grid. Phones: 13 rank rows x 4 suit columns. From 640px: 4 suit rows x 13 rank columns. */
+
+.card-picker-modal {
+  max-width: 720px;
+}
+
+.card-picker-selected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.card-picker-selected-cards {
+  display: flex;
+  gap: 6px;
+}
+/* Empty placeholders here sit on a light surface, not felt */
+.card-picker-selected .playing-card-empty {
+  border-color: var(--border);
+}
+.card-picker-count {
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.card-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.card-picker-cell {
+  grid-row: calc(var(--rank) + 1);
+  grid-column: calc(var(--suit) + 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 44px;
+  border-radius: 10px;
+  background: #fdfefe;
+  color: var(--ink);
+  border: 1px solid rgba(18, 24, 27, 0.12);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.card-picker-cell.is-red {
+  color: #c0514a;
+}
+.card-picker-cell:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+.card-picker-cell.is-picked {
+  outline: 3px solid var(--accent);
+  outline-offset: 1px;
+  transform: translateY(-2px);
+}
+.card-picker-cell:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+.card-picker-suit {
+  width: 16px;
+  height: 16px;
+}
+
+.card-picker-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+/* Wider screens: suits as rows, ranks as columns; cells become small upright cards */
+@media (min-width: 640px) {
+  .card-picker-grid {
+    grid-template-columns: repeat(13, 1fr);
+  }
+  .card-picker-cell {
+    grid-row: calc(var(--suit) + 1);
+    grid-column: calc(var(--rank) + 1);
+    flex-direction: column;
+    gap: 2px;
+    min-height: 58px;
+    font-size: 15px;
+  }
+}

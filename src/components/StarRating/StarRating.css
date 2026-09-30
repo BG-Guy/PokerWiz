@@ -1,0 +1,129 @@
+/* Draggable star rating. --star sets the size of one star; the track is five stars wide. */
+
+.star-rating {
+  --star: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+/* Touch screens: bigger targets */
+.star-rating.is-touch {
+  --star: 54px;
+}
+
+.star-rating-track {
+  position: relative;
+  display: block;
+  width: calc(var(--star) * 5);
+  height: var(--star);
+  cursor: pointer;
+  /* Let vertical swipes scroll the page; horizontal drags go to the rating */
+  touch-action: pan-y;
+  border-radius: 12px;
+}
+
+.star-rating-empty,
+.star-rating-full {
+  display: flex;
+  width: calc(var(--star) * 5);
+  height: var(--star);
+}
+.star-rating-empty svg,
+.star-rating-full svg {
+  width: var(--star);
+  height: var(--star);
+  flex-shrink: 0;
+}
+.star-rating-empty path {
+  fill: var(--surface-2);
+  stroke: var(--border);
+  stroke-width: 1;
+}
+.star-rating-full path {
+  fill: var(--accent);
+  stroke: var(--accent);
+  stroke-width: 1;
+}
+
+/* The filled row is clipped to the rating width */
+.star-rating-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Thumb line and floating value bubble */
+.star-rating-thumb {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--text);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+.star-rating-bubble {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%) scale(0.8);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.star-rating-track:hover .star-rating-thumb,
+.is-dragging .star-rating-thumb {
+  opacity: 0.8;
+}
+.is-dragging .star-rating-bubble,
+.star-rating-track:hover .star-rating-bubble {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+/* On touch the finger covers the stars, so lift the bubble higher */
+.is-touch .star-rating-bubble {
+  bottom: calc(100% + 28px);
+  font-size: 18px;
+  padding: 6px 14px;
+}
+
+.star-rating-readout {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.star-rating-value {
+  font-size: 28px;
+  font-weight: 600;
+}
+.star-rating-label {
+  font-weight: 800;
+  color: var(--accent-text);
+}
+.star-rating-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+
+/* Small static version */
+.star-rating.is-readonly {
+  --star: 16px;
+  display: inline-flex;
+  vertical-align: middle;
+}
+.is-readonly .star-rating-track {
+  cursor: default;
+}

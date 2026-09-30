@@ -1,0 +1,109 @@
+/* Player row: cards on the left, equity on the right. The leading hand gets an accent outline. */
+
+.equity-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  animation: equity-row-in 0.3s ease;
+}
+@keyframes equity-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.equity-row.is-leader {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.equity-row-cards {
+  display: flex;
+  gap: 6px;
+}
+
+.equity-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.equity-row-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.equity-row-name {
+  font-weight: 800;
+}
+.equity-row-tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+.equity-row-tag.is-made {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.equity-row-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+.equity-row-equity {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1;
+  transition: opacity 0.2s ease;
+}
+.equity-row-split {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+/* Dim numbers while a new result is being calculated */
+.is-stale .equity-row-equity,
+.is-stale .equity-row-bar span {
+  opacity: 0.45;
+}
+
+.equity-row-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.equity-row-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.5s cubic-bezier(0.3, 1, 0.4, 1), opacity 0.2s ease;
+}
+
+.equity-row-remove {
+  align-self: start;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--text-faint);
+}
+.equity-row-remove:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}

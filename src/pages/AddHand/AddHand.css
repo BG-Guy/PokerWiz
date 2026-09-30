@@ -1,0 +1,11 @@
+/* Add Hand page: only the header spacing; the recorder has its own layout styles. */
+
+/* Phones: drop the subtitle so the question stays in view under the table */
+@media (max-width: 639px) {
+  .add-hand .page-header {
+    margin-bottom: 4px;
+  }
+  .add-hand .page-header-subtitle {
+    display: none;
+  }
+}

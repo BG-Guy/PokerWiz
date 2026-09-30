@@ -1,0 +1,132 @@
+/* Action replay: a vertical timeline with one block per street. */
+
+.action-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Each street hangs off a vertical line with a dot */
+.action-timeline-street {
+  position: relative;
+  padding: 0 0 20px 24px;
+}
+.action-timeline-street::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 14px;
+  bottom: -2px;
+  width: 2px;
+  background: var(--border);
+}
+.action-timeline-street:last-child {
+  padding-bottom: 0;
+}
+.action-timeline-street:last-child::before {
+  display: none;
+}
+.action-timeline-street::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.action-timeline-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.action-timeline-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+}
+.action-timeline-cards {
+  display: flex;
+  gap: 4px;
+}
+.action-timeline-pot {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.action-timeline-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* One action: seat chip, verb, amount */
+.action-timeline-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  font-size: 14px;
+}
+.action-timeline-action.is-hero {
+  background: var(--accent-soft);
+}
+.action-timeline-actor {
+  min-width: 44px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+.is-hero .action-timeline-actor {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.action-timeline-verb {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.action-timeline-amount {
+  margin-left: auto;
+  font-weight: 600;
+}
+
+/* All-in: red tint, red edge, red "!!" icon and bold red wording */
+.action-timeline-action.is-allin {
+  background: color-mix(in srgb, var(--negative) 14%, transparent);
+  box-shadow: inset 3px 0 0 var(--negative);
+}
+.is-allin .action-timeline-verb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--negative);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.action-timeline-allin-icon {
+  animation: action-timeline-allin-pop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+@keyframes action-timeline-allin-pop {
+  from {
+    transform: scale(0.4) rotate(-20deg);
+  }
+}
+.is-allin .action-timeline-amount {
+  color: var(--negative);
+  font-weight: 700;
+}
+.is-allin .action-timeline-actor {
+  background: var(--negative);
+  color: #fff;
+}

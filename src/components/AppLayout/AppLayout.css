@@ -1,0 +1,58 @@
+/* App shell layout: one column on phones, icon rail on tablets, full sidebar on desktop. */
+
+.app-layout {
+  display: grid;
+  /* minmax(0, 1fr) stops wide content (e.g. scrolling chip rows) from stretching the page sideways */
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+.app-column {
+  min-width: 0;
+}
+
+/* Page area: leaves room at the bottom for the mobile tab bar */
+.app-main {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px 16px calc(96px + env(safe-area-inset-bottom));
+}
+
+/* Sticky mobile header with a frosted background */
+.app-mobile-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Tablet: narrow icon rail on the left */
+@media (min-width: 768px) {
+  .app-layout {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
+  .app-mobile-header {
+    display: none;
+  }
+  .app-main {
+    padding: 32px 32px 48px;
+  }
+}
+
+/* Desktop: full sidebar with labels */
+@media (min-width: 1100px) {
+  .app-layout {
+    grid-template-columns: 248px minmax(0, 1fr);
+  }
+  .app-main {
+    padding: 40px 48px 56px;
+  }
+}

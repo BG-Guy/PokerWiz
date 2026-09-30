@@ -1,0 +1,274 @@
+/* Prompt carousel animations, plus the shared building blocks every prompt uses (.prompt-*). */
+
+.prompt-carousel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+
+/* Row with the answered step and the Undo button */
+.prompt-carousel-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 34px;
+}
+.prompt-carousel-prev {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 13px;
+  opacity: 0.7;
+}
+.prompt-carousel-check {
+  flex-shrink: 0;
+  color: var(--accent-text);
+}
+.prompt-carousel-undo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+.prompt-carousel-undo:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+/* The active question card */
+.prompt-carousel-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+/* Forward: new card rises from below; the answered one shrinks up into the pill */
+.is-forward .prompt-carousel-card {
+  animation: prompt-enter-up 0.42s cubic-bezier(0.2, 0.9, 0.25, 1.05);
+}
+.is-forward .prompt-carousel-prev {
+  animation: prompt-prev-up 0.42s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+/* Back (Undo): the card drops in from above */
+.is-back .prompt-carousel-card {
+  animation: prompt-enter-down 0.36s cubic-bezier(0.2, 0.9, 0.25, 1.05);
+}
+.is-back .prompt-carousel-prev {
+  animation: prompt-fade 0.3s ease;
+}
+
+@keyframes prompt-enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(70px) scale(0.98);
+  }
+}
+@keyframes prompt-prev-up {
+  from {
+    opacity: 1;
+    transform: translateY(60px) scale(1.08);
+  }
+}
+@keyframes prompt-enter-down {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.98);
+  }
+}
+@keyframes prompt-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Shared prompt content */
+.prompt-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-text);
+}
+.prompt-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+}
+.prompt-text {
+  margin-top: -6px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.prompt-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.prompt-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.prompt-actions .btn {
+  min-height: 48px;
+  padding: 0 22px;
+}
+.prompt-field-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+/* Player rows used by the villain-cards and showdown prompts */
+.prompt-player-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.prompt-player-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.prompt-player-row.is-selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.prompt-player-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+.prompt-player-avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+}
+.prompt-player-avatar.is-hero {
+  background: var(--teal);
+  color: var(--ink);
+}
+.prompt-player-avatar.is-villain {
+  background: var(--slate);
+  color: #f6c1ba;
+}
+.prompt-player-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.prompt-player-meta {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.prompt-player-cards {
+  display: flex;
+  gap: 4px;
+}
+.prompt-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.prompt-slots {
+  display: flex;
+  gap: 8px;
+}
+
+/* Text inputs inside prompts */
+.prompt-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  resize: vertical;
+}
+.prompt-input:focus {
+  outline: 0;
+  border-color: var(--accent);
+}
+
+/* Compact money input in a player row (stacks step) */
+.prompt-stack-input {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: 116px;
+  flex-shrink: 0;
+  padding: 0 10px;
+  min-height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.prompt-stack-input:focus-within {
+  border-color: var(--accent);
+}
+.prompt-stack-input input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--text);
+}
+
+/* Stacks step: row wraps so the depth chips sit under the name and amount */
+.stack-row {
+  flex-wrap: wrap;
+}
+.stack-row-depths {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+}
+.stack-row-depths .filter-chip {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+}

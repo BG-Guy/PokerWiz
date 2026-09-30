@@ -1,0 +1,88 @@
+// One session in Game History. Tapping it expands buy-in, cash-out, notes and a link to its hands.
+import { Link } from 'react-router-dom';
+import { sessionProfit } from '../../utils/stats.js';
+import { formatDuration, formatMoney, formatWeekday, parseDate } from '../../utils/format.js';
+import Money from '../../components/Money/Money.jsx';
+import Icon from '../../components/Icon/Icon.jsx';
+import StarRating from '../../components/StarRating/StarRating.jsx';
+import TiltMeter from '../../components/TiltMeter/TiltMeter.jsx';
+import './SessionRow.css';
+
+export default function SessionRow({ session, handCount, isOpen, onToggle }) {
+  const profit = sessionProfit(session);
+  const hourly = profit / (session.durationMin / 60);
+  const detailsId = `session-details-${session.id}`;
+
+  return (
+    <li className={`session-row ${isOpen ? 'is-open' : ''}`}>
+      {/* Summary line: date | game + venue | hands | result */}
+      <button type="button" className="session-row-summary" onClick={onToggle} aria-expanded={isOpen} aria-controls={detailsId}>
+        <span className="session-row-date">
+          <span className="session-row-day num">{parseDate(session.date).getDate()}</span>
+          <span className="session-row-weekday">{formatWeekday(session.date)}</span>
+        </span>
+        <span className="session-row-main">
+          <span className="session-row-game">
+            {session.game} {session.stakes}
+          </span>
+          <span className="session-row-meta">
+            {session.venue} · {formatDuration(session.durationMin)}
+          </span>
+        </span>
+        <span className="session-row-hands num">{session.hands} hands</span>
+        <Money amount={profit} className="session-row-result" />
+        <Icon name="chevronDown" size={18} className="session-row-chevron" />
+      </button>
+
+      {/* Expanded details */}
+      {isOpen && (
+        <div className="session-row-details" id={detailsId}>
+          <dl className="session-row-stats">
+            <div>
+              <dt>Buy-in</dt>
+              <dd className="num">{formatMoney(session.buyIn, { sign: false })}</dd>
+            </div>
+            <div>
+              <dt>Cash-out</dt>
+              <dd className="num">{formatMoney(session.cashOut, { sign: false })}</dd>
+            </div>
+            <div>
+              <dt>Hourly</dt>
+              <dd className="num">{formatMoney(Math.round(hourly))}/h</dd>
+            </div>
+            <div>
+              <dt>Big blinds</dt>
+              <dd className="num">{(profit / session.bigBlind).toFixed(0)} bb</dd>
+            </div>
+          </dl>
+
+          {/* How the session felt: star rating and tilt level (recorded when finishing a live session) */}
+          {(session.rating != null || session.tilt != null) && (
+            <div className="session-row-feel">
+              {session.rating != null && (
+                <span className="session-row-feel-item">
+                  <StarRating value={session.rating} readOnly label="Session rating" />
+                  <span className="num">{session.rating.toFixed(1)}</span>
+                </span>
+              )}
+              {session.tilt != null && (
+                <span className="session-row-feel-item">
+                  <span className="session-row-feel-label">Tilt</span>
+                  <TiltMeter value={session.tilt} readOnly />
+                </span>
+              )}
+            </div>
+          )}
+
+          {session.notes && <p className="session-row-notes">{session.notes}</p>}
+          {handCount > 0 && (
+            <Link to={`/hands?session=${session.id}`} className="btn session-row-link">
+              Review {handCount} saved {handCount === 1 ? 'hand' : 'hands'}
+              <Icon name="chevronRight" size={16} />
+            </Link>
+          )}
+        </div>
+      )}
+    </li>
+  );
+}

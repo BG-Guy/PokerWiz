@@ -1,0 +1,28 @@
+/* Card container used for most page sections. */
+
+.panel {
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  min-width: 0;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.panel-title {
+  font-size: 19px;
+}
+
+@media (min-width: 768px) {
+  .panel {
+    padding: 24px;
+  }
+}

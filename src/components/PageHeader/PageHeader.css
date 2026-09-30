@@ -1,0 +1,33 @@
+/* Page title block. */
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: 20px;
+}
+
+.page-header-title {
+  font-size: clamp(26px, 6vw, 38px);
+  font-weight: 700;
+}
+
+.page-header-subtitle {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.page-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .page-header {
+    margin-bottom: 28px;
+  }
+}

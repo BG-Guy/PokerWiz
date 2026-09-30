@@ -1,0 +1,42 @@
+/* Filter pill row. */
+
+.filter-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px;
+}
+.filter-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.filter-chip:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+.filter-chip.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.filter-chip-count {
+  font-size: 12px;
+  opacity: 0.7;
+}

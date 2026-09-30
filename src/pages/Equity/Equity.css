@@ -1,0 +1,96 @@
+/* Equity Calculator layout: board on top (left on desktop), players below (right on desktop). */
+
+.equity-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+@media (min-width: 1000px) {
+  .equity-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 24px;
+    align-items: start;
+  }
+  .equity-board {
+    position: sticky;
+    top: 24px;
+  }
+}
+
+/* Felt board. Card size follows the board's width via container units. */
+.equity-board {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: var(--radius);
+  background: var(--felt);
+  color: var(--snow);
+  box-shadow: var(--shadow);
+}
+.equity-board .card-slot-lg {
+  --card-w: min(72px, 17cqi);
+}
+.equity-board .card-slot-empty {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(246, 251, 251, 0.35);
+  color: rgba(246, 251, 251, 0.7);
+}
+
+.equity-board-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.equity-board-street {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+}
+.equity-board-clear {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--teal);
+}
+.equity-board-cards {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.equity-players {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.equity-player-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.equity-add-player {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  border-radius: 18px;
+  border: 2px dashed var(--border);
+  font-weight: 800;
+  color: var(--text-muted);
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.equity-add-player:hover {
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.equity-status {
+  min-height: 1.5em;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-faint);
+}
