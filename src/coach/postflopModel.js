@@ -64,7 +64,7 @@ export function continueThreshold({ required, sizeRatio, defenders = 1, params, 
 export function minimumDefense({ sizeRatio, defenders = 1, params, rangeEdge = false }) {
   const theory = mdf({ pot: 1, risk: Math.max(0, sizeRatio), defenders });
   const factor = clamp((0.62 + 0.33 * (params.skill ?? 0.5)) / Math.sqrt(params.foldMult), 0.3, 1);
-  return Math.min(0.95, theory * factor * (rangeEdge ? 1.25 : 1));
+  return Math.min(0.95, theory * factor * (rangeEdge ? 1.4 : 1));
 }
 
 // Continue cutoff with the defense floor applied: if the price-based cutoff would fold more than the

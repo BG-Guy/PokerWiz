@@ -130,7 +130,7 @@ export function modelParams(profile, imageOf = null) {
   let foldMult = clamp(1.3 - 0.8 * L, 0.45, 1.35);
   foldMult = lerp(foldMult, 1, 0.6 * S) * (0.75 + 0.25 * S);
   let noise = 0.05 + 0.13 * (1 - S);
-  let bigBluffShy = clamp((0.7 - S) / 0.5, 0, 1);
+  let bigBluffShy = clamp((0.45 - S) / 0.35, 0, 1); // beginners 1, recreational ~0.65, regulars and up 0
   const drawSkill = clamp((S - 0.05) / 0.65, 0, 1);
   let drawAggro = lerp(0.15, 1, drawSkill ** 1.5);
 
