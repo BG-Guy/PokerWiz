@@ -75,12 +75,12 @@ For every combo on the board, the coach computes three numbers:
 - **Value region** starts at `0.97 - 0.42 * exp(-0.9 * size/pot)`: about 0.66 for a third-pot bet, 0.80 for a pot bet, 0.90 at 2x pot. Raises add 0.10, and multiway adds 0.03 per extra player.
 - **Bluffs** are assumed at `0.75 * required / foldMult`. Populations under-bluff big bets. Stations (low `foldMult`) believe you bluff more; nits believe you bluff less.
 - **Threshold** to continue: `valueStart + (1 - valueStart) * (required - bluffs) / (1 - bluffs)`. If they believe you bluff at least as often as the required equity, anything that beats air calls, but the floor still rises with bet size: `0.25 + 0.3 * size/pot * foldMult + 0.1 * required`. A station calls a third-pot bet with bottom pair, not a 2x-pot overbet.
-- MDF (`pot / (pot + bet)`) is kept in the code as the theoretical benchmark.
+- **Defense floor:** whatever the price says, a player never folds more than their skill allows. They defend at least MDF (`pot / (pot + bet)`) times `(0.62 + 0.33 * skill) / sqrt(foldMult)`, and 25% more (up to 95%) when they hold the stronger range: led into as the previous street's aggressor, or raised after betting. Without this floor, a regular folded 40-55% to small leads and check-raises, which made bluffing them look far too good.
 
 **Nobody has bet.**
 
 - **Value threshold** follows the same size curve, shifted by aggression.
-- **Bluffs:** air bluffs scale with `bluffMult`, and draws semi-bluff.
+- **Bluffs are sized to value.** When the player's range is known (always, during a review), bluffs are set so the betting range holds `size / (1 + size)` bluffs per value hand, about 1 bluff per 2 value bets at 75% pot on the river, and 30% more on earlier streets. That's scaled by `bluffMult / 1.15` (an average player is balanced) and by the big-bluff factor. Semi-bluffs with draws count first; air fills the rest. Before this, bluffs were a flat rate per weak hand, so a range that had already checked (mostly weak hands) came out as mostly bluffs on the river, and a big flop bet came out as almost pure value.
 - **Donk bets** are rare. A player acting before the previous street's aggressor rarely leads into them: bet frequency x0.12 for pros, up to x0.47 for amateurs. That's why checking to the raiser tells you almost nothing.
 
 **Raises.** The raise threshold follows the size curve too, so an all-in check-raise means close to the nuts. Raise edges are sharper than call edges, and calls facing a raise are sharper again.
@@ -92,13 +92,14 @@ For every combo on the board, the coach computes three numbers:
 | Fold | 0 |
 | Check | `eq * R * pot + future / 2` |
 | Call | `eq * R * (pot + call) - call + future` |
-| Bet / raise to X | `P(all fold) * pot + P(called) * (eqCalled * R * potCalled - chips added + future)` |
+| Bet / raise to X | `P(all fold) * pot + P(continue) * [(1 - r) * (eqVsCallers * R * potCalled - chips added + future) + r * (-chips added)]` |
 
 - **Bet sizes compared:** 33%, 50%, 75%, 100% and 150% of the pot; raises to about 0.6, 0.85 and 1.1 of a pot-sized raise; plus all in.
 - **Fold chances** come from each villain's continuing range at that size (the section 4 thresholds), multiplied together for multiway pots.
 - **`eqCalled`** is your equity against only the part of their range that continues.
+- **Raises back (`r`):** heads-up, part of their continuing range raises back. If your equity against those raises is under 40%, you fold to them and lose the chips you put in; the rest of the continuing range calls. This is what makes air check-raises and thin bets worse than they look.
 - **Realization `R`:** in position about 1.0; out of position 0.86 on the flop, 0.92 on the turn and 0.82 preflop. River and all-in are 1.0. Each extra opponent multiplies it by 0.96.
-- **Future value `future`:** `(eq - 0.5) * 2 * min(stack behind, pot) * factor`, with factor 0.35 on the flop, 0.2 on the turn and 0 on the river. This covers implied and reverse-implied odds, and stops the model preferring a shove just because it ends the hand now.
+- **Future value `future`:** `(eq - 0.5) * 2 * min(stack behind, pot) * factor`, with factor 0.35 on the flop, 0.2 on the turn and 0 on the river. This covers implied and reverse-implied odds, and stops the model preferring a shove just because it ends the hand now. It's asymmetric: a hand that's behind can still fold later, so negative future value counts a third.
 
 ## 6. Grading (`grading.js`)
 
@@ -134,7 +135,7 @@ Skill levels: Beginner (5), Recreational (22), Regular (50), Strong regular (75)
 
 - **Sharpness** (`noise`): pros follow their thresholds closely, beginners are all over the place.
 - **Calling:** folding is pulled toward the correct amount as skill rises; recreational players call noticeably more (x0.75 at skill 0).
-- **Big bluffs** (`bigBluffShy`): below strong-regular level, bluffing drops off as bets get bigger (`exp(-3 * shy * (size - 0.4))`). A recreational player's pot-size bet is almost never a bluff, and their big bets come from clearly strong hands (sharper edge, slightly higher threshold). Tilt brings big bluffs back.
+- **Big bluffs** (`bigBluffShy`, 1 for beginners, about 0.65 for recreational players, 0 from regular up): bluffing drops off as bets get bigger (`exp(-3 * shy * (size - 0.4))`). A recreational player's pot-size bet is almost never a bluff, and their big bets come from clearly strong hands (sharper edge, slightly higher threshold). Tilt brings big bluffs back.
 - **Draws** (`drawAggro`): recreational players check and call their draws, even big combo draws. Bets and raises are judged on made-hand strength (`hs`) instead of strength plus draw equity (`eff`), and semi-bluffs are scaled down. Strong players bet and raise draws.
 
 Mood and image:
@@ -191,9 +192,14 @@ Current results:
 
 Add a case whenever a verdict looks wrong, then tune.
 
+### Solver benchmark
+
+`scripts/solver-benchmark/` compares the coach with [postflop-solver](https://github.com/b-inary/postflop-solver), an open-source CFR solver, on single-raised pots (button opens 2.5 bb, big blind calls, 100 bb). Both use the coach's own preflop ranges, so only the postflop logic is tested. For each board, the full flop tree is solved first, then the turn and river are re-solved from the exact ranges that reach them with more sizes (33/75/125% turn, 33/75/150% river, 2.5x and all-in raises). At each decision point, 24 hands across the range get the coach's best play, scored with the solver's EV for that hand: agreement (the coach's kind of play is the solver's main one, or one it uses 30%+ of the time) and EV loss (solver EV of the best play minus solver EV of the coach's play, as a share of the pot). Spots the solver's strategy barely reaches are skipped: their values aren't converged.
+
+See the benchmark README for the latest numbers and how to run it.
+
 ## Known gaps / next steps
 
-- **Villain re-raises** aren't modeled when valuing hero bets. The calling range already includes the strong hands, but a bluff that gets raised loses more than the model says.
 - **Future streets** are a single "future value" term, not a game tree. A proper two-street lookahead (or solver data) would fix thin-value and slow-play spots.
 - **Preflop ranking** blends equities with a heuristic playability bonus. Replacing it with real solver ranges per position would sharpen preflop grading.
 - **Short stacks** (under 25 bb) should switch to push/fold charts preflop.

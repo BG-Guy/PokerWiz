@@ -124,7 +124,9 @@ export function analyzeHand(record, { iterations = 2500 } = {}) {
 
     // ----- Hero decision: grade it -----
     if (actor.role === 'hero') {
-      const common = { state, type, amount: action.amount, heroCards, board, villains, heroSkill, iterations, random };
+      // Leading into the previous street's aggressor: they hold the stronger range and defend more.
+      const leadsIntoAggressor = street !== 'Preflop' && donk;
+      const common = { state, type, amount: action.amount, heroCards, board, villains, heroSkill, iterations, random, leadsIntoAggressor };
       const graded =
         street === 'Preflop'
           ? gradePreflop({ ...common, actionsSoFar, tableSize })
@@ -190,6 +192,7 @@ export function analyzeHand(record, { iterations = 2500 } = {}) {
           sizeRatio: modeled === 'bet' || modeled === 'raise' ? sizeRatio : undefined,
         },
         params: villain.params,
+        weights: villain.weights,
       });
       for (let i = 0; i < COMBO_COUNT; i++) villain.weights[i] *= likelihood[i];
     }

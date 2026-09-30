@@ -25,12 +25,16 @@ import { scoreFromLoss, scoreFromDistance, gradeOf } from './grading.js';
 import { isInPosition } from './replay.js';
 
 const round2 = (n) => Math.round(n * 100) / 100;
+const clamp01 = (n) => Math.min(1, Math.max(0, n));
 
 // Share of the remaining stack/pot that tends to go in on later streets.
 const FUTURE_FACTOR = { Preflop: 0.35, Flop: 0.35, Turn: 0.2, River: 0 };
+// Asymmetric: a hand that's ahead gets paid on later streets, but a hand that's behind can still fold, so
+// it only pays off part of that (a third) as reverse implied odds. Checked against solver results.
 function futureValue(street, equity, pot, stackBehind) {
   if (stackBehind <= 0) return 0;
-  return (equity - 0.5) * 2 * Math.min(stackBehind, pot) * (FUTURE_FACTOR[street] ?? 0);
+  const edge = (equity - 0.5) * 2;
+  return (edge > 0 ? edge : edge / 3) * Math.min(stackBehind, pot) * (FUTURE_FACTOR[street] ?? 0);
 }
 
 // Share of raw equity a hand actually wins, by street, position and number of opponents.
@@ -117,7 +121,7 @@ export function villainReads(villains, state) {
 
 // ----- Postflop -----
 
-export function evaluatePostflop({ state, street, heroCards, board, villains, strengths, heroSkill, iterations, random }) {
+export function evaluatePostflop({ state, street, heroCards, board, villains, strengths, heroSkill, iterations, random, leadsIntoAggressor = false }) {
   const opts = getOptions(state);
   const hero = currentPlayer(state);
   const playerOf = (seat) => state.players.find((p) => p.seat === seat);
@@ -143,6 +147,7 @@ export function evaluatePostflop({ state, street, heroCards, board, villains, st
     let expectedCallChips = 0;
     let heroRisk = 0; // chips of the bet that can actually be called (anything beyond comes back)
     const continuing = [];
+    let raiseBack = null; // heads-up: the part of their continuing range that raises back
     for (const v of facing) {
       const vp = playerOf(v.seat);
       const callAmount = Math.min(to - vp.streetBet, vp.stack - vp.invested);
@@ -159,10 +164,14 @@ export function evaluatePostflop({ state, street, heroCards, board, villains, st
         params: v.params,
         isRaise: !opts.isOpening,
         river: street === 'River',
+        // Led into as the previous aggressor, or raised after betting: their range is ahead of a random one,
+        // so they defend more than the bare minimum.
+        rangeEdge: leadsIntoAggressor || !opts.isOpening,
       });
       pFoldAll *= 1 - cont.share;
       expectedCallChips += cont.share * callAmount;
       continuing.push(cont.weights);
+      if (facing.length === 1 && callAmount < vp.stack - vp.invested) raiseBack = cont;
     }
     if (facing.length === 0) heroRisk = heroAdd;
     if (facing.length === 0) pFoldAll = 0;
@@ -180,7 +189,20 @@ export function evaluatePostflop({ state, street, heroCards, board, villains, st
     const Rb = street === 'River' || allIn ? 1 : R;
     const behind = Math.min(heroBehind - heroRisk, villainBehind(to - hero.streetBet));
     const later = futureValue(street, equityWhenCalled, calledPot, behind);
-    const ev = pFoldAll * pot + notAllFold * (equityWhenCalled * Rb * calledPot - heroRisk + later);
+    let continued = equityWhenCalled * Rb * calledPot - heroRisk + later;
+    // They can raise back. A hand that can't stand a raise folds and loses its whole bet; the calls are
+    // worth what's left of the equity (against the calling part of the range only).
+    const rs = raiseBack?.raiseShare ?? 0;
+    if (rs > 0.03 && !allIn) {
+      const eqVsRaise =
+        equityVsRanges({ hero: heroCards, board, ranges: [raiseBack.raiseWeights], iterations: Math.round(iterations * 0.4), random }).equity ?? equityWhenCalled;
+      if (eqVsRaise < 0.4) {
+        const eqVsCall = clamp01((equityWhenCalled - rs * eqVsRaise) / (1 - rs));
+        const vsCall = eqVsCall * Rb * calledPot - heroRisk + futureValue(street, eqVsCall, calledPot, behind);
+        continued = (1 - rs) * vsCall + rs * -heroRisk;
+      }
+    }
+    const ev = pFoldAll * pot + notAllFold * continued;
     return { kind: 'raise', to, allIn, ev: round2(ev), foldEquity: pFoldAll, equityWhenCalled };
   };
 
@@ -233,8 +255,8 @@ function matchActual(actual, options, betOption) {
   return exact;
 }
 
-export function gradePostflop({ state, street, type, amount, heroCards, board, villains, strengths, heroSkill, iterations, random }) {
-  const analysis = evaluatePostflop({ state, street, heroCards, board, villains, strengths, heroSkill, iterations, random });
+export function gradePostflop({ state, street, type, amount, heroCards, board, villains, strengths, heroSkill, iterations, random, leadsIntoAggressor }) {
+  const analysis = evaluatePostflop({ state, street, heroCards, board, villains, strengths, heroSkill, iterations, random, leadsIntoAggressor });
   const actual = matchActual(normalizeAction(type, amount, analysis.opts, state), analysis.options, analysis.betOption);
   const best = analysis.options.reduce((a, b) => (b.ev > a.ev ? b : a));
   const evLoss = Math.max(0, best.ev - actual.ev);
