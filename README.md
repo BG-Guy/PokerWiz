@@ -25,6 +25,7 @@ npm run build    # production build into dist/
 npm start        # API that also serves dist/ on :3001
 node scripts/test-coach.mjs              # coach sanity checks (scripted hands with known answers)
 node scripts/generate-preflop-table.mjs  # rebuild the preflop hand ranking
+# coach vs solver benchmark: see scripts/solver-benchmark/README.md
 ```
 
 The database is created and seeded with sample data on first run at `server/data/pokerwiz.db`. Delete that file to start fresh. It uses Node's built-in `node:sqlite` (Node 22.13+), so there are no native modules to compile.
