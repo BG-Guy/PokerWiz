@@ -6,8 +6,8 @@ import Icon from '../../Icon/Icon.jsx';
 
 const STAKE_OPTIONS = STAKES.map((s) => ({ value: s.label, label: s.label }));
 const SIZE_OPTIONS = [
-  { value: 6, label: '6-max' },
   { value: 9, label: '9-max' },
+  { value: 6, label: '6-max' },
 ];
 
 export default function GamePrompt({ stakesLabel, tableSize, onContinue }) {

@@ -37,7 +37,7 @@ import './HandRecorder.css';
 const INITIAL_WIZARD = {
   step: 'game',
   stakesLabel: '$1/$2',
-  tableSize: 6,
+  tableSize: 9, // full ring by default; 6-max is one tap away
   heroSeat: null,
   villainSeats: [],
   stacks: {}, // seat -> starting stack in dollars (string while being typed)
