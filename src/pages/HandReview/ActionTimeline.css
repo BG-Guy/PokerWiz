@@ -130,3 +130,19 @@
   background: var(--negative);
   color: #fff;
 }
+
+/* Link to replay the hand from this street in Practice */
+.action-timeline-replay {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+.action-timeline-replay:hover {
+  filter: brightness(1.05);
+}

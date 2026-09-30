@@ -86,3 +86,21 @@
   min-height: 52px;
   font-size: 17px;
 }
+
+/* Replay setup: your hand and the board at the chosen street */
+.replay-setup-cards {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+.replay-setup-hand,
+.replay-setup-board {
+  display: inline-flex;
+  gap: 4px;
+}
+.replay-setup-later {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
