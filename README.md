@@ -27,6 +27,13 @@ node scripts/generate-preflop-table.mjs  # rebuild the preflop hand ranking
 
 The database is created and seeded with sample data on first run at `server/data/pokerwiz.db`. Delete that file to start fresh. It uses Node's built-in `node:sqlite` (Node 22.13+), so there are no native modules to compile.
 
+## Deploy
+
+PokerWiz needs its Node server running, so it can't be hosted on GitHub Pages (static files only).
+`render.yaml` deploys it to [Render](https://render.com): **New > Blueprint**, pick this repo, and Render builds the app,
+runs `npm start` and keeps the SQLite database on a persistent disk (`POKERWIZ_DB=/var/data/pokerwiz.db`).
+Persistent disks need a paid plan. On the free plan the database is reset on every deploy or restart.
+
 ## Project structure
 
 ```
