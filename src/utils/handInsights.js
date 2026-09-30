@@ -1,10 +1,10 @@
 // Hand insights: patterns in the hands you've recorded (results by position, verdicts, showdowns,
 // all-ins, and how your own rating and tilt line up with results). Everything here comes from saved hands.
-import { formatMoney } from './format.js';
+import { formatUnits } from './format.js';
 
 const sum = (list) => list.reduce((a, b) => a + b, 0);
 const average = (list) => (list.length ? sum(list) / list.length : null);
-const dollars = (n) => formatMoney(Math.round(n));
+const dollars = (n) => formatUnits(n, { whole: true }); // hands arrive converted (handsForDisplay)
 const isAllIn = (hand) => hand.streets.some((s) => s.actions.some((a) => a.allIn || a.verb === 'shoves' || a.verb === 'all in'));
 
 export function handInsights(hands) {

@@ -5,6 +5,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import Icon from '../Icon/Icon.jsx';
 import Brand from '../Brand/Brand.jsx';
 import ThemeToggle from '../ThemeToggle/ThemeToggle.jsx';
+import UnitToggle from '../UnitToggle/UnitToggle.jsx';
 import MoreSheet from './MoreSheet.jsx';
 import './NavBar.css';
 
@@ -63,8 +64,9 @@ export default function NavBar() {
         </li>
       </ul>
 
-      {/* Theme switch sits at the bottom of the sidebar (phones have it in the header) */}
+      {/* BB/$ and theme switches sit at the bottom of the sidebar (phones have them in the header) */}
       <div className="navbar-footer">
+        <UnitToggle />
         <ThemeToggle showLabel />
       </div>
 

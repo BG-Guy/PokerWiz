@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { createHand, getHand, updateHand } from '../../api/hands.js';
 import { prepareSavedHand } from '../../coach/savedHand.js';
+import { getMoneyUnit } from '../../utils/format.js';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import HandRecorder from '../../components/HandRecorder/HandRecorder.jsx';
@@ -63,7 +64,7 @@ export default function Coach() {
     else setPhase('analyzing');
     setError(null);
     requestRef.current += 1;
-    workerRef.current.postMessage({ id: requestRef.current, record: nextRecord });
+    workerRef.current.postMessage({ id: requestRef.current, record: nextRecord, unit: getMoneyUnit() });
   };
 
   // Saved-hand review: load the hand, fill in what's missing, analyze. Without ?hand, record a new one.

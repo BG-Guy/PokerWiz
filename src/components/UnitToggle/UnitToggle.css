@@ -1,0 +1,35 @@
+/* BB / $ switch: a small two-option pill next to the theme switch. */
+
+.unit-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.unit-toggle-label {
+  padding: 0 8px 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.unit-toggle-option {
+  min-width: 36px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-muted);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.unit-toggle-option:hover {
+  color: var(--text);
+}
+.unit-toggle-option.is-active {
+  background: var(--accent);
+  color: var(--on-accent);
+}

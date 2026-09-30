@@ -10,7 +10,7 @@ import Icon from '../../Icon/Icon.jsx';
 
 const VERDICT_OPTIONS = Object.entries(VERDICTS).map(([value, label]) => ({ value, label }));
 
-export default function DetailsPrompt({ defaultTitle, result, pot, saving, error, onSave }) {
+export default function DetailsPrompt({ defaultTitle, result, pot, bb, saving, error, onSave }) {
   const [title, setTitle] = useState(defaultTitle);
   const [verdict, setVerdict] = useState('review');
   const [note, setNote] = useState('');
@@ -23,9 +23,9 @@ export default function DetailsPrompt({ defaultTitle, result, pot, saving, error
         <Icon name="check" size={14} /> Wrap up
       </span>
       <h2 className="prompt-title">
-        Your result <Money amount={result} />
+        Your result <Money amount={result} bb={bb} />
       </h2>
-      <p className="prompt-text">Final pot {formatMoney(pot, { sign: false })}.</p>
+      <p className="prompt-text">Final pot {formatMoney(pot, { sign: false, bb })}.</p>
 
       <label className="prompt-field-label" htmlFor="hand-title">
         Title

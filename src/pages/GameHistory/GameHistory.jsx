@@ -5,7 +5,7 @@ import { getSessions } from '../../api/sessions.js';
 import { getHands } from '../../api/hands.js';
 import { useApi } from '../../hooks/useApi.js';
 import { summarize, newestFirst, sessionProfit } from '../../utils/stats.js';
-import { formatMoney, formatMonth } from '../../utils/format.js';
+import { formatMonth, formatUnits, sessionsForDisplay } from '../../utils/format.js';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import StatCard from '../../components/StatCard/StatCard.jsx';
@@ -52,7 +52,8 @@ export default function GameHistory() {
   const { data, error, reload } = useApi(loadHistory);
 
   if (!data) return <LoadState error={error} onRetry={reload} />;
-  const [sessions, hands] = data;
+  const [rawSessions, hands] = data;
+  const sessions = sessionsForDisplay(rawSessions); // amounts in the BB/$ display unit
 
   // Apply filters, then compute the summary for exactly what is shown.
   const filtered = newestFirst(sessions).filter(
@@ -73,9 +74,9 @@ export default function GameHistory() {
       {/* Totals for the current filter */}
       <div className="game-history-summary">
         <StatCard label="Sessions" value={summary.count} hint={`${summary.winning} winning`} />
-        <StatCard label="Net" value={formatMoney(summary.net)} tone={summary.net >= 0 ? 'positive' : 'negative'} />
+        <StatCard label="Net" value={formatUnits(summary.net)} tone={summary.net >= 0 ? 'positive' : 'negative'} />
         <StatCard label="Hours" value={summary.hours.toFixed(1)} hint={`${summary.hands.toLocaleString('en-US')} hands`} />
-        <StatCard label="Hourly" value={`${formatMoney(summary.hourly)}/h`} />
+        <StatCard label="Hourly" value={`${formatUnits(summary.hourly, { whole: true })}/h`} />
       </div>
 
       {/* Month groups */}
@@ -83,7 +84,7 @@ export default function GameHistory() {
         <section key={month.key} className="game-history-month">
           <div className="game-history-month-head">
             <h2>{month.label}</h2>
-            <Money amount={month.sessions.reduce((sum, s) => sum + sessionProfit(s), 0)} />
+            <Money amount={month.sessions.reduce((sum, s) => sum + sessionProfit(s), 0)} bb={1} />
           </div>
           <ul className="game-history-list">
             {month.sessions.map((session) => (

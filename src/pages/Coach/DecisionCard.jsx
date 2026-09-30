@@ -7,8 +7,9 @@ import RangeGrid from './RangeGrid.jsx';
 import './DecisionCard.css';
 
 const pct = (x) => `${Math.round(x * 100)}%`;
-const dollars = (n) => formatMoney(Math.round(n * 100) / 100, { sign: false });
-const signed = (n) => formatMoney(Math.round(n * 100) / 100);
+// Amounts in big blinds or dollars; bb is the hand's big blind.
+const plain = (n, bb) => formatMoney(Math.round(n * 100) / 100, { sign: false, bb });
+const signed = (n, bb) => formatMoney(Math.round(n * 100) / 100, { bb });
 
 const CHART_WORDS = { raise: 'Raise', call: 'Call', fold: 'Fold', check: 'Check' };
 
@@ -43,7 +44,7 @@ function ChartScale({ thresholds, handTop }) {
 }
 
 // EV of every option as diverging bars from zero; the best option and yours are marked.
-function EvList({ options }) {
+function EvList({ options, bb }) {
   const maxAbs = Math.max(1e-9, ...options.map((o) => Math.abs(o.ev)));
   return (
     <ul className="decision-ev">
@@ -62,7 +63,7 @@ function EvList({ options }) {
                 style={option.ev < 0 ? { right: '50%', width: `${width}%` } : { left: '50%', width: `${width}%` }}
               />
             </span>
-            <span className={`decision-ev-value num ${option.ev < 0 ? 'is-negative' : ''}`}>{signed(option.ev)}</span>
+            <span className={`decision-ev-value num ${option.ev < 0 ? 'is-negative' : ''}`}>{signed(option.ev, bb)}</span>
           </li>
         );
       })}
@@ -70,7 +71,7 @@ function EvList({ options }) {
   );
 }
 
-export default function DecisionCard({ decision, number }) {
+export default function DecisionCard({ decision, number, bb = null }) {
   const d = decision;
   const yourPlay = d.kind === 'chart' ? d.actualLabel : d.actual.label;
   const bestPlay = d.kind === 'chart' ? CHART_WORDS[d.advice.best] : d.best.label;
@@ -112,12 +113,12 @@ export default function DecisionCard({ decision, number }) {
       <dl className="decision-numbers">
         <div>
           <dt>Pot</dt>
-          <dd className="num">{dollars(d.pot)}</dd>
+          <dd className="num">{plain(d.pot, bb)}</dd>
         </div>
         {d.toCall > 0 && (
           <div>
             <dt>To call</dt>
-            <dd className="num">{dollars(d.toCall)}</dd>
+            <dd className="num">{plain(d.toCall, bb)}</dd>
           </div>
         )}
         {needed !== null && (
@@ -146,7 +147,7 @@ export default function DecisionCard({ decision, number }) {
         )}
       </dl>
 
-      {d.kind === 'chart' ? <ChartScale thresholds={d.thresholds} handTop={d.handTop} /> : <EvList options={d.options} />}
+      {d.kind === 'chart' ? <ChartScale thresholds={d.thresholds} handTop={d.handTop} /> : <EvList options={d.options} bb={bb} />}
 
       <ul className="decision-notes">
         {d.notes.map((note) => (

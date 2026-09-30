@@ -3,6 +3,7 @@
 import { getHands } from '../../api/hands.js';
 import { useApi } from '../../hooks/useApi.js';
 import { buildHighlights } from '../../utils/handHighlights.js';
+import { handsForDisplay } from '../../utils/format.js';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import HandsTabs from '../../components/HandsTabs/HandsTabs.jsx';
@@ -23,7 +24,7 @@ export default function HandHighlights() {
       ) : (
         <div className="hand-highlights-layout">
           <div className="hand-highlights-grid">
-            {buildHighlights(hands).map((category) => (
+            {buildHighlights(handsForDisplay(hands)).map((category) => (
               <HighlightCategory key={category.id} category={category} />
             ))}
           </div>

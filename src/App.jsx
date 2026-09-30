@@ -1,5 +1,6 @@
 // Route table: maps each URL to its page, all rendered inside the shared app layout.
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useUnit } from './theme/UnitContext.jsx';
 import AppLayout from './components/AppLayout/AppLayout.jsx';
 import Dashboard from './pages/Dashboard/Dashboard.jsx';
 import HandReview from './pages/HandReview/HandReview.jsx';
@@ -15,6 +16,8 @@ import HandHighlights from './pages/HandHighlights/HandHighlights.jsx';
 import HandInsights from './pages/HandInsights/HandInsights.jsx';
 
 export default function App() {
+  // Re-render every page when the BB/$ switch changes (amounts are formatted during render).
+  useUnit();
   return (
     <Routes>
       <Route element={<AppLayout />}>

@@ -4,6 +4,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import NavBar from '../NavBar/NavBar.jsx';
 import Brand from '../Brand/Brand.jsx';
 import ThemeToggle from '../ThemeToggle/ThemeToggle.jsx';
+import UnitToggle from '../UnitToggle/UnitToggle.jsx';
 import './AppLayout.css';
 
 export default function AppLayout() {
@@ -19,10 +20,13 @@ export default function AppLayout() {
       <NavBar />
 
       <div className="app-column">
-        {/* Mobile-only top bar: the sidebar (with brand and theme switch) is hidden on phones */}
+        {/* Mobile-only top bar: the sidebar (with brand, BB/$ and theme switches) is hidden on phones */}
         <header className="app-mobile-header">
           <Brand />
-          <ThemeToggle />
+          <span className="app-mobile-header-tools">
+            <UnitToggle />
+            <ThemeToggle />
+          </span>
         </header>
 
         <main className="app-main">

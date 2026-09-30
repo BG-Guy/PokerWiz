@@ -4,7 +4,7 @@ import { getSessions } from '../../api/sessions.js';
 import { useApi } from '../../hooks/useApi.js';
 import { summarize, hourlyBy } from '../../utils/stats.js';
 import { sessionFindings, hourlyByWeekday, resultsByTilt } from '../../utils/sessionInsights.js';
-import { formatMoney } from '../../utils/format.js';
+import { formatUnits, sessionsForDisplay } from '../../utils/format.js';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import StatCard from '../../components/StatCard/StatCard.jsx';
@@ -14,7 +14,8 @@ import LeakCard from './LeakCard.jsx';
 import './Insights.css';
 
 export default function Insights() {
-  const { data: sessions, error, reload } = useApi(getSessions);
+  const { data, error, reload } = useApi(getSessions);
+  const sessions = data && sessionsForDisplay(data); // amounts in the BB/$ display unit
   if (!sessions) return <LoadState error={error} onRetry={reload} />;
   if (sessions.length === 0) return <LoadState error={new Error('Finish a session to unlock insights.')} />;
 
@@ -25,7 +26,7 @@ export default function Insights() {
   const byWeekday = hourlyByWeekday(sessions);
   const byTilt = resultsByTilt(sessions);
   const findings = sessionFindings(sessions);
-  const perHour = (value) => `${formatMoney(Math.round(value))}/h`;
+  const perHour = (value) => `${formatUnits(value, { whole: true })}/h`;
 
   return (
     <div className="insights">
@@ -68,7 +69,7 @@ export default function Insights() {
         </Panel>
         <Panel title="Results by tilt level">
           {byTilt.length ? (
-            <BarList items={byTilt} formatValue={(v) => formatMoney(Math.round(v))} />
+            <BarList items={byTilt} formatValue={(v) => formatUnits(v, { whole: true })} />
           ) : (
             <p className="insights-empty">Rate your tilt when you finish a session to see how it affects results.</p>
           )}

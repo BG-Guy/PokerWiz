@@ -2,7 +2,7 @@
 // axes, gridlines, a zero line and one dot per session. Hover (desktop) or tap/drag (phone) to read a point:
 // a crosshair with badges on both axes plus a card with hours in, bankroll and that session's result.
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { formatDate, formatMoney } from '../../utils/format.js';
+import { formatDate, formatUnits, getMoneyUnit } from '../../utils/format.js';
 import { sessionProfit } from '../../utils/stats.js';
 import { useMediaQuery } from '../../hooks/useMediaQuery.js';
 import FilterChips from '../FilterChips/FilterChips.jsx';
@@ -51,7 +51,15 @@ function useWidth(ref) {
 }
 
 const hoursLabel = (h) => `${Math.round(h * 10) / 10}h`;
-const compactMoney = (v) => (Math.abs(v) >= 1000 ? `${v < 0 ? '-' : ''}$${Math.round(Math.abs(v) / 100) / 10}k` : formatMoney(v, { sign: false }).replace('$', v < 0 ? '-$' : '$'));
+// Axis labels: "$1.2k" / "1.2k bb" for big numbers. Sessions come in already converted to the display unit.
+function compactMoney(v) {
+  const minus = v < 0 ? '-' : '';
+  if (Math.abs(v) >= 1000) {
+    const k = `${Math.round(Math.abs(v) / 100) / 10}k`;
+    return getMoneyUnit() === 'bb' ? `${minus}${k} bb` : `${minus}$${k}`;
+  }
+  return `${minus}${formatUnits(Math.abs(v), { sign: false, whole: true })}`;
+}
 
 export default function BankrollChart({ sessions }) {
   const wrapRef = useRef(null);
@@ -126,7 +134,7 @@ export default function BankrollChart({ sessions }) {
           height={height}
           viewBox={`0 0 ${width} ${height}`}
           role="img"
-          aria-label={`Bankroll over ${hoursLabel(lastHours)} of play, now ${formatMoney(values[values.length - 1])}`}
+          aria-label={`Bankroll over ${hoursLabel(lastHours)} of play, now ${formatUnits(values[values.length - 1], { whole: true })}`}
           onPointerMove={pick}
           onPointerDown={pick}
           onPointerLeave={(event) => event.pointerType === 'mouse' && setActiveIndex(null)}
@@ -205,13 +213,13 @@ export default function BankrollChart({ sessions }) {
               Hours in <strong className="num">{hoursLabel(active.hours)}</strong>
             </span>
             <span>
-              Bankroll <strong className="num">{formatMoney(Math.round(active.bankroll))}</strong>
+              Bankroll <strong className="num">{formatUnits(active.bankroll, { whole: true })}</strong>
             </span>
             {active.session && (
               <span>
                 Session{' '}
                 <strong className={`num ${sessionProfit(active.session) >= 0 ? 'is-win' : 'is-loss'}`}>
-                  {formatMoney(sessionProfit(active.session))}
+                  {formatUnits(sessionProfit(active.session))}
                 </strong>
               </span>
             )}

@@ -3,7 +3,8 @@
 import { formatMoney } from '../utils/format.js';
 
 const pct = (x) => `${Math.round(x * 100)}%`;
-const dollars = (n) => formatMoney(Math.round(n * 100) / 100, { sign: false });
+// Amounts in the hand's big blinds or dollars (ctx.bb is the big blind).
+const money = (n, ctx) => formatMoney(Math.round(n * 100) / 100, { sign: false, bb: ctx.bb });
 
 const ACTION_WORDS = { raise: 'raise', call: 'call', fold: 'fold', check: 'check' };
 
@@ -106,7 +107,7 @@ export function explainPostflop(decision, ctx) {
 
   if (decision.toCall > 0) {
     const required = decision.toCall / (decision.pot + decision.toCall);
-    notes.push(`Pot odds: call ${dollars(decision.toCall)} into a pot of ${dollars(decision.pot)}, so you need ${pct(required)} equity to break even.`);
+    notes.push(`Pot odds: call ${money(decision.toCall, ctx)} into a pot of ${money(decision.pot, ctx)}, so you need ${pct(required)} equity to break even.`);
   }
   let equityLine = `Against ${rangeText} you have about ${pct(decision.equity)} equity`;
   if (!decision.inPosition && decision.street !== 'River') {
@@ -135,7 +136,7 @@ export function explainPostflop(decision, ctx) {
     notes.push('Your play was the highest-value option.');
   } else {
     notes.push(
-      `Your play (${decision.actual.label}) is worth ${dollars(decision.actual.ev)} against ${dollars(best.ev)} for the best line: about ${dollars(decision.evLoss)} given up (${pct(decision.evLoss / decision.potRef)} of the pot).`
+      `Your play (${decision.actual.label}) is worth ${money(decision.actual.ev, ctx)} against ${money(best.ev, ctx)} for the best line: about ${money(decision.evLoss, ctx)} given up (${pct(decision.evLoss / decision.potRef)} of the pot).`
     );
   }
 

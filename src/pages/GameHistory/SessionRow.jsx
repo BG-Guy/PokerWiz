@@ -1,7 +1,7 @@
 // One session in Game History. Tapping it expands buy-in, cash-out, notes and a link to its hands.
 import { Link } from 'react-router-dom';
 import { sessionProfit } from '../../utils/stats.js';
-import { formatDuration, formatMoney, formatWeekday, parseDate } from '../../utils/format.js';
+import { formatDuration, formatUnits, formatWeekday, parseDate } from '../../utils/format.js';
 import Money from '../../components/Money/Money.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import StarRating from '../../components/StarRating/StarRating.jsx';
@@ -30,7 +30,7 @@ export default function SessionRow({ session, handCount, isOpen, onToggle }) {
           </span>
         </span>
         <span className="session-row-hands num">{session.hands} hands</span>
-        <Money amount={profit} className="session-row-result" />
+        <Money amount={profit} bb={1} className="session-row-result" />
         <Icon name="chevronDown" size={18} className="session-row-chevron" />
       </button>
 
@@ -40,15 +40,15 @@ export default function SessionRow({ session, handCount, isOpen, onToggle }) {
           <dl className="session-row-stats">
             <div>
               <dt>Buy-in</dt>
-              <dd className="num">{formatMoney(session.buyIn, { sign: false })}</dd>
+              <dd className="num">{formatUnits(session.buyIn, { sign: false })}</dd>
             </div>
             <div>
               <dt>Cash-out</dt>
-              <dd className="num">{formatMoney(session.cashOut, { sign: false })}</dd>
+              <dd className="num">{formatUnits(session.cashOut, { sign: false })}</dd>
             </div>
             <div>
               <dt>Hourly</dt>
-              <dd className="num">{formatMoney(Math.round(hourly))}/h</dd>
+              <dd className="num">{formatUnits(hourly, { whole: true })}/h</dd>
             </div>
             <div>
               <dt>Big blinds</dt>

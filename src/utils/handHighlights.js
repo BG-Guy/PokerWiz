@@ -1,8 +1,8 @@
 // Hand highlights: "awards" picked from the recorded hands (best and worst played by your own rating,
 // most tilted, biggest pots won and lost, multiway wars, big laydowns, preflop fireworks, all-in thrillers).
-import { formatMoney } from './format.js';
+import { formatUnits } from './format.js';
 
-const dollars = (n) => formatMoney(n, { sign: false });
+const dollars = (n) => formatUnits(n, { sign: false }); // hands arrive converted (handsForDisplay)
 const TILT_WORDS = ['', 'Zen', 'Calm', 'Uneasy', 'Frustrated', 'Full tilt'];
 
 // Hero actions with the street they happened on.

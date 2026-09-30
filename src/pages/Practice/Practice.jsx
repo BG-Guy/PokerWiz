@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { GAMES, generateSpot, heroAct, dealStreet, seenCards, spotRecord } from '../../practice/generateSpot.js';
 import { overallAccuracy, accuracyLabel } from '../../coach/grading.js';
 import { applyLevel, applyPreset, defaultProfile, describeProfile } from '../../coach/profiles.js';
-import { formatMoney } from '../../utils/format.js';
+import { formatMoney, getMoneyUnit } from '../../utils/format.js';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import PokerTable from '../../components/HandRecorder/PokerTable.jsx';
 import PromptCarousel from '../../components/HandRecorder/PromptCarousel.jsx';
@@ -58,7 +58,7 @@ function actionLines(state) {
       .map((a) => {
         const who = a.actor === 'Hero' ? 'You' : a.actor;
         const verb = a.actor === 'Hero' ? firstPerson(a.verb) : a.verb;
-        return `${who} ${verb}${a.amount ? ` ${formatMoney(a.amount, { sign: false })}` : ''}`;
+        return `${who} ${verb}${a.amount ? ` ${formatMoney(a.amount, { sign: false, bb: state.bb })}` : ''}`;
       })
       .join(', ');
     return { name: street.name, cards, text: text || (index === state.streets.length - 1 ? 'Your turn to act first' : '') };
@@ -68,7 +68,7 @@ function actionLines(state) {
 // How the hand ended, in words.
 function outcomeText(spot) {
   const bb = spot.state.bb;
-  const amount = `${formatMoney(Math.abs(spot.result), { sign: false })} (${Math.round((Math.abs(spot.result) / bb) * 10) / 10} bb)`;
+  const amount = formatMoney(Math.abs(spot.result), { sign: false, bb });
   if (spot.heroFolded) return spot.result < 0 ? `You folded and lost ${amount}.` : 'You folded.';
   if (spot.result > 0) return `You won ${amount}${spot.showdown ? ' at showdown' : ''}.`;
   if (spot.result < 0) return `You lost ${amount}${spot.showdown ? ' at showdown' : ''}.`;
@@ -129,7 +129,7 @@ export default function Practice() {
     if (phase !== 'play' || spot?.status !== 'done') return;
     setPhase('grading');
     requestRef.current += 1;
-    workerRef.current.postMessage({ id: requestRef.current, record: spotRecord(spot) });
+    workerRef.current.postMessage({ id: requestRef.current, record: spotRecord(spot), unit: getMoneyUnit() });
   }, [phase, spot]);
 
   const deal = () => {
@@ -214,7 +214,7 @@ export default function Practice() {
 
       <div className="hand-recorder">
         <div className="hand-recorder-table">
-          <PokerTable seats={seats} board={state.board} pot={state.pot} rotation={heroSeat} />
+          <PokerTable seats={seats} board={state.board} pot={state.pot} bb={state.bb} rotation={heroSeat} />
         </div>
 
         <div className="hand-recorder-panel">
@@ -238,7 +238,7 @@ export default function Practice() {
           <p className="practice-stacks">
             {isTable && <>Table: {describeProfile(spot.setup.villains[0].profile).label} · </>}
             You started with <span className="num">{heroStackBB} bb</span>
-            {state.ante > 0 && <> · Big-blind ante {formatMoney(state.ante, { sign: false })}</>}
+            {state.ante > 0 && <> · Big-blind ante {formatMoney(state.ante, { sign: false, bb: state.bb })}</>}
           </p>
 
           {phase === 'play' && spot.status === 'hero' && (
@@ -290,7 +290,7 @@ export default function Practice() {
                 </p>
               )}
               {review?.decisions.map((decision, index) => (
-                <DecisionCard key={index} decision={decision} number={index + 1} />
+                <DecisionCard key={index} decision={decision} number={index + 1} bb={state.bb} />
               ))}
               <div className="practice-next">
                 <button type="button" className="btn practice-next-btn" onClick={deal}>

@@ -1,7 +1,7 @@
 // Insights about recorded hands: headline numbers, results by seat, verdicts, showdown split and findings.
 // Shown on its own tab on phones and next to Highlights on desktop.
 import { handInsights } from '../../utils/handInsights.js';
-import { formatMoney } from '../../utils/format.js';
+import { formatUnits, handsForDisplay } from '../../utils/format.js';
 import Panel from '../Panel/Panel.jsx';
 import BarList from '../BarList/BarList.jsx';
 import Money from '../Money/Money.jsx';
@@ -11,8 +11,8 @@ import Icon from '../Icon/Icon.jsx';
 import './HandInsightsPanel.css';
 
 export default function HandInsightsPanel({ hands }) {
-  const insights = handInsights(hands);
-  const money = (v) => formatMoney(Math.round(v));
+  const insights = handInsights(handsForDisplay(hands)); // amounts in the BB/$ display unit
+  const money = (v) => formatUnits(v, { whole: true });
 
   return (
     <Panel title="Hand insights" className="hand-insights">
@@ -25,7 +25,7 @@ export default function HandInsightsPanel({ hands }) {
         <div>
           <dt>Net</dt>
           <dd>
-            <Money amount={insights.net} />
+            <Money amount={insights.net} bb={1} />
           </dd>
         </div>
         <div>
