@@ -57,6 +57,33 @@ export function continueThreshold({ required, sizeRatio, defenders = 1, params, 
   return valueStart + ((1 - valueStart) * (required - bluffBelief)) / (1 - bluffBelief);
 }
 
+// The least a player defends against a bet of this size: minimum defense frequency (pot / (pot + bet)),
+// scaled by skill (sound players come close to it; weak ones fold more) and by how much they like folding.
+// rangeEdge: the defender was the previous street's aggressor and is being led into; with the stronger
+// range they defend more than the bare minimum (solvers fold very little to small leads).
+export function minimumDefense({ sizeRatio, defenders = 1, params, rangeEdge = false }) {
+  const theory = mdf({ pot: 1, risk: Math.max(0, sizeRatio), defenders });
+  const factor = clamp((0.62 + 0.33 * (params.skill ?? 0.5)) / Math.sqrt(params.foldMult), 0.3, 1);
+  return Math.min(0.95, theory * factor * (rangeEdge ? 1.25 : 1));
+}
+
+// Continue cutoff with the defense floor applied: if the price-based cutoff would fold more than the
+// player's minimum defense, lower it until enough of the range continues.
+function defendedCutoff({ cutoff, weights, strengths, sizeRatio, defenders, params, rangeEdge = false }) {
+  if (!weights) return cutoff;
+  const { eff, valid } = strengths;
+  let total = 0;
+  let above = 0;
+  for (let i = 0; i < COMBO_COUNT; i++) {
+    if (!valid[i] || weights[i] <= 0) continue;
+    total += weights[i];
+    if (eff[i] >= cutoff) above += weights[i];
+  }
+  const floor = minimumDefense({ sizeRatio, defenders, params, rangeEdge });
+  if (total === 0 || above / total >= floor) return cutoff;
+  return Math.min(cutoff, strengthCutoff(weights, eff, valid, floor));
+}
+
 // Strength cutoff so that `share` of the (weighted) range is at or above it.
 export function strengthCutoff(weights, strength, valid, share) {
   const items = [];
@@ -93,7 +120,9 @@ function aggressionStrength(eff, draw, params) {
 // Probabilities for one combo when nobody has bet yet: { bet, check }.
 // donk = acting before the previous street's aggressor, who hasn't acted yet (leading into them is rare).
 // sizeRatio = the bet's size / pot when known (bigger bets = stronger value hands), else a typical 0.6.
-function unopenedProbabilities(eff, draw, params, donk, sizeRatio = 0.6) {
+// airScale: per-combo air-bluff rate for this spot, from balancedAirScale (bluffs sized to the value in the
+// range). Without it (no range known) air bluffs use a flat rate.
+function unopenedParts(eff, draw, params, sizeRatio = 0.6, airScale = null) {
   const s = softnessOf(params);
   const a = aggroNorm(params);
   const valueThreshold = clamp(valueRegionStart(sizeRatio) - 0.1 * a, 0.5, 0.97);
@@ -105,12 +134,41 @@ function unopenedProbabilities(eff, draw, params, donk, sizeRatio = 0.6) {
   // Pure bluffs from the bottom of the range, semi-bluffs from draws.
   // Recreational players bluff small if at all, and check their draws (even combo draws) instead of betting.
   const sizeFactor = bluffSizeFactor(sizeRatio, params);
-  const airBluff = 0.1 * params.bluffMult * (1 - sigmoid((eff - 0.35) / s)) * sizeFactor;
+  const air = (1 - sigmoid((eff - 0.35) / s)) * sizeFactor;
+  const airBluff = Math.min(0.9, air * (airScale ?? 0.1 * params.bluffMult));
   const semiBluff = clamp(draw * 1.2, 0, 0.5) * clamp(params.aggression / 2.5, 0.2, 1.4) * (params.drawAggro ?? 1) * Math.sqrt(sizeFactor);
+  return { value, air, airBluff, semiBluff, sizeFactor };
+}
+
+function unopenedProbabilities(eff, draw, params, donk, sizeRatio = 0.6, airScale = null) {
+  const { value, airBluff, semiBluff, sizeFactor } = unopenedParts(eff, draw, params, sizeRatio, airScale);
   // The floor is the "random" bet any hand might make; for players who don't bluff big it shrinks with size.
   let bet = clamp(value + airBluff + semiBluff, 0.002 + 0.018 * sizeFactor, 0.98);
   if (donk) bet *= 0.12 + 0.35 * (1 - params.skill); // amateurs donk more than pros
   return { bet, check: 1 - bet };
+}
+
+// Bluffs in proportion to value. A balanced bettor bluffs size/(1+size) as many hands as they value bet
+// (about 1 bluff per 2 value bets for a 75% pot bet on the river); earlier streets carry more bluffs, since
+// they still have equity. bluffMult scales it (an average player, bluffMult about 1.15, is balanced), and
+// players who shy away from big bluffs bluff less at big sizes. Semi-bluffs count first; air fills the rest.
+// Returns the per-combo air-bluff rate for this range, spot and size.
+export function balancedAirScale({ weights, strengths, params, sizeRatio = 0.6 }) {
+  const { eff, draw, valid } = strengths;
+  const river = draw.every((d) => d === 0);
+  let valueMass = 0;
+  let semiMass = 0;
+  let airMass = 0;
+  for (let i = 0; i < COMBO_COUNT; i++) {
+    if (!valid[i] || weights[i] <= 0) continue;
+    const p = unopenedParts(eff[i], draw[i], params, sizeRatio, 0);
+    valueMass += weights[i] * p.value;
+    semiMass += weights[i] * p.semiBluff;
+    airMass += weights[i] * p.air;
+  }
+  const ratio = (sizeRatio / (1 + sizeRatio)) * (river ? 1 : 1.3) * (params.bluffMult / 1.15) * bluffSizeFactor(sizeRatio, params);
+  const airNeeded = Math.max(0, valueMass * ratio - semiMass);
+  return airMass > 0 ? airNeeded / airMass : 0;
 }
 
 // Probabilities for one combo when facing a bet: { fold, call, raise }. cutoff comes from continueThreshold.
@@ -148,27 +206,33 @@ export function comboActionProbabilities({ index, strengths, context, params }) 
 // Likelihood of the observed action for every combo (Float64Array(1326)).
 // context: { facingBet, facingRaise, pot, toCall, defenders, donk, sizeRatio }  (pot includes the bet being
 // faced; sizeRatio is the size of the observed bet/raise relative to the pot, when there is one)
-export function postflopActionLikelihood({ action, strengths, context, params }) {
+// weights (optional): the player's range before this action, so bluffs can be balanced against their value
+// hands and their defense can respect the floor. Without it, flat rates are used.
+export function postflopActionLikelihood({ action, strengths, context, params, weights = null }) {
   const { eff, draw, valid } = strengths;
   const likelihood = new Float64Array(COMBO_COUNT);
 
   // Facing a bet: price = call / (pot + call); size = the bet relative to the pot before it.
-  const cutoff = context.facingBet
-    ? continueThreshold({
-        required: context.toCall / (context.pot + context.toCall),
-        sizeRatio: context.betRatio ?? context.toCall / Math.max(context.pot - context.toCall, 1e-9),
-        defenders: context.defenders,
-        params,
-        isRaise: context.facingRaise,
-        river: strengths.draw.every((d) => d === 0),
-      })
-    : 0.5;
+  let cutoff = 0.5;
+  if (context.facingBet) {
+    const sizeRatio = context.betRatio ?? context.toCall / Math.max(context.pot - context.toCall, 1e-9);
+    cutoff = continueThreshold({
+      required: context.toCall / (context.pot + context.toCall),
+      sizeRatio,
+      defenders: context.defenders,
+      params,
+      isRaise: context.facingRaise,
+      river: strengths.draw.every((d) => d === 0),
+    });
+    cutoff = defendedCutoff({ cutoff, weights, strengths, sizeRatio, defenders: context.defenders, params });
+  }
+  const airScale = !context.facingBet && weights ? balancedAirScale({ weights, strengths, params, sizeRatio: context.sizeRatio ?? 0.6 }) : null;
 
   for (let i = 0; i < COMBO_COUNT; i++) {
     if (!valid[i]) continue;
     let value;
     if (!context.facingBet) {
-      const p = unopenedProbabilities(eff[i], draw[i], params, context.donk, context.sizeRatio);
+      const p = unopenedProbabilities(eff[i], draw[i], params, context.donk, context.sizeRatio, airScale);
       value = action === 'check' ? p.check : p.bet;
     } else {
       const p = facingBetProbabilities(eff[i], draw[i], cutoff, params, context.sizeRatio, context.facingRaise ? 0.6 : 1);
@@ -179,22 +243,29 @@ export function postflopActionLikelihood({ action, strengths, context, params })
   return likelihood;
 }
 
-// Weights of the part of a range that continues when the hero bets or raises (used for EV math).
+// Weights of the part of a range that continues when the hero bets or raises (used for EV math), and the part
+// of it that raises back.
 // required / sizeRatio as in continueThreshold. Returns { weights, share } (share = weighted fraction that continues).
-export function continuingRange({ weights, strengths, required, sizeRatio, defenders, params, isRaise = false, river = true }) {
+export function continuingRange({ weights, strengths, required, sizeRatio, defenders, params, isRaise = false, river = true, rangeEdge = false }) {
   const { eff, draw, valid } = strengths;
-  const cutoff = continueThreshold({ required, sizeRatio, defenders, params, isRaise, river });
+  const priced = continueThreshold({ required, sizeRatio, defenders, params, isRaise, river });
+  const cutoff = defendedCutoff({ cutoff: priced, weights, strengths, sizeRatio, defenders, params, rangeEdge });
   const next = new Float64Array(COMBO_COUNT);
+  const raising = new Float64Array(COMBO_COUNT);
   let before = 0;
   let after = 0;
+  let raised = 0;
   for (let i = 0; i < COMBO_COUNT; i++) {
     if (!valid[i] || weights[i] <= 0) continue;
     const p = facingBetProbabilities(eff[i], draw[i], cutoff, params, 0.8, isRaise ? 0.6 : 1);
     next[i] = weights[i] * (1 - p.fold);
+    raising[i] = weights[i] * p.raise;
     before += weights[i];
     after += next[i];
+    raised += raising[i];
   }
-  return { weights: next, share: before > 0 ? after / before : 0 };
+  // raiseShare: the part of the continuing range that raises back (weights in raiseWeights).
+  return { weights: next, share: before > 0 ? after / before : 0, raiseWeights: raising, raiseShare: after > 0 ? raised / after : 0 };
 }
 
 // How a player's range splits when nobody has bet yet: the weights that would bet and the weights that
@@ -206,9 +277,10 @@ export function bettingSplit({ weights, strengths, params, sizeRatio = 0.6, donk
   const check = new Float64Array(COMBO_COUNT);
   let total = 0;
   let betTotal = 0;
+  const airScale = balancedAirScale({ weights, strengths, params, sizeRatio });
   for (let i = 0; i < COMBO_COUNT; i++) {
     if (!valid[i] || weights[i] <= 0) continue;
-    const p = unopenedProbabilities(eff[i], draw[i], params, donk, sizeRatio);
+    const p = unopenedProbabilities(eff[i], draw[i], params, donk, sizeRatio, airScale);
     bet[i] = weights[i] * p.bet;
     check[i] = weights[i] * p.check;
     total += weights[i];
