@@ -1,0 +1,36 @@
+/* Tendency + skill level chips for one player. */
+
+.read-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.read-picker.is-compact {
+  gap: 10px;
+}
+
+.read-picker-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.read-picker-label {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.read-picker-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.read-picker-description {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}

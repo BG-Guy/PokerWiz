@@ -29,6 +29,17 @@ function traitNotes(decision, ctx) {
     if (bluffMult > 1.8 && decision.toCall > 0 && acted?.kind === 'fold') {
       notes.push(`${read.position} (${read.label}) bluffs a lot, so their betting range is weaker than it looks. Call down lighter.`);
     }
+    // Recreational habits: big bets are value, and they call (not bet) their draws.
+    const facedBig = decision.toCall > 0 && read.seat === decision.aggressorSeat && (decision.facedBetRatio ?? 0) >= 0.75;
+    if (facedBig && villain.params.bigBluffShy >= 0.5) {
+      notes.push(`${read.position} (${read.label}) rarely bluffs this big: players at that level bluff small if at all, so their range here was weighted heavily toward value.`);
+    }
+    if (villain.params.drawAggro <= 0.4 && decision.toCall > 0 && read.seat === decision.aggressorSeat && decision.street !== 'River') {
+      notes.push(`${read.position} plays draws passively (they check and call them), so this bet was read as a made hand more than a semi-bluff.`);
+    }
+    if (villain.params.drawAggro <= 0.4 && decision.toCall === 0 && acted?.kind === 'raise' && (acted.equityWhenCalled ?? 0) >= 0.5 && decision.street !== 'River') {
+      notes.push(`${read.position} calls with their draws rather than folding or raising: expect to get called by draws, and charge them for it.`);
+    }
     if (villain.profile.tilt >= 60) notes.push(`${read.position} is tilted: their ranges were widened and they were modeled to bluff more and fold less.`);
   }
   return notes;

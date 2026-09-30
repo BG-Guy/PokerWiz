@@ -74,7 +74,7 @@ For every combo on the board, the coach computes three numbers:
 - The player estimates their equity against the range they put the bettor on. That range is a value region plus some bluffs.
 - **Value region** starts at `0.97 - 0.42 * exp(-0.9 * size/pot)`: about 0.66 for a third-pot bet, 0.80 for a pot bet, 0.90 at 2x pot. Raises add 0.10, and multiway adds 0.03 per extra player.
 - **Bluffs** are assumed at `0.75 * required / foldMult`. Populations under-bluff big bets. Stations (low `foldMult`) believe you bluff more; nits believe you bluff less.
-- **Threshold** to continue: `valueStart + (1 - valueStart) * (required - bluffs) / (1 - bluffs)`. If they believe you bluff at least as often as the required equity, anything that beats air calls.
+- **Threshold** to continue: `valueStart + (1 - valueStart) * (required - bluffs) / (1 - bluffs)`. If they believe you bluff at least as often as the required equity, anything that beats air calls, but the floor still rises with bet size: `0.25 + 0.3 * size/pot * foldMult + 0.1 * required`. A station calls a third-pot bet with bottom pair, not a 2x-pot overbet.
 - MDF (`pot / (pot + bet)`) is kept in the code as the theoretical benchmark.
 
 **Nobody has bet.**
@@ -108,33 +108,50 @@ For every combo on the board, the coach computes three numbers:
 - **Labels:** Best at 97+, Good at 80+, Inaccuracy at 55+, Mistake at 30+, Blunder below 30.
 - **Hand accuracy** is a weighted average of the decisions, weighted by the square root of the pot in big blinds, so big pots count more.
 
-## Traits (`profiles.js`)
+## Reads: tendency + skill level (`profiles.js`)
 
-There are five meters, each from 0 to 100:
+A read has two parts, chosen separately: **how they play** (tendency) and **how good they are** (skill level). Under them are five meters, each from 0 to 100:
 
-- Looseness
-- Aggression
-- Skill
+- Looseness and Aggression (set by the tendency)
+- Skill (set by the level)
 - Tilt
 - Form (cold run ... heater, with 50 as neutral)
 
-Presets fill in the first three. They aim at typical tracker numbers (VPIP / PFR, aggression):
+Tendencies aim at typical tracker numbers (VPIP / PFR, aggression):
 
-| Preset | VPIP / PFR | Aggression |
+| Tendency | VPIP / PFR | Notes |
 | --- | --- | --- |
+| Unknown | 24 / 19 | an average player |
 | Nit | 14 / 11 | |
 | TAG | 22 / 19 | |
-| LAG | 32 / 26 | 3-5 |
-| Calling station | 40 / 8 | below 1.5 |
-| Maniac | 50 / 40 | 5+ |
-| Recreational | loose-passive | |
-| Pro | close to solver | |
+| LAG | 32 / 26 | aggression 3-5 |
+| Loose passive | 35 / 10 | |
+| Calling station | 40 / 8 | aggression below 1.5 |
+| Maniac | 50 / 40 | aggression 5+ |
+| Drunk | very loose | extra noise, folds 30% less, bluffs 30% more and at any size |
+
+Skill levels: Beginner (5), Recreational (22), Regular (50), Strong regular (75), Pro (95). Skill sets:
+
+- **Sharpness** (`noise`): pros follow their thresholds closely, beginners are all over the place.
+- **Calling:** folding is pulled toward the correct amount as skill rises; recreational players call noticeably more (x0.75 at skill 0).
+- **Big bluffs** (`bigBluffShy`): below strong-regular level, bluffing drops off as bets get bigger (`exp(-3 * shy * (size - 0.4))`). A recreational player's pot-size bet is almost never a bluff, and their big bets come from clearly strong hands (sharper edge, slightly higher threshold). Tilt brings big bluffs back.
+- **Draws** (`drawAggro`): recreational players check and call their draws, even big combo draws. Bets and raises are judged on made-hand strength (`hs`) instead of strength plus draw equity (`eff`), and semi-bluffs are scaled down. Strong players bet and raise draws.
+
+Mood and image:
 
 - **Tilt** widens ranges (up to +60%), raises aggression (+50%) and bluffs (x2), cuts folding (-30%) and adds noise. This follows the tilt research: more hands, more aggression, ignoring pot odds.
 - **Heater** makes a player a bit wider and more aggressive, and less likely to fold.
 - **Cold run** makes a player tighter and more passive, and more likely to fold ("scared money").
 - **Your table image** (your own Looseness and Aggression, plus visible tilt) changes how often villains fold to you. A wild image gets fewer folds, a nitty image gets more.
-- **Your Skill** sets how strict the grading is.
+- **Your level** sets how strict the grading is.
+
+## Practice mode (`src/practice/generateSpot.js`)
+
+You pick a game (cash: 6-max, $1/$2, 100 bb; tournament: 9-max, 1/2 with a big-blind ante, 30 bb), a spot (preflop, heads-up, 3-way) and a read and stack for each opponent. Preflop uses one read for the whole table.
+
+- **Preflop:** every seat is dealt; players before you act on their real cards, sampling fold / call / raise from the preflop model's likelihoods for their hand. Half the time the bottom 40% of hands is redealt to you, so fewer spots are automatic folds.
+- **Heads-up / 3-way:** the first player in preflop order opens and the others call. Each player's cards are dealt by rejection sampling so they fit that action for their read. Then a street is picked (flop 45%, turn 30%, river 25%) and everyone plays on to your turn: villains sample check/bet (random standard size, overbets for wild players) or fold/call/raise from the postflop model with their real cards. Your earlier streets are played by a solid regular; spots where it would fold are redealt.
+- Your decision is appended to the log and graded by `analyzeHand` like any other hand. Villain cards are revealed with the grade.
 
 ## Reviewing saved hands (the Coach button in Hands)
 
@@ -181,6 +198,8 @@ Add a case whenever a verdict looks wrong, then tune.
 - **Short stacks** (under 25 bb) should switch to push/fold charts preflop.
 - **Blockers** aren't used explicitly. Card removal is only handled through sampling.
 - **PLO** isn't supported by the coach; the evaluator and ranges are Hold'em only.
+- **Sizing against sticky players:** against calling stations and recreational players the coach prefers big value bets and grades half-pot value bets hard. Real players fold more of their weak hands to big bets than the calling floor says; a better continuing-range model would soften this.
+- **Tournament ICM** isn't modeled: tournament spots are graded on chips, and preflop charts don't adjust for the ante.
 - **Villain grading** ("how well did they play") would reuse the same machinery.
 - **Profile learning:** trait meters could be filled in from a villain's past hands and stored per opponent.
 

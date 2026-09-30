@@ -1,8 +1,9 @@
-// Coach-mode step: reads on every player. Pick a player type (Nit, LAG, Calling station...) and fine-tune the
-// trait meters. For the hero, the meters describe your table image (how villains react to your bets),
-// your level (how strictly the coach grades) and your state (tilt, heater / cold run).
+// Coach-mode step: reads on every player. Pick a tendency (Nit, LAG, Drunk...) and a skill level (Beginner ...
+// Pro), then fine-tune the trait meters. For the hero, the meters describe your table image (how villains
+// react to your bets), your level (how strictly the coach grades) and your state (tilt, heater / cold run).
 import { useState } from 'react';
-import { PRESETS, TRAITS, applyPreset, describeProfile, setTrait } from '../../../coach/profiles.js';
+import { TRAITS, describeProfile, setTrait } from '../../../coach/profiles.js';
+import ReadPicker from '../../ReadPicker/ReadPicker.jsx';
 import TraitMeter from '../../TraitMeter/TraitMeter.jsx';
 import Icon from '../../Icon/Icon.jsx';
 import './TraitsPrompt.css';
@@ -14,7 +15,6 @@ export default function TraitsPrompt({ players, profiles, onChange, onContinue }
   const player = ordered.find((p) => p.seat === activeSeat);
   const profile = profiles[activeSeat];
   const isHero = player.role === 'hero';
-  const preset = PRESETS.find((p) => p.id === profile.preset);
 
   return (
     <>
@@ -25,7 +25,7 @@ export default function TraitsPrompt({ players, profiles, onChange, onContinue }
       <p className="prompt-text">
         {isHero
           ? 'Your image changes how villains respond to your bets. Your level sets how strict the coach is.'
-          : 'Pick a type, then fine-tune. Traits change their ranges and how often they fold, call and bluff.'}
+          : 'Pick how they play and how good they are, then fine-tune. Reads change their ranges and how often they fold, call and bluff.'}
       </p>
 
       {/* One tab per player */}
@@ -50,21 +50,8 @@ export default function TraitsPrompt({ players, profiles, onChange, onContinue }
         ))}
       </div>
 
-      {/* Player type presets */}
-      <span className="prompt-field-label">{isHero ? 'Your style' : 'Player type'}</span>
-      <div className="prompt-chips">
-        {PRESETS.map((p) => (
-          <button
-            key={p.id}
-            type="button"
-            className={`filter-chip ${profile.preset === p.id ? 'is-active' : ''}`}
-            onClick={() => onChange(activeSeat, applyPreset(profile, p.id))}
-          >
-            {p.label}
-          </button>
-        ))}
-      </div>
-      <p className="traits-description">{preset ? preset.description : 'Custom read: set by the meters below.'}</p>
+      {/* Tendency and skill level */}
+      <ReadPicker profile={profile} isHero={isHero} onChange={(next) => onChange(activeSeat, next)} />
 
       {/* Fine-tuning meters */}
       <div className="traits-meters">

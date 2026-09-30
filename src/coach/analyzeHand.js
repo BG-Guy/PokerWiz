@@ -142,6 +142,8 @@ export function analyzeHand(record, { iterations = 2500 } = {}) {
         heroHand: describeHeroHand(heroCards, board, strengths),
         equityVsActual,
         reads: villainReads(villains, state),
+        aggressorSeat: streetAggressor,
+        facedBetRatio,
         ...graded,
       };
       decision.notes = graded.kind === 'chart' ? explainPreflop(decision, ctx) : explainPostflop(decision, ctx);

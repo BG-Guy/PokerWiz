@@ -11,7 +11,7 @@ export function actionType(action) {
   return VERB_TYPES[action.verb] ?? 'raise'; // "raises to", "3-bets to", "re-raises to"
 }
 
-// record: { players: [{ seat, position, role, name, stack }], positions, stakes: { sb, bb }, streets, board }
+// record: { players: [{ seat, position, role, name, stack }], positions, stakes: { sb, bb, ante? }, streets, board }
 // visit({ state, action, type, street, streetIndex, actionsSoFar }) is called before each action is applied.
 // Returns the final engine state. Throws if the log doesn't match the table (e.g. a hand without stacks).
 export function replayHand(record, visit) {
@@ -20,6 +20,7 @@ export function replayHand(record, visit) {
     positions: record.positions,
     sb: record.stakes.sb,
     bb: record.stakes.bb,
+    ante: record.stakes.ante ?? 0,
   });
 
   record.streets.forEach((street, streetIndex) => {

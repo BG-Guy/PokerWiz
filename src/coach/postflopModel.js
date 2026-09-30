@@ -51,7 +51,9 @@ export function continueThreshold({ required, sizeRatio, defenders = 1, params, 
   // overbets (over 2x pot) look more suspicious. Stations believe in more bluffs, nits in fewer.
   const suspicion = 0.75 + 0.15 * clamp((sizeRatio - 1) / 3, 0, 1);
   const bluffBelief = clamp((suspicion * required) / params.foldMult, 0.02, 0.75);
-  if (required <= bluffBelief) return 0.3; // they think you bluff enough: anything that beats air calls
+  // They think you bluff enough: anything that beats air calls. Even so, bigger bets scare off more of the
+  // weakest hands (a station calls a third-pot bet with bottom pair, not a 2x-pot overbet).
+  if (required <= bluffBelief) return clamp(0.25 + 0.3 * sizeRatio * params.foldMult + 0.1 * required, 0.3, valueStart);
   return valueStart + ((1 - valueStart) * (required - bluffBelief)) / (1 - bluffBelief);
 }
 
@@ -74,6 +76,20 @@ export function strengthCutoff(weights, strength, valid, share) {
   return strength[items[items.length - 1]];
 }
 
+// Share of a player's normal bluffing that survives at this bet size (bet / pot). Players with bigBluffShy
+// (recreational) bluff small if at all: a pot-size bluff is rare, an overbet bluff almost never happens.
+export function bluffSizeFactor(sizeRatio, params) {
+  return Math.exp(-3 * (params.bigBluffShy ?? 0) * Math.max(0, sizeRatio - 0.4));
+}
+
+// Strength a player bets and raises with. Players who play draws aggressively count a draw's equity
+// (eff); passive drawers (recreational players, drawAggro near 0) bet and raise only on what they've
+// made, and keep their draws for calling. hs is recovered from eff = hs + (1 - hs) * draw.
+function aggressionStrength(eff, draw, params) {
+  const hs = draw < 1 ? Math.max(0, (eff - draw) / (1 - draw)) : eff;
+  return eff - (1 - (params.drawAggro ?? 1)) * (eff - hs);
+}
+
 // Probabilities for one combo when nobody has bet yet: { bet, check }.
 // donk = acting before the previous street's aggressor, who hasn't acted yet (leading into them is rare).
 // sizeRatio = the bet's size / pot when known (bigger bets = stronger value hands), else a typical 0.6.
@@ -82,11 +98,17 @@ function unopenedProbabilities(eff, draw, params, donk, sizeRatio = 0.6) {
   const a = aggroNorm(params);
   const valueThreshold = clamp(valueRegionStart(sizeRatio) - 0.1 * a, 0.5, 0.97);
   const valueFrequency = clamp(0.35 + 0.3 * params.aggression, 0.3, 0.95);
-  const value = valueFrequency * sigmoid((eff - valueThreshold) / edgeSoftness(s, valueThreshold));
+  // Players who don't bluff big don't bet big with medium hands either: their big bets are clearly strong.
+  const bigBet = (params.bigBluffShy ?? 0) * clamp((sizeRatio - 0.4) / 0.6, 0, 1);
+  const valueSoftness = edgeSoftness(s * (1 - 0.6 * bigBet), valueThreshold);
+  const value = valueFrequency * sigmoid((aggressionStrength(eff, draw, params) - valueThreshold - 0.05 * bigBet) / valueSoftness);
   // Pure bluffs from the bottom of the range, semi-bluffs from draws.
-  const airBluff = 0.1 * params.bluffMult * (1 - sigmoid((eff - 0.35) / s));
-  const semiBluff = clamp(draw * 1.2, 0, 0.5) * clamp(params.aggression / 2.5, 0.2, 1.4);
-  let bet = clamp(value + airBluff + semiBluff, 0.02, 0.98);
+  // Recreational players bluff small if at all, and check their draws (even combo draws) instead of betting.
+  const sizeFactor = bluffSizeFactor(sizeRatio, params);
+  const airBluff = 0.1 * params.bluffMult * (1 - sigmoid((eff - 0.35) / s)) * sizeFactor;
+  const semiBluff = clamp(draw * 1.2, 0, 0.5) * clamp(params.aggression / 2.5, 0.2, 1.4) * (params.drawAggro ?? 1) * Math.sqrt(sizeFactor);
+  // The floor is the "random" bet any hand might make; for players who don't bluff big it shrinks with size.
+  let bet = clamp(value + airBluff + semiBluff, 0.002 + 0.018 * sizeFactor, 0.98);
   if (donk) bet *= 0.12 + 0.35 * (1 - params.skill); // amateurs donk more than pros
   return { bet, check: 1 - bet };
 }
@@ -100,9 +122,27 @@ function facingBetProbabilities(eff, draw, cutoff, params, raiseRatio = 0.8, cri
   const cont = sigmoid((eff - cutoff) / edgeSoftness(s * crisp, cutoff));
   const raiseThreshold = clamp(valueRegionStart(raiseRatio) + 0.06 - 0.08 * a, 0.72, 0.985);
   const raiseFrequency = clamp(0.15 + 0.2 * params.aggression, 0.1, 0.9);
-  // Raises are deliberate: sharper edges than calls, plus semi-bluff raises with draws.
-  const raise = clamp(raiseFrequency * sigmoid((eff - raiseThreshold) / edgeSoftness(s * 0.6, raiseThreshold)) + 0.125 * draw * params.bluffMult, 0, cont);
+  // Raises are deliberate: sharper edges than calls, plus semi-bluff raises with draws (players who play
+  // draws passively, like recreational players, just call with them).
+  const drawRaise = 0.125 * draw * params.bluffMult * (params.drawAggro ?? 1) * bluffSizeFactor(raiseRatio, params);
+  const raise = clamp(raiseFrequency * sigmoid((aggressionStrength(eff, draw, params) - raiseThreshold) / edgeSoftness(s * 0.6, raiseThreshold)) + drawRaise, 0, cont);
   return { fold: 1 - cont, call: Math.max(0.005, cont - raise), raise: Math.max(0.003, raise) };
+}
+
+// How one specific combo plays in a spot, for simulating a player (Practice mode). Same context as
+// postflopActionLikelihood. Returns { check, bet } when nobody has bet, else { fold, call, raise }.
+export function comboActionProbabilities({ index, strengths, context, params }) {
+  const { eff, draw } = strengths;
+  if (!context.facingBet) return unopenedProbabilities(eff[index], draw[index], params, context.donk, context.sizeRatio);
+  const cutoff = continueThreshold({
+    required: context.toCall / (context.pot + context.toCall),
+    sizeRatio: context.betRatio ?? context.toCall / Math.max(context.pot - context.toCall, 1e-9),
+    defenders: context.defenders,
+    params,
+    isRaise: context.facingRaise,
+    river: draw.every((d) => d === 0),
+  });
+  return facingBetProbabilities(eff[index], draw[index], cutoff, params, context.sizeRatio, context.facingRaise ? 0.6 : 1);
 }
 
 // Likelihood of the observed action for every combo (Float64Array(1326)).

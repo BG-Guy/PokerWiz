@@ -1,0 +1,117 @@
+// Practice setup: the game (cash or tournament), the spot (preflop, heads-up, 3-way), and who you're up
+// against: each opponent's tendency, skill level and stack. Preflop uses one read for the whole table.
+import { GAMES, FORMATS } from '../../practice/generateSpot.js';
+import { LEVELS, applyLevel, describeProfile, levelOf } from '../../coach/profiles.js';
+import ReadPicker from '../../components/ReadPicker/ReadPicker.jsx';
+import FilterChips from '../../components/FilterChips/FilterChips.jsx';
+import Icon from '../../components/Icon/Icon.jsx';
+import './PracticeSetup.css';
+
+const STACK_CHOICES = {
+  cash: [40, 60, 100, 150, 200],
+  mtt: [10, 15, 20, 30, 50, 80],
+};
+
+function StackPicker({ game, value, onChange, label }) {
+  return (
+    <div className="practice-stack">
+      <span className="read-picker-label">{label}</span>
+      <div className="practice-stack-row">
+        {STACK_CHOICES[game].map((bb) => (
+          <button key={bb} type="button" className={`filter-chip ${value === bb ? 'is-active' : ''}`} aria-pressed={value === bb} onClick={() => onChange(bb)}>
+            {bb} bb
+          </button>
+        ))}
+        <label className="practice-stack-input">
+          <input
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={1000}
+            value={value}
+            aria-label={`${label} in big blinds`}
+            onChange={(event) => onChange(Math.max(1, Math.min(1000, Number(event.target.value) || 1)))}
+          />
+          <span>bb</span>
+        </label>
+      </div>
+    </div>
+  );
+}
+
+export default function PracticeSetup({ setup, onChange, onStart }) {
+  const format = FORMATS.find((f) => f.id === setup.format);
+  const game = GAMES.find((g) => g.id === setup.game);
+  const shown = setup.villains.slice(0, format.villains);
+  const isTable = setup.format === 'preflop';
+
+  const changeGame = (id) => {
+    const next = GAMES.find((g) => g.id === id);
+    onChange({
+      ...setup,
+      game: id,
+      hero: { ...setup.hero, stackBB: next.defaultStackBB },
+      villains: setup.villains.map((v) => ({ ...v, stackBB: next.defaultStackBB })),
+    });
+  };
+  const changeVillain = (index, patch) =>
+    onChange({ ...setup, villains: setup.villains.map((v, i) => (i === index ? { ...v, ...patch } : v)) });
+
+  return (
+    <div className="practice-setup">
+      <section className="practice-card">
+        <h2 className="practice-card-title">The game</h2>
+        <FilterChips label="Game" value={setup.game} onChange={changeGame} options={GAMES.map((g) => ({ value: g.id, label: g.label }))} />
+        <FilterChips
+          label="Spot"
+          value={setup.format}
+          onChange={(id) => onChange({ ...setup, format: id })}
+          options={FORMATS.map((f) => ({ value: f.id, label: f.label }))}
+        />
+        <p className="practice-card-text">
+          {format.description} {game.id === 'mtt' ? 'Blinds 1/2 with a big-blind ante, 9-handed.' : 'Blinds $1/$2, 6-max.'}
+        </p>
+      </section>
+
+      {shown.map((villain, index) => (
+        <section key={index} className="practice-card">
+          <h2 className="practice-card-title">
+            <Icon name={isTable ? 'users' : 'villain'} size={18} />
+            {isTable ? 'The table' : shown.length > 1 ? `Opponent ${index + 1}` : 'Your opponent'}
+            <span className="practice-card-badge">{describeProfile(villain.profile).label}</span>
+          </h2>
+          {isTable && <p className="practice-card-text">Everyone at the table plays this read.</p>}
+          <ReadPicker profile={villain.profile} onChange={(profile) => changeVillain(index, { profile })} />
+          <StackPicker game={setup.game} label="Stack" value={villain.stackBB} onChange={(stackBB) => changeVillain(index, { stackBB })} />
+        </section>
+      ))}
+
+      <section className="practice-card">
+        <h2 className="practice-card-title">
+          <Icon name="hero" size={18} /> You
+        </h2>
+        <StackPicker game={setup.game} label="Your stack" value={setup.hero.stackBB} onChange={(stackBB) => onChange({ ...setup, hero: { ...setup.hero, stackBB } })} />
+        <div className="read-picker-group">
+          <span className="read-picker-label">Grade me as</span>
+          <div className="read-picker-chips">
+            {LEVELS.map((level) => (
+              <button
+                key={level.id}
+                type="button"
+                className={`filter-chip ${levelOf(setup.hero.profile).id === level.id ? 'is-active' : ''}`}
+                onClick={() => onChange({ ...setup, hero: { ...setup.hero, profile: applyLevel(setup.hero.profile, level.id) } })}
+              >
+                {level.label}
+              </button>
+            ))}
+          </div>
+          <p className="read-picker-description">Higher levels get less slack on close decisions.</p>
+        </div>
+      </section>
+
+      <button type="button" className="btn practice-start" onClick={onStart}>
+        <Icon name="play" size={18} /> Deal a spot
+      </button>
+    </div>
+  );
+}
