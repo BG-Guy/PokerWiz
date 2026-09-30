@@ -1,0 +1,88 @@
+/* Practice setup: stacked cards for the game, each opponent and you. */
+
+.practice-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.practice-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.practice-card-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+}
+.practice-card-badge {
+  margin-left: auto;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.practice-card-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.practice-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.practice-stack-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.practice-stack-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.practice-stack-input input {
+  width: 56px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--text);
+  text-align: right;
+}
+.practice-stack-input input:focus {
+  outline: none;
+}
+.practice-stack-input:focus-within {
+  border-color: var(--accent);
+}
+
+.practice-start {
+  align-self: stretch;
+  justify-content: center;
+  min-height: 52px;
+  font-size: 17px;
+}

@@ -384,7 +384,7 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
       cards: cards[seat] ?? [],
       // Coach mode shows each player's read (e.g. "LAG", "Tilted") on their seat.
       badge:
-        isCoach && role && profiles[seat] && (role === 'villain' || profiles[seat].preset !== 'unknown' || describeProfile(profiles[seat]).tags.length)
+        isCoach && role && profiles[seat] && (role === 'villain' || describeProfile(profiles[seat]).label !== 'Unknown')
           ? describeProfile(profiles[seat]).label
           : null,
       // Before the action starts show the starting stack; during it, what's left behind.

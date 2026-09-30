@@ -39,28 +39,32 @@ function actingOrder(state, positionOrder, afterSeat = null) {
 
 // Start a hand: post blinds (capped by stack) and put the first preflop player on the clock.
 // positions: table positions in seat order, clockwise from the button (see TABLE_POSITIONS).
-export function createHand({ players, positions, sb, bb }) {
+// ante: a tournament big-blind ante, posted by the big blind on top of the blind. It goes in the pot
+// but doesn't count toward the bet to call.
+export function createHand({ players, positions, sb, bb, ante = 0 }) {
   const preflopOrder = [...positions.slice(3), ...positions.slice(0, 3)]; // UTG ... BTN, SB, BB
   const postflopOrder = [...positions.slice(1), positions[0]]; // SB, BB, ... BTN
 
   const list = players.map((p) => ({ ...p, invested: 0, streetBet: 0, folded: false, allIn: false, lastAction: null }));
   for (const p of list) {
+    const anted = p.position === 'BB' ? Math.min(ante, p.stack) : 0;
     const blind = p.position === 'SB' ? sb : p.position === 'BB' ? bb : 0;
-    const posted = Math.min(blind, p.stack);
-    p.invested = posted;
+    const posted = Math.min(blind, p.stack - anted);
+    p.invested = anted + posted;
     p.streetBet = posted;
-    p.allIn = posted > 0 && posted >= p.stack;
+    p.allIn = p.invested > 0 && p.invested >= p.stack;
   }
 
-  // Blinds from seats that folded before the action reached them are dead money in the pot.
+  // Blinds (and the ante) from seats that folded before the action reached them are dead money in the pot.
   const inHand = new Set(list.map((p) => p.position));
-  const dead = (inHand.has('SB') ? 0 : sb) + (inHand.has('BB') ? 0 : bb);
+  const dead = (inHand.has('SB') ? 0 : sb) + (inHand.has('BB') ? 0 : bb + ante);
   const pot = round2(dead + list.reduce((sum, p) => sum + p.invested, 0));
 
   const state = {
     players: list,
     sb,
     bb,
+    ante,
     pot,
     currentBet: bb,
     minRaise: bb,

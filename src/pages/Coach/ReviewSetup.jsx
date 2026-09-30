@@ -1,21 +1,16 @@
 // Header for a coach review of a saved hand: which hand it is, what the coach had to assume, and quick
-// reads (player type per villain, your level) that re-run the analysis when changed.
+// reads (tendency and skill level per villain, your level) that re-run the analysis when changed.
 import { Link } from 'react-router-dom';
-import { PRESETS, defaultProfile } from '../../coach/profiles.js';
+import { LEVELS, applyLevel, defaultProfile, levelOf } from '../../coach/profiles.js';
+import ReadPicker from '../../components/ReadPicker/ReadPicker.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import './ReviewSetup.css';
 
-// Your level sets how strictly the coach grades (tolerance for small EV differences).
-export const LEVELS = [
-  { label: 'Amateur', skill: 20 },
-  { label: 'Regular', skill: 50 },
-  { label: 'Pro', skill: 85 },
-];
-
-export default function ReviewSetup({ hand, record, assumptions, busy, status, onReadChange, onLevelChange }) {
+// onReadChange(position, profile) for a villain; onHeroChange(profile) for your level (how strictly the coach grades).
+export default function ReviewSetup({ hand, record, assumptions, busy, status, onReadChange, onHeroChange }) {
   const villains = record.players.filter((p) => p.role === 'villain');
-  const heroSkill = (record.players.find((p) => p.role === 'hero').profile ?? defaultProfile()).skill;
-  const level = LEVELS.reduce((a, b) => (Math.abs(b.skill - heroSkill) < Math.abs(a.skill - heroSkill) ? b : a));
+  const heroProfile = record.players.find((p) => p.role === 'hero').profile ?? defaultProfile();
+  const level = levelOf(heroProfile);
   // The "no reads" note goes away once any villain has a read.
   const shown = villains.some((v) => v.profile) ? assumptions.filter((a) => a.id !== 'reads') : assumptions;
 
@@ -42,26 +37,14 @@ export default function ReviewSetup({ hand, record, assumptions, busy, status, o
         </ul>
       )}
 
-      {/* Reads: tap a player type and the coach re-runs */}
+      {/* Reads: change a tendency or level and the coach re-runs */}
       <div className="review-setup-reads">
         {villains.map((villain) => (
           <div key={villain.seat} className="review-setup-read">
             <span className="review-setup-read-name">
               <Icon name="villain" size={14} /> {villain.position}
             </span>
-            <div className="review-setup-chips">
-              {PRESETS.map((preset) => (
-                <button
-                  key={preset.id}
-                  type="button"
-                  className={`filter-chip ${(villain.profile?.preset ?? 'unknown') === preset.id ? 'is-active' : ''}`}
-                  disabled={busy}
-                  onClick={() => onReadChange(villain.position, preset.id)}
-                >
-                  {preset.label}
-                </button>
-              ))}
-            </div>
+            <ReadPicker compact profile={villain.profile ?? defaultProfile()} disabled={busy} onChange={(next) => onReadChange(villain.position, next)} />
           </div>
         ))}
         <div className="review-setup-read">
@@ -71,11 +54,11 @@ export default function ReviewSetup({ hand, record, assumptions, busy, status, o
           <div className="review-setup-chips">
             {LEVELS.map((option) => (
               <button
-                key={option.label}
+                key={option.id}
                 type="button"
-                className={`filter-chip ${option === level ? 'is-active' : ''}`}
+                className={`filter-chip ${option.id === level.id ? 'is-active' : ''}`}
                 disabled={busy}
-                onClick={() => onLevelChange(option.skill)}
+                onClick={() => onHeroChange(applyLevel(heroProfile, option.id))}
               >
                 {option.label}
               </button>

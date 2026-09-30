@@ -4,14 +4,14 @@
 // Each case prints the hero's decisions with grade, best line and EV so the model can be tuned by eye.
 import { createHand, applyAction, dealBoard, heroResult } from '../src/utils/handEngine.js';
 import { analyzeHand } from '../src/coach/analyzeHand.js';
-import { applyPreset, defaultProfile } from '../src/coach/profiles.js';
+import { applyLevel, applyPreset, defaultProfile } from '../src/coach/profiles.js';
 import { prepareSavedHand } from '../src/coach/savedHand.js';
 
 const VERBOSE = process.argv.includes('--verbose');
 const POSITIONS = ['BTN', 'SB', 'BB', 'UTG', 'HJ', 'CO'];
 
 // Build a coach record by playing a script through the engine.
-// players: [{ position, role, cards, stack, preset? }]; script: [{ act: {type, amount} } | { deal: [codes] }]
+// players: [{ position, role, cards, stack, preset?, level? }]  (preset = tendency, level = skill level); script: [{ act: {type, amount} } | { deal: [codes] }]
 function buildRecord({ players, script, sb = 1, bb = 2, winners }) {
   const seated = players.map((p) => ({
     seat: POSITIONS.indexOf(p.position),
@@ -20,7 +20,7 @@ function buildRecord({ players, script, sb = 1, bb = 2, winners }) {
     name: p.role === 'hero' ? 'You' : p.position,
     stack: p.stack ?? 200,
     cards: p.cards ?? [],
-    profile: p.preset ? applyPreset(defaultProfile(), p.preset) : p.profile ?? defaultProfile(),
+    profile: applyLevel(p.preset ? applyPreset(defaultProfile(), p.preset) : p.profile ?? defaultProfile(), p.level ?? 'regular'),
   }));
   let state = createHand({ players: seated, positions: POSITIONS, sb, bb });
   for (const step of script) {
@@ -82,7 +82,7 @@ const CASES = [
     name: 'River bluff with air vs a calling station',
     expect: 'bluff is a mistake',
     players: [
-      { position: 'BB', role: 'villain', preset: 'station' },
+      { position: 'BB', role: 'villain', preset: 'station', level: 'rec' },
       { position: 'BTN', role: 'hero', cards: ['Jc', 'Tc'] },
     ],
     script: [
@@ -138,10 +138,53 @@ const CASES = [
     name: 'Short-stacked villain shoves, hero calls with 22 vs a maniac',
     expect: 'call is fine vs a maniac',
     players: [
-      { position: 'BTN', role: 'villain', preset: 'maniac', stack: 30 },
+      { position: 'BTN', role: 'villain', preset: 'maniac', level: 'rec', stack: 30 },
       { position: 'BB', role: 'hero', cards: ['2h', '2c'] },
     ],
     script: [act('allin'), act('call'), deal('Kd', '9s', '5c'), deal('Jh'), deal('4d')],
+  },
+  // Recreational habits: big bets are value, draws are played passively.
+  ...['rec', 'strong'].map((level) => ({
+    name: `Calls a pot-size river bet with top pair, weak kicker vs a ${level === 'rec' ? 'recreational' : 'strong'} player`,
+    expect: level === 'rec' ? 'range is all made hands (recs rarely bluff big): call worth about half' : 'range has bluffs: call is fine',
+    players: [
+      { position: 'BB', role: 'villain', preset: 'unknown', level },
+      { position: 'BTN', role: 'hero', cards: ['Kd', '9c'] },
+    ],
+    script: [
+      act('raise', 5), act('call'),
+      deal('Ks', '8d', '4c'), act('check'), act('bet', 6), act('call'),
+      deal('2s'), act('check'), act('check'),
+      deal('7h'), act('bet', 22), act('call'),
+    ],
+    winners: ['BB'],
+  })),
+  ...['rec', 'strong'].map((level) => ({
+    name: `Faces a flop check-raise on a draw-heavy board with top pair vs a ${level === 'rec' ? 'recreational' : 'strong'} player`,
+    expect: level === 'rec' ? 'raise range is made hands, no combo draws' : 'raise range includes combo draws',
+    players: [
+      { position: 'BB', role: 'villain', preset: 'unknown', level },
+      { position: 'BTN', role: 'hero', cards: ['Ac', 'Jd'] },
+    ],
+    script: [
+      act('raise', 5), act('call'),
+      deal('Jh', 'Th', '4c'), act('check'), act('bet', 6), act('raise', 24), act('call'),
+    ],
+    winners: ['BB'],
+  })),
+  {
+    name: 'River bluff with air vs a drunk player',
+    expect: 'bluff is a mistake',
+    players: [
+      { position: 'BB', role: 'villain', preset: 'drunk', level: 'rec' },
+      { position: 'BTN', role: 'hero', cards: ['Jc', 'Tc'] },
+    ],
+    script: [
+      act('raise', 5), act('call'),
+      deal('Ah', '8s', '3d'), act('check'), act('check'),
+      deal('2h'), act('check'), act('check'),
+      deal('6s'), act('check'), act('bet', 10),
+    ],
   },
 ];
 

@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { createHand, getHand, updateHand } from '../../api/hands.js';
 import { prepareSavedHand } from '../../coach/savedHand.js';
-import { applyPreset, defaultProfile, setTrait } from '../../coach/profiles.js';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import HandRecorder from '../../components/HandRecorder/HandRecorder.jsx';
@@ -117,14 +116,9 @@ export default function Coach() {
     setRecord(next);
     analyze(next, { keepReport: true });
   };
-  const changeRead = (position, presetId) =>
-    rerunWith(
-      record.players.map((p) =>
-        p.role === 'villain' && p.position === position ? { ...p, profile: applyPreset(p.profile ?? defaultProfile(), presetId) } : p
-      )
-    );
-  const changeLevel = (skill) =>
-    rerunWith(record.players.map((p) => (p.role === 'hero' ? { ...p, profile: setTrait(p.profile ?? defaultProfile(), 'skill', skill) } : p)));
+  const changeRead = (position, profile) =>
+    rerunWith(record.players.map((p) => (p.role === 'villain' && p.position === position ? { ...p, profile } : p)));
+  const changeHero = (profile) => rerunWith(record.players.map((p) => (p.role === 'hero' ? { ...p, profile } : p)));
 
   const startOver = () => {
     if (savedHandId) {
@@ -155,9 +149,13 @@ export default function Coach() {
         title="Coach"
         subtitle={savedHandId ? 'A math-based review of a hand from your Hands.' : 'Replay a hand and get a math-based review of every decision.'}
       >
-        {savedHandId && (
+        {savedHandId ? (
           <Link to="/coach" className="btn btn-ghost">
             <Icon name="plus" size={16} /> Coach a new hand
+          </Link>
+        ) : (
+          <Link to="/practice" className="btn btn-ghost">
+            <Icon name="zap" size={16} /> Practice spots
           </Link>
         )}
       </PageHeader>
@@ -199,7 +197,7 @@ export default function Coach() {
           busy={busy || phase === 'analyzing'}
           status={status}
           onReadChange={changeRead}
-          onLevelChange={changeLevel}
+          onHeroChange={changeHero}
         />
       )}
 

@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { to: '/hands', label: 'Hands', icon: 'cards', phone: true },
   { to: '/session', label: 'Play', icon: 'play', phone: true, primary: true },
   { to: '/coach', label: 'Coach', icon: 'coach', phone: true },
+  { to: '/practice', label: 'Practice', icon: 'zap', phone: false },
   { to: '/history', label: 'History', icon: 'clock', phone: false },
   { to: '/insights', label: 'Insights', icon: 'chart', phone: false },
   { to: '/goals', label: 'Goals', icon: 'target', phone: false },
