@@ -20,6 +20,12 @@
 }
 
 /* Sticky mobile header with a frosted background */
+.app-mobile-header-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .app-mobile-header {
   position: sticky;
   top: 0;

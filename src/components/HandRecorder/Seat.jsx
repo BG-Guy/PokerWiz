@@ -7,13 +7,13 @@ import './Seat.css';
 
 // Short bubble text for the last action: "Raise $6", "Check".
 const ACTION_WORDS = { folds: 'Fold', checks: 'Check', calls: 'Call', bets: 'Bet', 'raises to': 'Raise', 're-raises to': 'Raise' };
-function actionBubble({ verb, amount, allIn }) {
-  if (allIn) return `All in ${formatMoney(amount, { sign: false })}`;
+function actionBubble({ verb, amount, allIn }, bb) {
+  if (allIn) return `All in ${formatMoney(amount, { sign: false, bb })}`;
   const word = ACTION_WORDS[verb] ?? verb.replace(' to', '').replace(/^\w/, (c) => c.toUpperCase());
-  return amount ? `${word} ${formatMoney(amount, { sign: false })}` : word;
+  return amount ? `${word} ${formatMoney(amount, { sign: false, bb })}` : word;
 }
 
-export default function Seat({ seat, position, betPosition, selectable, onClick }) {
+export default function Seat({ seat, bb = null, position, betPosition, selectable, onClick }) {
   const { role, name, cards = [], badge, stack, allIn, folded, bet, lastAction, isActive, isWinner } = seat;
   const classes = [
     'seat',
@@ -46,12 +46,12 @@ export default function Seat({ seat, position, betPosition, selectable, onClick 
         {allIn ? (
           <span className="seat-stack is-allin">All in</span>
         ) : (
-          stack != null && <span className="seat-stack num">{formatMoney(stack, { sign: false })}</span>
+          stack != null && <span className="seat-stack num">{formatMoney(stack, { sign: false, bb })}</span>
         )}
       </span>
 
       {isActive && <span className="seat-flag">To act</span>}
-      {!isActive && lastAction && <span className={`seat-bubble ${lastAction.allIn ? 'is-allin' : ''}`}>{actionBubble(lastAction)}</span>}
+      {!isActive && lastAction && <span className={`seat-bubble ${lastAction.allIn ? 'is-allin' : ''}`}>{actionBubble(lastAction, bb)}</span>}
     </>
   );
 
@@ -73,7 +73,7 @@ export default function Seat({ seat, position, betPosition, selectable, onClick 
       {bet > 0 && !folded && (
         <span className="seat-bet num" style={{ left: `${betPosition.x}%`, top: `${betPosition.y}%` }}>
           <span className="seat-bet-chip" aria-hidden="true" />
-          {formatMoney(bet, { sign: false })}
+          {formatMoney(bet, { sign: false, bb })}
         </span>
       )}
     </>

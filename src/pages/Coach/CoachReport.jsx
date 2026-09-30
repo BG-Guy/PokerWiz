@@ -40,7 +40,7 @@ export default function CoachReport({ report, onNewHand, onSave, saveState, canS
             ))}
           </div>
           <p className="coach-report-result">
-            Result <Money amount={report.result ?? 0} />
+            Result <Money amount={report.result ?? 0} bb={report.stakes?.bb} />
           </p>
         </div>
       </section>
@@ -93,7 +93,7 @@ export default function CoachReport({ report, onNewHand, onSave, saveState, canS
       {/* Every decision */}
       <section className="coach-report-decisions">
         {report.decisions.map((decision, index) => (
-          <DecisionCard key={index} decision={decision} number={index + 1} />
+          <DecisionCard key={index} decision={decision} number={index + 1} bb={report.stakes?.bb} />
         ))}
       </section>
 

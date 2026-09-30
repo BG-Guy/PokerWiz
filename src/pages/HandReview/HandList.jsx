@@ -1,7 +1,7 @@
 // Left pane of Hand Review: search box, verdict filter chips, and the list of hands.
 import { Link } from 'react-router-dom';
 import { VERDICTS } from '../../constants/poker.js';
-import { formatDate } from '../../utils/format.js';
+import { bigBlindOf, formatDate } from '../../utils/format.js';
 import FilterChips from '../../components/FilterChips/FilterChips.jsx';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
 import Money from '../../components/Money/Money.jsx';
@@ -92,7 +92,7 @@ export default function HandList({
                 )}
               </span>
               <span className="hand-list-side">
-                <Money amount={hand.result} />
+                <Money amount={hand.result} bb={bigBlindOf(hand.stakes)} />
                 <VerdictBadge verdict={hand.verdict} />
               </span>
             </Link>

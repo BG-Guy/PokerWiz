@@ -1,21 +1,26 @@
 // Action step: the player on the clock picks Fold / Check / Call / Bet / Raise / All in.
 // Bet and Raise open a sizing panel with quick sizes, a stepper and a free amount (capped at the stack).
 import { useState } from 'react';
-import { formatMoney } from '../../../utils/format.js';
+import { formatMoney, getMoneyUnit } from '../../../utils/format.js';
 import Icon from '../../Icon/Icon.jsx';
 import { getOptions, sizeSuggestions } from '../../../utils/handEngine.js';
 import './ActionPrompt.css';
 
 const round2 = (n) => Math.round(n * 100) / 100;
-const dollars = (n) => formatMoney(n, { sign: false });
 
 export default function ActionPrompt({ hand, playerName, onAction, onSkipToEnd }) {
   const { player, remaining, maxTo, toCall, canCheck, callIsAllIn, canRaise, isOpening, minTo } = getOptions(hand);
   const sizes = sizeSuggestions(hand);
+  const dollars = (n) => formatMoney(n, { sign: false, bb: hand.bb });
+  // The typed amount is in the display unit (big blinds or dollars); value is always in dollars.
+  const scale = getMoneyUnit() === 'bb' && hand.bb > 0 ? hand.bb : 1;
+  const toText = (chips) => String(round2(chips / scale));
   const [sizing, setSizing] = useState(false);
-  const [amount, setAmount] = useState(String(sizes[Math.min(1, sizes.length - 1)]?.amount ?? minTo));
+  const [amount, setAmount] = useState(toText(sizes[Math.min(1, sizes.length - 1)]?.amount ?? minTo));
 
-  const value = Math.min(Number(amount), maxTo);
+  // Big-blind amounts are snapped to half a small blind, so 2.33 bb at $1/$3 is a clean $7.
+  const typed = scale === 1 ? Number(amount) : Math.round((Number(amount) * scale) / (hand.sb / 2)) * (hand.sb / 2);
+  const value = Math.min(typed, maxTo);
   const tooSmall = !(value >= minTo);
   const heroFolded = hand.players.some((p) => p.role === 'hero' && p.folded);
   const aggressiveWord = isOpening ? 'Bet' : 'Raise';
@@ -23,7 +28,7 @@ export default function ActionPrompt({ hand, playerName, onAction, onSkipToEnd }
   const canSize = canRaise && minTo < maxTo;
 
   // Stepper moves by one small blind, between the minimum and the stack.
-  const nudge = (steps) => setAmount(String(round2(Math.min(maxTo, Math.max(minTo, (value || 0) + steps * hand.sb)))));
+  const nudge = (steps) => setAmount(toText(Math.min(maxTo, Math.max(minTo, (value || 0) + steps * hand.sb))));
 
   // Describe what the player is facing.
   let situation = 'No bet yet.';
@@ -91,13 +96,13 @@ export default function ActionPrompt({ hand, playerName, onAction, onSkipToEnd }
               <button
                 key={size.label}
                 type="button"
-                className={`filter-chip ${value === size.amount ? 'is-active' : ''}`}
-                onClick={() => setAmount(String(size.amount))}
+                className={`filter-chip ${Math.abs(value - size.amount) < 0.005 ? 'is-active' : ''}`}
+                onClick={() => setAmount(toText(size.amount))}
               >
                 {size.label} <span className="filter-chip-count num">{dollars(size.amount)}</span>
               </button>
             ))}
-            <button type="button" className={`filter-chip action-prompt-allin-chip ${value >= maxTo ? 'is-active' : ''}`} onClick={() => setAmount(String(maxTo))}>
+            <button type="button" className={`filter-chip action-prompt-allin-chip ${value >= maxTo ? 'is-active' : ''}`} onClick={() => setAmount(toText(maxTo))}>
               All in <span className="filter-chip-count num">{dollars(maxTo)}</span>
             </button>
           </div>
@@ -110,17 +115,18 @@ export default function ActionPrompt({ hand, playerName, onAction, onSkipToEnd }
               </svg>
             </button>
             <label className="action-prompt-input">
-              <span aria-hidden="true">$</span>
+              {scale === 1 && <span aria-hidden="true">$</span>}
               <input
                 type="number"
                 inputMode="decimal"
-                min={minTo}
-                max={maxTo}
-                step={hand.sb}
+                min={minTo / scale}
+                max={maxTo / scale}
+                step={hand.sb / scale}
                 value={amount}
                 aria-label={`${aggressiveWord} amount`}
                 onChange={(event) => setAmount(event.target.value)}
               />
+              {scale !== 1 && <span aria-hidden="true">bb</span>}
             </label>
             <button type="button" className="action-prompt-step" onClick={() => nudge(1)} aria-label="Bigger">
               <Icon name="plus" size={18} />

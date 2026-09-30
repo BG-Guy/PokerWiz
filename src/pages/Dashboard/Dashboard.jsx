@@ -7,7 +7,7 @@ import { getGoals } from '../../api/goals.js';
 import { useApi } from '../../hooks/useApi.js';
 import { summarize, cumulativeProfit, newestFirst, sessionProfit } from '../../utils/stats.js';
 import { analyzeGoal, statusTone, GOAL_STATUS } from '../../utils/goalInsights.js';
-import { formatMoney, formatDate, formatDuration, formatWeekday, todayIso } from '../../utils/format.js';
+import { formatDate, formatDuration, formatWeekday, formatUnits, sessionsForDisplay, todayIso } from '../../utils/format.js';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import StatCard from '../../components/StatCard/StatCard.jsx';
@@ -29,7 +29,8 @@ export default function Dashboard() {
   if (!data) return <LoadState error={error} onRetry={reload} />;
 
   // Derived data for each dashboard block.
-  const [sessions, hands, goals, liveSession] = data;
+  const [rawSessions, hands, goals, liveSession] = data;
+  const sessions = sessionsForDisplay(rawSessions); // amounts in the BB/$ display unit
   const summary = summarize(sessions);
   const bankroll = cumulativeProfit(sessions);
   const recentSessions = newestFirst(sessions).slice(0, 4);
@@ -56,12 +57,12 @@ export default function Dashboard() {
       <div className="dashboard-stats">
         <StatCard
           label="Net profit"
-          value={formatMoney(summary.net)}
+          value={formatUnits(summary.net)}
           tone={summary.net >= 0 ? 'positive' : 'negative'}
           hint={`${summary.count} sessions`}
           icon="trendUp"
         />
-        <StatCard label="Hourly" value={`${formatMoney(Math.round(summary.hourly))}/h`} hint={`${Math.round(summary.hours)} hours played`} icon="clock" />
+        <StatCard label="Hourly" value={`${formatUnits(summary.hourly, { whole: true })}/h`} hint={`${Math.round(summary.hours)} hours played`} icon="clock" />
         <StatCard label="Win rate" value={`${summary.bbPer100.toFixed(1)} bb/100`} hint={`${summary.hands.toLocaleString('en-US')} hands`} icon="chart" />
         <StatCard
           label="Winning sessions"
@@ -138,7 +139,7 @@ export default function Dashboard() {
                     {session.venue} · {formatDuration(session.durationMin)}
                   </span>
                 </span>
-                <Money amount={sessionProfit(session)} />
+                <Money amount={sessionProfit(session)} bb={1} />
               </li>
             ))}
           </ul>

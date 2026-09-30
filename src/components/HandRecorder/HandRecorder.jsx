@@ -203,7 +203,7 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
     const logged = next.streets[next.streets.length - 1].actions.at(-1);
     const isHero = actor.role === 'hero';
     const who = isHero ? 'You' : actor.position;
-    const amount = logged.amount ? ` ${formatMoney(logged.amount, { sign: false })}` : '';
+    const amount = logged.amount ? ` ${formatMoney(logged.amount, { sign: false, bb: stakes.bb })}` : '';
     let text = `${who} ${isHero ? secondPerson(logged.verb) : logged.verb}${amount}`;
     if (logged.allIn) {
       const verb = logged.verb === 'calls' ? (isHero ? 'call' : 'calls') : isHero ? 'go' : 'goes';
@@ -234,7 +234,7 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
   };
 
   const finishShowdown = () => {
-    const text = winners.length > 1 ? 'Split pot' : `${nameOf(winners[0])} won ${formatMoney(hand.pot, { sign: false })}`;
+    const text = winners.length > 1 ? 'Split pot' : `${nameOf(winners[0])} won ${formatMoney(hand.pot, { sign: false, bb: stakes.bb })}`;
     advance({ step: finalStep }, { text, role: winners.includes(heroSeat) ? 'hero' : 'villain' });
   };
 
@@ -355,6 +355,7 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
         defaultTitle={defaultTitle()}
         result={heroResult(hand, winners)}
         pot={hand.pot}
+        bb={stakes.bb}
         saving={saving}
         error={saveError}
         onSave={handleSave}
@@ -365,6 +366,7 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
       <AnalyzePrompt
         result={heroResult(hand, winners)}
         pot={hand.pot}
+        bb={stakes.bb}
         decisions={hand.streets.reduce((n, s) => n + s.actions.filter((a) => a.actor === 'Hero').length, 0)}
         onAnalyze={() => onAnalyze({ record: buildRecord(), payload: buildPayload({ title: defaultTitle() }) })}
       />
@@ -403,6 +405,7 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
       <div className="hand-recorder-table">
         <PokerTable
           seats={seats}
+          bb={stakes.bb}
           board={hand?.board ?? []}
           pot={hand?.pot ?? 0}
           rotation={heroSeat ?? 0}

@@ -69,9 +69,9 @@ export default function FinishSessionSheet({ open, session, elapsedMs, onClose, 
           </div>
           <div className="finish-sheet-summary">
             <span>
-              Buy-in {formatMoney(session.buyIn, { sign: false })} · {formatDuration(minutesPlayed)}
+              Buy-in {formatMoney(session.buyIn, { sign: false, bb: session.bigBlind })} · {formatDuration(minutesPlayed)}
             </span>
-            {net != null && <Money amount={net} className="finish-sheet-net" />}
+            {net != null && <Money amount={net} bb={session.bigBlind} className="finish-sheet-net" />}
           </div>
         </section>
 

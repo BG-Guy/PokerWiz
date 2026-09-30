@@ -2,7 +2,7 @@
 // (verdict, star rating, tilt, notes).
 import { Link } from 'react-router-dom';
 import { VERDICTS } from '../../constants/poker.js';
-import { formatLongDate, formatMoney } from '../../utils/format.js';
+import { bigBlindOf, formatLongDate, formatMoney } from '../../utils/format.js';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
 import Money from '../../components/Money/Money.jsx';
 import VerdictBadge from '../../components/VerdictBadge/VerdictBadge.jsx';
@@ -112,12 +112,12 @@ export default function HandDetail({ hand, backTo, onUpdate }) {
           <dl className="hand-detail-numbers">
             <div>
               <dt>Final pot</dt>
-              <dd className="num">{formatMoney(hand.potSize, { sign: false })}</dd>
+              <dd className="num">{formatMoney(hand.potSize, { sign: false, bb: bigBlindOf(hand.stakes) })}</dd>
             </div>
             <div>
               <dt>Result</dt>
               <dd>
-                <Money amount={hand.result} className="hand-detail-result" />
+                <Money amount={hand.result} bb={bigBlindOf(hand.stakes)} className="hand-detail-result" />
               </dd>
             </div>
           </dl>
@@ -126,7 +126,7 @@ export default function HandDetail({ hand, backTo, onUpdate }) {
 
       <section className="hand-detail-section">
         <h3 className="hand-detail-section-title">Action</h3>
-        <ActionTimeline streets={hand.streets} board={hand.board} />
+        <ActionTimeline streets={hand.streets} board={hand.board} bb={bigBlindOf(hand.stakes)} />
       </section>
 
       {/* The user's own review: verdict, star rating, tilt and notes (each saved as it changes) */}

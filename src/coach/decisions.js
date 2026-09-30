@@ -15,6 +15,7 @@
 //
 // Preflop (normal spots): solver-style charts by position, adjusted to the opener's looseness. The score
 // depends on how far the hand sits from the boundary of the right action.
+import { formatMoney } from '../utils/format.js';
 import { getOptions, currentPlayer } from '../utils/handEngine.js';
 import { COMBOS, classOf, CLASS_NAMES } from './combos.js';
 import { preflopSituation, preflopAdvice } from './preflopModel.js';
@@ -54,7 +55,7 @@ function normalizeAction(type, amount, opts, state) {
 
 // Readable label for an option.
 export function optionLabel(option, state) {
-  const dollars = (n) => `$${round2(n).toLocaleString('en-US')}`;
+  const dollars = (n) => formatMoney(round2(n), { sign: false, bb: state.bb });
   if (option.kind === 'fold') return 'Fold';
   if (option.kind === 'check') return 'Check';
   if (option.kind === 'call') return `Call ${dollars(option.amount)}`;

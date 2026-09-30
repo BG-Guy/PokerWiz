@@ -8,11 +8,11 @@ import './SessionTimeline.css';
 const EVENT_ICONS = { start: 'play', note: 'note', rebuy: 'coins', hand: 'cards' };
 
 // Body of one entry, depending on its type.
-function EntryContent({ entry, initialBuyIn }) {
+function EntryContent({ entry, initialBuyIn, bb }) {
   if (entry.type === 'start') {
     return (
       <p className="session-timeline-text">
-        Sat down with <strong className="num">{formatMoney(initialBuyIn, { sign: false })}</strong>
+        Sat down with <strong className="num">{formatMoney(initialBuyIn, { sign: false, bb })}</strong>
       </p>
     );
   }
@@ -20,7 +20,7 @@ function EntryContent({ entry, initialBuyIn }) {
   if (entry.type === 'rebuy') {
     return (
       <p className="session-timeline-text">
-        Rebuy <strong className="num">{formatMoney(entry.amount, { sign: false })}</strong>
+        Rebuy <strong className="num">{formatMoney(entry.amount, { sign: false, bb })}</strong>
       </p>
     );
   }
@@ -28,7 +28,7 @@ function EntryContent({ entry, initialBuyIn }) {
   return (
     <Link to={`/hands/${entry.handId}`} className="session-timeline-hand">
       <span>{entry.text}</span>
-      {entry.amount != null && <Money amount={entry.amount} />}
+      {entry.amount != null && <Money amount={entry.amount} bb={bb} />}
       <Icon name="chevronRight" size={16} />
     </Link>
   );
@@ -56,7 +56,7 @@ export default function SessionTimeline({ session }) {
                   </span>
                 )}
               </div>
-              <EntryContent entry={entry} initialBuyIn={session.buyIn - rebuyTotal} />
+              <EntryContent entry={entry} initialBuyIn={session.buyIn - rebuyTotal} bb={session.bigBlind} />
             </div>
           </li>
         ))}

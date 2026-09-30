@@ -12,6 +12,7 @@ A poker tracker for mobile and desktop: a React frontend and a small Express + S
 - **Game history:** past sessions by month, with filters, rating and tilt.
 - **Insights:** leaks and strengths plus hourly by venue, stakes, game and day, all from your sessions. Hand insights live in the Hands tab.
 - **Goals:** measured from your real data (hands played, profit, hours, hands reviewed), with pace projections and a "focus next" pick.
+- **Big blinds or dollars:** every amount shows in big blinds by default; the BB / $ switch (header on phones, sidebar on desktop) flips the whole app to dollars. Totals across stakes add up each session's result in its own big blinds.
 - **Bankroll chart:** bankroll against hours played. Hover or tap it to read any point.
 - **Equity calculator:** 2 to 6 hands plus an optional board. It gives exact results when possible and otherwise simulates random boards (in a web worker).
 

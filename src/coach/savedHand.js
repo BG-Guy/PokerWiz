@@ -127,7 +127,7 @@ export function prepareSavedHand(hand) {
       // Players who didn't shove had chips behind: what went in plus 50 bb, rounded up to 50 bb.
       const withRoom = Math.ceil(((commitment.invested.get(player.seat) ?? 0) + 50 * stakes.bb) / (50 * stakes.bb)) * 50 * stakes.bb;
       player.stack = shove ?? Math.max(100 * stakes.bb, withRoom);
-      guesses.push(`${player.name} ${formatMoney(player.stack, { sign: false })}${shove ? ' (all in)' : ''}`);
+      guesses.push(`${player.name} ${formatMoney(player.stack, { sign: false, bb: stakes.bb })}${shove ? ' (all in)' : ''}`);
     }
     assumptions.push({
       id: 'stacks',

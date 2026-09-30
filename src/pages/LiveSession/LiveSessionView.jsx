@@ -80,7 +80,7 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
           <dl className="live-view-numbers">
             <div>
               <dt>Buy-in</dt>
-              <dd className="num">{formatMoney(session.buyIn, { sign: false })}</dd>
+              <dd className="num">{formatMoney(session.buyIn, { sign: false, bb: session.bigBlind })}</dd>
             </div>
             <div>
               <dt>Hands dealt</dt>

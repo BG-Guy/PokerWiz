@@ -1,9 +1,9 @@
 // Session insights: leaks and strengths computed from finished sessions only (venue, stakes, game, day of
 // the week, session length, tilt and your own rating). Nothing here needs a hand tracker.
 import { sessionProfit, hourlyBy, sessionLengthSplit } from './stats.js';
-import { formatMoney, parseDate } from './format.js';
+import { formatUnits, getMoneyUnit, parseDate } from './format.js';
 
-const perHour = (v) => `${formatMoney(Math.round(v))}/h`;
+const perHour = (v) => `${formatUnits(v, { whole: true })}/h`; // sessions arrive converted (sessionsForDisplay)
 const average = (list) => (list.length ? list.reduce((a, b) => a + b, 0) / list.length : 0);
 const TILT_LABELS = ['', 'Zen', 'Calm', 'Uneasy', 'Frustrated', 'Full tilt'];
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -35,7 +35,7 @@ export function sessionFindings(sessions) {
       id: 'length',
       severity: split.longAvg < 0 ? 'high' : 'medium',
       title: 'Long sessions cost you',
-      detail: `Sessions over ${split.cutoffMin / 60} hours average ${formatMoney(Math.round(split.longAvg))}; shorter ones average ${formatMoney(Math.round(split.shortAvg))}.`,
+      detail: `Sessions over ${split.cutoffMin / 60} hours average ${formatUnits(split.longAvg, { whole: true })}; shorter ones average ${formatUnits(split.shortAvg, { whole: true })}.`,
       action: `Set a hard stop at the ${split.cutoffMin / 60}-hour mark.`,
     });
   }
@@ -48,9 +48,9 @@ export function sessionFindings(sessions) {
     if (gap > 0) {
       findings.push({
         id: 'tilt',
-        severity: gap > 150 ? 'high' : 'medium',
+        severity: gap > (getMoneyUnit() === 'bb' ? 75 : 150) ? 'high' : 'medium', // $150 at $1/$2 = 75 bb
         title: 'Tilt is expensive',
-        detail: `Tilted sessions average ${formatMoney(Math.round(average(tilted.map(sessionProfit))))}, calm ones ${formatMoney(Math.round(average(calm.map(sessionProfit))))}.`,
+        detail: `Tilted sessions average ${formatUnits(average(tilted.map(sessionProfit)), { whole: true })}, calm ones ${formatUnits(average(calm.map(sessionProfit)), { whole: true })}.`,
         action: 'When the tilt meter hits Frustrated, take a break or quit for the day.',
       });
     }
@@ -72,7 +72,7 @@ export function sessionFindings(sessions) {
         id: `${field}-worst`,
         severity: 'medium',
         title: `Losing ${words(worst.label)}`,
-        detail: `You lose ${formatMoney(Math.round(-worst.value), { sign: false })}/h ${words(worst.label)}, while your best spot earns ${perHour(best.value)}.`,
+        detail: `You lose ${formatUnits(-worst.value, { sign: false, whole: true })}/h ${words(worst.label)}, while your best spot earns ${perHour(best.value)}.`,
         action: `Play more ${words(best.label)} and review your hands ${words(worst.label)}.`,
       });
     }
@@ -97,7 +97,7 @@ export function sessionFindings(sessions) {
         id: 'form',
         severity: 'low',
         title: 'Recent downswing',
-        detail: `Your last five sessions average ${formatMoney(Math.round(recentAvg))} against ${formatMoney(Math.round(overallAvg))} overall.`,
+        detail: `Your last five sessions average ${formatUnits(recentAvg, { whole: true })} against ${formatUnits(overallAvg, { whole: true })} overall.`,
         action: 'Normal variance happens. Check your tilt ratings and keep sessions short until it turns.',
       });
     } else if (recentAvg > overallAvg + 60) {
@@ -105,7 +105,7 @@ export function sessionFindings(sessions) {
         id: 'form',
         severity: 'strength',
         title: 'On a heater',
-        detail: `Your last five sessions average ${formatMoney(Math.round(recentAvg))} against ${formatMoney(Math.round(overallAvg))} overall.`,
+        detail: `Your last five sessions average ${formatUnits(recentAvg, { whole: true })} against ${formatUnits(overallAvg, { whole: true })} overall.`,
         action: 'Enjoy it, but keep the same game selection and stop-loss discipline.',
       });
     }

@@ -14,7 +14,8 @@ function pointOnRail(visualIndex, count, radiusX, radiusY) {
 }
 
 // seats: [{ seat, position, role, name, cards, folded, bet, lastAction, isActive, isWinner }]
-export default function PokerTable({ seats, board, pot, rotation = 0, selectable = null, onSeatClick }) {
+// bb: the big blind, for showing amounts in big blinds.
+export default function PokerTable({ seats, board, pot, bb = null, rotation = 0, selectable = null, onSeatClick }) {
   const count = seats.length;
   const someoneActive = seats.some((s) => s.isActive);
 
@@ -31,7 +32,7 @@ export default function PokerTable({ seats, board, pot, rotation = 0, selectable
           {pot > 0 && (
             <div className="poker-table-pot">
               <span className="poker-table-chip" aria-hidden="true" />
-              Pot <span className="num">{formatMoney(pot, { sign: false })}</span>
+              Pot <span className="num">{formatMoney(pot, { sign: false, bb })}</span>
             </div>
           )}
         </div>
@@ -47,6 +48,7 @@ export default function PokerTable({ seats, board, pot, rotation = 0, selectable
           <Seat
             key={seat.seat}
             seat={seat}
+            bb={bb}
             position={position}
             betPosition={betPosition}
             selectable={canSelect}

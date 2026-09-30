@@ -1,13 +1,14 @@
 // Home page peek at hand highlights: the top hand from three award categories, with a link to all of them.
 import { Link } from 'react-router-dom';
 import { highlightPreview } from '../../utils/handHighlights.js';
+import { handsForDisplay } from '../../utils/format.js';
 import Panel from '../../components/Panel/Panel.jsx';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import './HighlightsPreview.css';
 
 export default function HighlightsPreview({ hands }) {
-  const items = highlightPreview(hands, 3);
+  const items = highlightPreview(handsForDisplay(hands), 3);
 
   return (
     <Panel
