@@ -1,0 +1,19 @@
+# Render Blueprint: one Node web service that builds the frontend and runs the Express API,
+# which also serves dist/. The SQLite database lives on a persistent disk so data survives redeploys.
+services:
+  - type: web
+    name: pokerwiz
+    runtime: node
+    plan: starter # persistent disks need a paid plan; on "free" the database resets on every deploy/restart
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22.22.2"
+      - key: POKERWIZ_DB
+        value: /var/data/pokerwiz.db
+    disk:
+      name: pokerwiz-data
+      mountPath: /var/data
+      sizeGB: 1
