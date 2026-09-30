@@ -147,7 +147,7 @@ Mood and image:
 
 ## Practice mode (`src/practice/generateSpot.js`)
 
-You pick a game (cash: 6-max, $1/$2, 100 bb; tournament: 9-max, 1/2 with a big-blind ante, 30 bb), a spot (preflop, heads-up, 3-way) and a read and stack for each opponent. Preflop uses one read for the whole table.
+You pick a game (both 9-handed; cash: $1/$2, 100 bb; tournament: 1/2 with a big-blind ante, 30 bb), a spot (preflop, heads-up, 3-way) and a read and stack for each opponent. Preflop uses one read for the whole table.
 
 - **Preflop:** every seat is dealt; players before you act on their real cards, sampling fold / call / raise from the preflop model's likelihoods for their hand. Half the time the bottom 40% of hands is redealt to you, so fewer spots are automatic folds.
 - **Heads-up / 3-way:** the first player in preflop order opens and the others call. Each player's cards are dealt by rejection sampling so they fit that action for their read. Then a street is picked (flop 45%, turn 30%, river 25%) and everyone plays on to your turn: villains sample check/bet (random standard size, overbets for wild players) or fold/call/raise from the postflop model with their real cards. Your earlier streets are played by a solid regular; spots where it would fold are redealt.
@@ -161,7 +161,7 @@ Every No-Limit Hold'em hand in Hands has a Coach button. `savedHand.js` turns th
 Hands recorded with the current recorder already have seats and stacks. Older hands and the samples only have the action log, so the missing parts are rebuilt from it:
 
 - **Players:** everyone who acted, in order. Anyone who never acted folded before the action.
-- **Table size:** 9-max if a 9-max-only seat (UTG+1, MP, LJ) appears, otherwise 6-max.
+- **Table size:** the hand's own, otherwise 9-max (the app's default; every 6-max seat also exists at 9-max).
 - **Stacks:** the log is first replayed with bottomless stacks to measure how much each player put in.
   - A player who shoved gets exactly the stack that puts them all in at that point.
   - Everyone else gets 100 bb, or what they put in plus 50 bb (rounded up to 50 bb) when that's more.

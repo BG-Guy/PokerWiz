@@ -9,7 +9,6 @@ import { createHand, applyAction, dealBoard, currentPlayer } from '../utils/hand
 import { formatMoney } from '../utils/format.js';
 import { actionType, replayHand } from './replay.js';
 
-const NINE_MAX_ONLY = ['UTG+1', 'MP', 'LJ'];
 const BOARD_SIZE = { Preflop: 0, Flop: 3, Turn: 4, River: 5 };
 const BOTTOMLESS = 1e7; // stack used while measuring how much each player put in
 const ORDER_ERROR = "This hand's action log doesn't follow the betting order, so the coach can't replay it.";
@@ -80,7 +79,8 @@ export function prepareSavedHand(hand) {
   if (!stakes) return { error: "The coach couldn't read this hand's stakes." };
 
   const { players, derived } = playersOf(hand);
-  const tableSize = hand.tableSize ?? (players.some((p) => NINE_MAX_ONLY.includes(p.position)) ? 9 : 6);
+  // Every 6-max seat also exists at a 9-max table, so hands without a table size are read as 9-max (the default).
+  const tableSize = hand.tableSize ?? 9;
   const positions = TABLE_POSITIONS[tableSize];
   if (players.some((p) => !positions.includes(p.position))) return { error: "This hand's seats don't fit a 6-max or 9-max table." };
 
