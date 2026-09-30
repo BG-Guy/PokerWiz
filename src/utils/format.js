@@ -24,7 +24,8 @@ export function formatMoney(amount, { sign = true, bb = null } = {}) {
 // "12.5 bb"; one decimal below 100 bb, whole numbers above.
 function formatBB(value) {
   const rounded = value >= 100 ? Math.round(value) : Math.round(value * 10) / 10;
-  return `${rounded.toLocaleString('en-US', { maximumFractionDigits: 1 })} bb`;
+  // Plain String() below 1,000 (no separators needed, and far cheaper: labels are built in hot loops).
+  return `${rounded < 1000 ? String(rounded) : rounded.toLocaleString('en-US', { maximumFractionDigits: 1 })} bb`;
 }
 
 function withSign(amount, text, sign) {

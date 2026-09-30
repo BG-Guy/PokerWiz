@@ -44,26 +44,29 @@ export function equityVsRanges({ hero, board, ranges, iterations = 3000, random 
   const need = 5 - board.length;
   const fullBoard = [...board, 0, 0, 0, 0, 0].slice(0, 5);
 
+  // Reused every sample (this loop runs thousands of times per decision): a stamp per card marks it used
+  // in the current sample, so nothing has to be cleared or allocated.
+  const usedStamp = new Int32Array(52);
+  const hands = new Array(samplers.length);
   let score = 0;
   let samples = 0;
   for (let it = 0; it < iterations; it++) {
+    const stamp = it + 1;
     // Villain hands, without clashes between villains.
-    const used = new Set();
-    const hands = [];
     let ok = true;
-    for (const sampler of samplers) {
+    for (let v = 0; v < samplers.length; v++) {
       let cards = null;
       for (let tries = 0; tries < 12 && !cards; tries++) {
-        const pick = sampleCombo(sampler, random);
-        if (!used.has(pick[0]) && !used.has(pick[1])) cards = pick;
+        const pick = sampleCombo(samplers[v], random);
+        if (usedStamp[pick[0]] !== stamp && usedStamp[pick[1]] !== stamp) cards = pick;
       }
       if (!cards) {
         ok = false;
         break;
       }
-      used.add(cards[0]);
-      used.add(cards[1]);
-      hands.push(cards);
+      usedStamp[cards[0]] = stamp;
+      usedStamp[cards[1]] = stamp;
+      hands[v] = cards;
     }
     if (!ok) continue;
 
@@ -71,18 +74,18 @@ export function equityVsRanges({ hero, board, ranges, iterations = 3000, random 
     let filled = 0;
     while (filled < need) {
       const card = deck[Math.floor(random() * deck.length)];
-      if (used.has(card)) continue;
-      used.add(card);
+      if (usedStamp[card] === stamp) continue;
+      usedStamp[card] = stamp;
       fullBoard[board.length + filled] = card;
       filled++;
     }
 
-    const heroScore = evaluate([...hero, ...fullBoard]);
+    const heroScore = evaluate(hero, fullBoard, 5);
     let best = heroScore;
     let heroTies = 1;
     let heroBest = true;
     for (const cards of hands) {
-      const s = evaluate([...cards, ...fullBoard]);
+      const s = evaluate(cards, fullBoard, 5);
       if (s > best) {
         best = s;
         heroBest = false;

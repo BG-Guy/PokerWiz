@@ -15,12 +15,11 @@ export const HAND_NAMES = [
   'Straight flush',
 ];
 
-// Pack a category (0-8) and up to five tie-break ranks into one comparable number.
-function score(category, kickers) {
-  let value = category;
-  for (let i = 0; i < 5; i++) value = value * 16 + (kickers[i] ?? 0);
-  return value;
-}
+// The evaluator runs millions of times per coach review (equity sampling), so it allocates nothing:
+// scratch counters live at module level and scores are built with arithmetic.
+const counts = new Uint8Array(15);
+const suitMasks = new Int32Array(4);
+const suitCounts = new Uint8Array(4);
 
 // Highest straight in a rank bitmask (bit r set = rank r present), or 0. Handles the A-2-3-4-5 wheel.
 function straightHigh(mask) {
@@ -31,20 +30,33 @@ function straightHigh(mask) {
   return 0;
 }
 
-// Top n ranks present in a bitmask, high to low.
-function topRanks(mask, n) {
-  const ranks = [];
-  for (let r = 14; r >= 2 && ranks.length < n; r--) if (mask & (1 << r)) ranks.push(r);
-  return ranks;
+// Pack a category (0-8) and five tie-break ranks (0 = none) into one comparable number.
+const pack = (category, a = 0, b = 0, c = 0, d = 0, e = 0) => ((((category * 16 + a) * 16 + b) * 16 + c) * 16 + d) * 16 + e;
+
+// The top n ranks of a bitmask, high to low, packed after a category.
+function packTop(category, mask, n) {
+  let value = category;
+  let taken = 0;
+  for (let r = 14; r >= 2 && taken < n; r--) {
+    if (mask & (1 << r)) {
+      value = value * 16 + r;
+      taken++;
+    }
+  }
+  for (; taken < 5; taken++) value *= 16;
+  return value;
 }
 
-export function evaluate(cards) {
-  const counts = new Array(15).fill(0);
-  const suitMasks = [0, 0, 0, 0];
-  const suitCounts = [0, 0, 0, 0];
+// cards: 5 to 7 card integers. Extra board cards can be passed separately (board, boardCount) to avoid
+// building a combined array in hot loops.
+export function evaluate(cards, board = null, boardCount = 0) {
+  counts.fill(0);
+  suitMasks.fill(0);
+  suitCounts.fill(0);
   let rankMask = 0;
-
-  for (const card of cards) {
+  const total = cards.length + boardCount;
+  for (let i = 0; i < total; i++) {
+    const card = i < cards.length ? cards[i] : board[i - cards.length];
     const rank = (card >> 2) + 2;
     const suit = card & 3;
     counts[rank]++;
@@ -57,35 +69,40 @@ export function evaluate(cards) {
   for (let s = 0; s < 4; s++) {
     if (suitCounts[s] >= 5) {
       const high = straightHigh(suitMasks[s]);
-      return high ? score(8, [high]) : score(5, topRanks(suitMasks[s], 5));
+      return high ? pack(8, high) : packTop(5, suitMasks[s], 5);
     }
   }
 
-  // Group ranks by how many times they appear, high to low.
+  // Group ranks by how many times they appear, high to low (no arrays: the top few of each are enough).
   let quad = 0;
-  const trips = [];
-  const pairs = [];
-  const singles = [];
+  let trip1 = 0;
+  let trip2 = 0;
+  let pair1 = 0;
+  let pair2 = 0;
+  let pair3 = 0;
+  let singleMask = 0;
   for (let r = 14; r >= 2; r--) {
-    if (counts[r] === 4) quad = r;
-    else if (counts[r] === 3) trips.push(r);
-    else if (counts[r] === 2) pairs.push(r);
-    else if (counts[r] === 1) singles.push(r);
+    const c = counts[r];
+    if (c === 4) quad = r;
+    else if (c === 3) {
+      if (!trip1) trip1 = r;
+      else if (!trip2) trip2 = r;
+    } else if (c === 2) {
+      if (!pair1) pair1 = r;
+      else if (!pair2) pair2 = r;
+      else if (!pair3) pair3 = r;
+    } else if (c === 1) singleMask |= 1 << r;
   }
+  const topSingle = singleMask ? 31 - Math.clz32(singleMask) : 0;
 
-  if (quad) {
-    const kicker = Math.max(trips[0] ?? 0, pairs[0] ?? 0, singles[0] ?? 0);
-    return score(7, [quad, kicker]);
-  }
-  if (trips.length && (trips.length > 1 || pairs.length)) {
-    return score(6, [trips[0], Math.max(trips[1] ?? 0, pairs[0] ?? 0)]);
-  }
+  if (quad) return pack(7, quad, Math.max(trip1, pair1, topSingle));
+  if (trip1 && (trip2 || pair1)) return pack(6, trip1, Math.max(trip2, pair1));
   const straight = straightHigh(rankMask);
-  if (straight) return score(4, [straight]);
-  if (trips.length) return score(3, [trips[0], ...singles.slice(0, 2)]);
-  if (pairs.length >= 2) return score(2, [pairs[0], pairs[1], Math.max(pairs[2] ?? 0, singles[0] ?? 0)]);
-  if (pairs.length === 1) return score(1, [pairs[0], ...singles.slice(0, 3)]);
-  return score(0, singles.slice(0, 5));
+  if (straight) return pack(4, straight);
+  if (trip1) return packTop(3 * 16 + trip1, singleMask, 2) / 16;
+  if (pair2) return pack(2, pair1, pair2, Math.max(pair3, topSingle));
+  if (pair1) return packTop(16 + pair1, singleMask, 3) / 16;
+  return packTop(0, singleMask, 5);
 }
 
 // Category index (0-8) of a score.
