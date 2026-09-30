@@ -36,7 +36,7 @@ const BOARD_CARDS = { Flop: 3, Turn: 1, River: 1 };
 const round2 = (n) => Math.round(n * 100) / 100;
 
 // The player who plays your earlier streets, and whose ranges your hands are drawn from: a solid regular.
-const HERO_AUTOPILOT = modelParams(defaultProfile());
+export const HERO_AUTOPILOT = modelParams(defaultProfile());
 
 function pickWeighted(items, random) {
   const total = items.reduce((sum, [, w]) => sum + w, 0);
@@ -50,9 +50,12 @@ function pickWeighted(items, random) {
 
 // A deck that deals by rejection: accept(codes) gives each candidate hand a chance (0..1) of being kept,
 // so a player's cards fit the action they're about to take. cards = what's left (starts as a full deck).
-function createDeck(random, remaining = FULL_DECK) {
+export function createDeck(random, remaining = FULL_DECK) {
   const cards = [...remaining];
-  const take = (code) => cards.splice(cards.indexOf(code), 1);
+  const take = (code) => {
+    const at = cards.indexOf(code);
+    if (at !== -1) cards.splice(at, 1);
+  };
   return {
     cards,
     take,
@@ -158,7 +161,7 @@ function postflopAction({ state, seat, cards, params, strengths, tracker, random
 }
 
 // Keeps who bet last this street and the street before (to spot donk leads), and the size of the last bet.
-function applyTracked(state, action, tracker) {
+export function applyTracked(state, action, tracker) {
   const actor = currentPlayer(state);
   const before = state.currentBet;
   const toCall = Math.max(0, before - actor.streetBet);
@@ -190,7 +193,7 @@ function tableFor(setup) {
   return { game, positions: TABLE_POSITIONS[game.tableSize] };
 }
 
-const heroDecisions = (state) => state.streets.reduce((n, street) => n + street.actions.filter((a) => a.actor === 'Hero').length, 0);
+export const heroDecisions = (state) => state.streets.reduce((n, street) => n + street.actions.filter((a) => a.actor === 'Hero').length, 0);
 
 function makeSpot(fields) {
   return { ...fields, firstDecision: heroDecisions(fields.state), status: 'hero' };
@@ -327,7 +330,7 @@ const NEXT_STREET = { Preflop: 'Flop', Flop: 'Turn', Turn: 'River' };
 const nextStreetName = (state) => NEXT_STREET[state.street];
 
 // Deal the next street, and start a new street for the donk-bet tracking.
-function dealNext(state, codes, tracker) {
+export function dealNext(state, codes, tracker) {
   tracker.previous = tracker.current ?? tracker.previous;
   tracker.current = null;
   tracker.betRatio = null;
@@ -349,7 +352,7 @@ function strengthsFor(state) {
 
 // Plays villains until you're on the clock (status 'hero'), the next street needs dealing ('board', with
 // street and count), or the hand is over ('done'). Never mutates the spot it's given.
-function advance(spot, random) {
+export function advance(spot, random) {
   const tracker = { ...spot.tracker };
   let state = spot.state;
   // Once you fold the hand is over for you: no need to deal it out.
@@ -393,12 +396,17 @@ export function dealStreet(spot, codes = null, random = Math.random) {
       const holder = holderOf(code);
       if (holder !== undefined) cards[holder] = cards[holder].map((c) => (c === code ? deck.deal(1)[0] : c));
     }
+  } else if (spot.plannedBoard?.length >= spot.count) {
+    // Replays of saved hands: the cards that really came, in order.
+    dealt = spot.plannedBoard.slice(0, spot.count);
   } else {
     dealt = deck.deal(spot.count);
   }
+  // Picking your own card leaves the real runout behind; otherwise the planned cards are used up in order.
+  const plannedBoard = codes ? [] : (spot.plannedBoard ?? []).slice(dealt.length);
   const tracker = { ...spot.tracker };
   const state = dealNext(spot.state, dealt, tracker);
-  return advance({ ...spot, cards, deck: deck.cards, state, tracker }, random);
+  return advance({ ...spot, cards, deck: deck.cards, state, tracker, plannedBoard }, random);
 }
 
 // Cards you've seen: your hand and the board (what the card picker greys out).

@@ -12,6 +12,7 @@ import TiltMeter from '../../components/TiltMeter/TiltMeter.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import ActionTimeline from './ActionTimeline.jsx';
 import { coachSupport } from '../../coach/savedHand.js';
+import { replayStreets } from '../../practice/replaySpot.js';
 import './HandDetail.css';
 
 const VERDICT_OPTIONS = Object.entries(VERDICTS).map(([value, label]) => ({ value, label }));
@@ -37,6 +38,8 @@ export default function HandDetail({ hand, backTo, onUpdate }) {
   const villains = villainsOf(hand);
   // Every Hold'em hand can be reviewed by the coach (missing details are rebuilt from the log).
   const coach = coachSupport(hand);
+  const replayFrom = coach.ok ? replayStreets(hand) : [];
+  const replayLink = (street) => (replayFrom.includes(street) ? `/practice?hand=${hand.id}&street=${street}` : null);
 
   return (
     <article className="hand-detail">
@@ -66,6 +69,20 @@ export default function HandDetail({ hand, backTo, onUpdate }) {
         <p className="hand-detail-coach-off">
           <Icon name="coach" size={16} /> {coach.reason}
         </p>
+      )}
+
+      {/* Replay: take the hand from a street into Practice and play it differently */}
+      {coach.ok && replayFrom.length > 0 && (
+        <div className="hand-detail-replay">
+          <span className="hand-detail-replay-label">
+            <Icon name="undo" size={16} /> Replay from
+          </span>
+          {replayFrom.map((street) => (
+            <Link key={street} to={replayLink(street)} className="filter-chip">
+              {street}
+            </Link>
+          ))}
+        </div>
       )}
 
       {/* Felt table: board on top, then your hand next to the villains' (face down unless shown) */}
@@ -126,7 +143,7 @@ export default function HandDetail({ hand, backTo, onUpdate }) {
 
       <section className="hand-detail-section">
         <h3 className="hand-detail-section-title">Action</h3>
-        <ActionTimeline streets={hand.streets} board={hand.board} bb={bigBlindOf(hand.stakes)} />
+        <ActionTimeline streets={hand.streets} board={hand.board} bb={bigBlindOf(hand.stakes)} replayLink={replayLink} />
       </section>
 
       {/* The user's own review: verdict, star rating, tilt and notes (each saved as it changes) */}

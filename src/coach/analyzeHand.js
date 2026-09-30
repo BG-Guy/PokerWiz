@@ -51,7 +51,9 @@ function modelAction(type, actor, state) {
 }
 
 // record: see HandRecorder.buildRecord(). Returns the full report (plain data, safe to post from a worker).
-export function analyzeHand(record, { iterations = 2500 } = {}) {
+// rangesOnly: skip grading and return each villain's range after the log instead ({ ranges: [{ seat, weights }] }),
+// e.g. to deal them cards that fit how they played (Practice replays).
+export function analyzeHand(record, { iterations = 2500, rangesOnly = false } = {}) {
   const random = createRandom(seedFromString(JSON.stringify([record.players.map((p) => [p.position, p.cards, p.stack]), record.streets, record.board])));
   const heroRecord = record.players.find((p) => p.role === 'hero');
   if (!heroRecord || heroRecord.cards?.length !== 2) throw new Error('The coach needs your two hole cards.');
@@ -123,6 +125,7 @@ export function analyzeHand(record, { iterations = 2500 } = {}) {
     }
 
     // ----- Hero decision: grade it -----
+    if (actor.role === 'hero' && rangesOnly) return;
     if (actor.role === 'hero') {
       // Leading into the previous street's aggressor: they hold the stronger range and defend more.
       const leadsIntoAggressor = street !== 'Preflop' && donk;
@@ -197,6 +200,8 @@ export function analyzeHand(record, { iterations = 2500 } = {}) {
       for (let i = 0; i < COMBO_COUNT; i++) villain.weights[i] *= likelihood[i];
     }
   });
+
+  if (rangesOnly) return { ranges: villains.map((v) => ({ seat: v.seat, weights: v.weights })) };
 
   // ----- Summary -----
   const accuracy = overallAccuracy(decisions, bb);

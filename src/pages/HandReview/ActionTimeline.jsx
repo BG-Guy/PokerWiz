@@ -1,4 +1,5 @@
 // Street-by-street replay of a hand: cards dealt on each street, pot size, and every action.
+import { Link } from 'react-router-dom';
 import { formatMoney } from '../../utils/format.js';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
@@ -10,7 +11,8 @@ const STREET_CARDS = { Flop: [0, 3], Turn: [3, 4], River: [4, 5] };
 // All-in actions: recorded with allIn: true, or written as "shoves" / "all in" in older hands.
 const isAllIn = (action) => action.allIn || action.verb === 'shoves' || action.verb === 'all in';
 
-export default function ActionTimeline({ streets, board, bb = null }) {
+// replayLink(streetName): link to replay the hand from that street in Practice, or null.
+export default function ActionTimeline({ streets, board, bb = null, replayLink = null }) {
   return (
     <ol className="action-timeline">
       {streets.map((street) => {
@@ -27,6 +29,11 @@ export default function ActionTimeline({ streets, board, bb = null }) {
                 ))}
               </span>
               <span className="action-timeline-pot num">Pot {formatMoney(street.pot, { sign: false, bb })}</span>
+              {replayLink?.(street.name) && (
+                <Link to={replayLink(street.name)} className="action-timeline-replay">
+                  <Icon name="undo" size={14} /> Replay from here
+                </Link>
+              )}
             </div>
 
             {/* Actions in order; the hero's own actions are highlighted, all-ins are called out in red */}

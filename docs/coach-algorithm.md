@@ -155,6 +155,15 @@ You pick a game (both 9-handed; cash: $1/$2, 100 bb; tournament: 1/2 with a big-
 - **Playing it out:** from the spot on you play the hand to the end. After each of your actions villains answer with the same models (preflop chart likelihoods preflop, the postflop model after). The next cards are dealt at random or picked by you. A picked card that a villain holds is swapped out of their hand for a random card, so the picker never reveals their cards. The hand ends at a fold (yours ends it right away) or at showdown.
 - **Grading:** the finished hand goes through `analyzeHand` like any other hand. Only your decisions from the spot on are graded (earlier streets were played for you); the hand's accuracy is the usual pot-weighted average. Villain cards still in the hand are revealed.
 
+### Replaying a saved hand (`src/practice/replaySpot.js`)
+
+From a hand in Hands you can replay any street it reached in Practice (`/practice?hand=<id>&street=Turn`). The hand goes through `prepareSavedHand` (the same rebuild the coach review uses), and the log is replayed up to the start of that street. Villains still in the hand play:
+
+- **their real cards** when the hand shows them (and you choose that), or
+- **a hand from their range at that point**: `analyzeHand(..., { rangesOnly: true })` runs the coach's range tracking over the log so far, and a combo is drawn from it, avoiding every card already known or still to come.
+
+The next streets bring the cards that really came, random cards, or cards you pick (a picked card a villain holds is swapped out of their hand). From there it's ordinary Practice: villains answer with the postflop model, you play to the end, and the coach grades your decisions from that street on, next to the real hand's result.
+
 ## Reviewing saved hands (the Coach button in Hands)
 
 Every No-Limit Hold'em hand in Hands has a Coach button. `savedHand.js` turns the saved hand into a record the coach can replay.

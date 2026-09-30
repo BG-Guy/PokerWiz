@@ -2,7 +2,11 @@
 // then play random spots against them. Villains act on their real cards using the coach's player models.
 // From the spot on you play the hand to the end (the next cards are random, or picked by you), then the
 // coach grades every decision you made, the same way it grades your own hands.
+// /practice?hand=<id>&street=Turn replays a saved hand from that street instead (see ReplaySetup).
 import { useEffect, useRef, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { getHand } from '../../api/hands.js';
+import { replayStreets, spotFromSavedHand } from '../../practice/replaySpot.js';
 import { GAMES, generateSpot, heroAct, dealStreet, seenCards, spotRecord } from '../../practice/generateSpot.js';
 import { overallAccuracy, accuracyLabel } from '../../coach/grading.js';
 import { applyLevel, applyPreset, defaultProfile, describeProfile } from '../../coach/profiles.js';
@@ -17,6 +21,8 @@ import DecisionCard from '../Coach/DecisionCard.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
 import PracticeSetup from './PracticeSetup.jsx';
+import ReplaySetup from './ReplaySetup.jsx';
+import LoadState from '../../components/LoadState/LoadState.jsx';
 import '../../components/HandRecorder/HandRecorder.css';
 import '../Coach/Coach.css';
 import './Practice.css';
@@ -76,8 +82,12 @@ function outcomeText(spot) {
 }
 
 export default function Practice() {
+  const [searchParams] = useSearchParams();
+  const replayId = searchParams.get('hand');
   const [setup, setSetup] = useState(loadSetup);
-  const [phase, setPhase] = useState('setup'); // setup | play | grading | result
+  const [phase, setPhase] = useState(replayId ? 'loading' : 'setup'); // setup | loading | replay | play | grading | result
+  const [replayHand, setReplayHand] = useState(null);
+  const [replayOptions, setReplayOptions] = useState(null);
   const [spot, setSpot] = useState(null);
   const [review, setReview] = useState(null); // { accuracy, label, decisions }
   const [error, setError] = useState(null);
@@ -117,12 +127,41 @@ export default function Practice() {
     return () => worker.terminate();
   }, []);
 
-  // Random board mode: deal the next street by itself after a short beat, so the action can be read.
+  // Replay of a saved hand: load it and pick sensible defaults (the street from the link, the real runout).
   useEffect(() => {
-    if (phase !== 'play' || spot?.status !== 'board' || setup.boardMode === 'pick') return undefined;
+    if (!replayId) return undefined;
+    let active = true;
+    setPhase('loading');
+    getHand(replayId)
+      .then((hand) => {
+        if (!active) return;
+        const streets = replayStreets(hand);
+        const street = streets.includes(searchParams.get('street')) ? searchParams.get('street') : streets[0];
+        if (!street) throw new Error('This hand ended preflop, so there is no street to replay from.');
+        const later = (hand.board ?? []).length > { Flop: 3, Turn: 4, River: 5 }[street];
+        setReplayHand(hand);
+        setReplayOptions({ street, villainCards: 'real', boardMode: later ? 'real' : 'random', profiles: {} });
+        setPhase('replay');
+      })
+      .catch((err) => {
+        if (!active) return;
+        setError(err.message);
+        setPhase('replay');
+      });
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [replayId]);
+
+  // Picked cards wait for you; otherwise the next street comes by itself after a short beat, so the action
+  // can be read (replays use the cards that really came when that's the choice).
+  const boardMode = spot?.setup.boardMode ?? setup.boardMode;
+  useEffect(() => {
+    if (phase !== 'play' || spot?.status !== 'board' || boardMode === 'pick') return undefined;
     const timer = setTimeout(() => setSpot((s) => (s?.status === 'board' ? dealStreet(s) : s)), 700);
     return () => clearTimeout(timer);
-  }, [phase, spot, setup.boardMode]);
+  }, [phase, spot, boardMode]);
 
   // Hand over: grade it.
   useEffect(() => {
@@ -133,6 +172,10 @@ export default function Practice() {
   }, [phase, spot]);
 
   const deal = () => {
+    if (replayHand) {
+      startReplay();
+      return;
+    }
     const next = generateSpot(setup);
     setError(next ? null : 'Could not find a spot with these settings. Try again or change the stacks.');
     setSpot(next);
@@ -142,6 +185,39 @@ export default function Practice() {
     setPhase(next ? 'play' : 'setup');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // Start (or restart) a replay: villains dealt from their range get new cards each time.
+  function startReplay() {
+    const next = spotFromSavedHand(replayHand, replayOptions);
+    if (next.error) {
+      setError(next.error);
+      setPhase('replay');
+      return;
+    }
+    setError(null);
+    setSpot(next);
+    setReview(null);
+    firstDecisionRef.current = next.firstDecision;
+    setHandNumber((n) => n + 1);
+    setPhase('play');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  if (phase === 'loading') return <LoadState />;
+
+  if (phase === 'replay') {
+    return (
+      <div className="practice">
+        <PageHeader title="Replay" subtitle="Take a hand from any street and play it differently." />
+        {error && (
+          <p className="practice-error" role="alert">
+            <Icon name="alert" size={16} /> {error}
+          </p>
+        )}
+        {replayHand && replayOptions && <ReplaySetup hand={replayHand} options={replayOptions} onChange={setReplayOptions} onStart={startReplay} />}
+      </div>
+    );
+  }
 
   if (phase === 'setup') {
     return (
@@ -184,12 +260,16 @@ export default function Practice() {
     };
   });
   const bb = state.bb;
+  const replay = spot.replay ?? null;
   const heroStackBB = Math.round((state.players.find((p) => p.seat === heroSeat).stack / bb) * 10) / 10;
 
   return (
     <div className="practice">
-      <PageHeader title="Practice" subtitle={`Hand ${handNumber} · ${GAMES.find((g) => g.id === spot.setup.game).label}`}>
-        <button type="button" className="btn btn-ghost" onClick={() => setPhase('setup')}>
+      <PageHeader
+        title={replay ? 'Replay' : 'Practice'}
+        subtitle={replay ? `${replay.title} · from the ${replay.street.toLowerCase()}` : `Hand ${handNumber} · ${spot.game.label}`}
+      >
+        <button type="button" className="btn btn-ghost" onClick={() => setPhase(replay ? 'replay' : 'setup')}>
           <Icon name="chevronLeft" size={16} /> Setup
         </button>
       </PageHeader>
@@ -247,7 +327,7 @@ export default function Practice() {
             </PromptCarousel>
           )}
 
-          {phase === 'play' && spot.status === 'board' && setup.boardMode === 'pick' && (
+          {phase === 'play' && spot.status === 'board' && boardMode === 'pick' && (
             <PromptCarousel stepKey={`board-${handNumber}-${spot.street}`} direction="forward">
               <BoardPrompt street={spot.street} count={spot.count} used={seenCards(spot)} onDeal={(codes) => setSpot(dealStreet(spot, codes))} />
               <button type="button" className="btn btn-ghost practice-random-card" onClick={() => setSpot(dealStreet(spot))}>
@@ -256,7 +336,7 @@ export default function Practice() {
             </PromptCarousel>
           )}
 
-          {phase === 'play' && spot.status === 'board' && setup.boardMode !== 'pick' && (
+          {phase === 'play' && spot.status === 'board' && boardMode !== 'pick' && (
             <p className="practice-dealing" aria-live="polite">
               Dealing the {spot.street.toLowerCase()}...
             </p>
@@ -277,6 +357,13 @@ export default function Practice() {
                 <div className="practice-summary-text">
                   <span className="practice-summary-kicker">Hand over</span>
                   <p className={`practice-summary-outcome ${spot.result > 0 ? 'is-win' : spot.result < 0 ? 'is-loss' : ''}`}>{outcomeText(spot)}</p>
+                  {replay && replay.realResult != null && (
+                    <p className="practice-summary-detail">
+                      In the real hand: {replay.realResult > 0 ? 'you won' : replay.realResult < 0 ? 'you lost' : 'you broke even'}
+                      {replay.realResult !== 0 && ` ${formatMoney(Math.abs(replay.realResult), { sign: false, bb })}`}.
+                      {Object.values(replay.dealtFrom).includes('range') && ' Villains dealt from their range get new cards on every replay.'}
+                    </p>
+                  )}
                   {review && (
                     <p className="practice-summary-detail">
                       {review.decisions.length} {review.decisions.length === 1 ? 'decision' : 'decisions'} graded. Results vary with the cards; the grade is about the decisions.
@@ -293,8 +380,13 @@ export default function Practice() {
                 <DecisionCard key={index} decision={decision} number={index + 1} bb={state.bb} />
               ))}
               <div className="practice-next">
+                {replay && (
+                  <Link to={`/hands/${replay.handId}`} className="btn btn-ghost">
+                    <Icon name="chevronLeft" size={16} /> Back to the hand
+                  </Link>
+                )}
                 <button type="button" className="btn practice-next-btn" onClick={deal}>
-                  Next hand <Icon name="chevronRight" size={16} />
+                  {replay ? 'Replay again' : 'Next hand'} <Icon name="chevronRight" size={16} />
                 </button>
               </div>
             </>

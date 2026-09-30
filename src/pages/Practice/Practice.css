@@ -70,7 +70,9 @@
 
 .practice-next {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
+  gap: 8px;
 }
 .practice-next-btn {
   min-height: 48px;

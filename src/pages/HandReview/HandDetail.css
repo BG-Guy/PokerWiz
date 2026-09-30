@@ -209,3 +209,19 @@
   font-weight: 700;
   color: var(--text-muted);
 }
+
+/* Replay from a street: label and one chip per street */
+.hand-detail-replay {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.hand-detail-replay-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
