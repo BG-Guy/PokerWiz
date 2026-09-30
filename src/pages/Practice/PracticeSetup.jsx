@@ -1,5 +1,6 @@
-// Practice setup: the game (cash or tournament), the spot (preflop, heads-up, 3-way), and who you're up
-// against: each opponent's tendency, skill level and stack. Preflop uses one read for the whole table.
+// Practice setup: the game (cash or tournament), the spot (preflop, heads-up, 3-way), how the next cards
+// come (random or picked by you), and who you're up against: each opponent's tendency, skill level and
+// stack. Preflop uses one read for the whole table.
 import { GAMES, FORMATS } from '../../practice/generateSpot.js';
 import { LEVELS, applyLevel, describeProfile, levelOf } from '../../coach/profiles.js';
 import ReadPicker from '../../components/ReadPicker/ReadPicker.jsx';
@@ -71,6 +72,23 @@ export default function PracticeSetup({ setup, onChange, onStart }) {
         <p className="practice-card-text">
           {format.description} {game.id === 'mtt' ? 'Blinds 1/2 with a big-blind ante, 9-handed.' : 'Blinds $1/$2, 6-max.'}
         </p>
+        <div className="read-picker-group">
+          <span className="read-picker-label">Next cards</span>
+          <FilterChips
+            label="Next cards"
+            value={setup.boardMode}
+            onChange={(boardMode) => onChange({ ...setup, boardMode })}
+            options={[
+              { value: 'random', label: 'Random' },
+              { value: 'pick', label: 'I pick them' },
+            ]}
+          />
+          <p className="read-picker-description">
+            {setup.boardMode === 'pick'
+              ? 'You choose each street\'s cards, to practice the runouts you want.'
+              : 'The flop, turn and river are dealt at random as the hand plays out.'}
+          </p>
+        </div>
       </section>
 
       {shown.map((villain, index) => (
@@ -110,7 +128,7 @@ export default function PracticeSetup({ setup, onChange, onStart }) {
       </section>
 
       <button type="button" className="btn practice-start" onClick={onStart}>
-        <Icon name="play" size={18} /> Deal a spot
+        <Icon name="play" size={18} /> Deal a hand
       </button>
     </div>
   );

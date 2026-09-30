@@ -6,8 +6,10 @@
 //   preflop  a full table (6-max cash, 9-max tournament); everyone before you acts, you make the next decision
 //   hu       a heads-up pot: one player opens, the other calls, then a decision on the flop, turn or river
 //   3way     the same with three players
-// Earlier streets are played for you by a solid regular; spots where that player would have folded are redealt.
-import { createHand, applyAction, dealBoard, currentPlayer, getOptions } from '../utils/handEngine.js';
+// Streets before the spot are played for you by a solid regular; spots where that player would have folded
+// are redealt. From the spot on, the hand plays to the end: you make every decision, villains answer, and the
+// next cards are dealt at random or picked by you (see dealStreet).
+import { createHand, applyAction, dealBoard, currentPlayer, getOptions, showdownWinners, heroResult } from '../utils/handEngine.js';
 import { TABLE_POSITIONS } from '../constants/poker.js';
 import { FULL_DECK, codeToIndex } from '../utils/cards.js';
 import { classOf, comboIndex } from '../coach/combos.js';
@@ -24,9 +26,9 @@ export const GAMES = [
 ];
 
 export const FORMATS = [
-  { id: 'preflop', label: 'Preflop', description: 'A full table acts before you. Open, call, 3-bet or fold.', villains: 1 },
-  { id: 'hu', label: 'Heads-up', description: 'Two players see a flop. Decide on the flop, turn or river.', villains: 1 },
-  { id: '3way', label: '3-way', description: 'Three players see a flop. Decide on the flop, turn or river.', villains: 2 },
+  { id: 'preflop', label: 'Preflop', description: 'A full table acts before you. Open, call, 3-bet or fold, then play the hand out.', villains: 1 },
+  { id: 'hu', label: 'Heads-up', description: 'Two players see a flop. You take over on the flop, turn or river and play to the end.', villains: 1 },
+  { id: '3way', label: '3-way', description: 'Three players see a flop. You take over on the flop, turn or river and play to the end.', villains: 2 },
 ];
 
 const TARGET_STREETS = [['Flop', 0.45], ['Turn', 0.3], ['River', 0.25]];
@@ -47,11 +49,13 @@ function pickWeighted(items, random) {
 }
 
 // A deck that deals by rejection: accept(codes) gives each candidate hand a chance (0..1) of being kept,
-// so a player's cards fit the action they're about to take.
-function createDeck(random) {
-  const cards = [...FULL_DECK];
+// so a player's cards fit the action they're about to take. cards = what's left (starts as a full deck).
+function createDeck(random, remaining = FULL_DECK) {
+  const cards = [...remaining];
   const take = (code) => cards.splice(cards.indexOf(code), 1);
   return {
+    cards,
+    take,
     dealHand(accept = () => 1) {
       let pick = null;
       for (let tries = 0; tries < 600; tries++) {
@@ -169,8 +173,10 @@ function applyTracked(state, action, tracker) {
 // ----- Spot builder -----
 
 // setup: { game, format, villains: [{ profile, stackBB }], hero: { profile, stackBB } }
-// Returns { state, record, cards: { seat: [codes] }, heroSeat, villainSeats } with the hero on the clock,
-// or null if no spot came up (very rare; call again).
+// Returns a spot with you on the clock, or null if none came up (very rare; call again). A spot holds
+// everything needed to keep playing: { state, cards: { seat: [codes] }, deck (cards left), heroSeat,
+// villainSeats, players, paramsBySeat, tracker, game, positions, setup, firstDecision, status }.
+// firstDecision = how many of your decisions came before the spot (played for you), so grading can skip them.
 export function generateSpot(setup, random = Math.random) {
   for (let attempt = 0; attempt < 60; attempt++) {
     const spot = setup.format === 'preflop' ? tryPreflopSpot(setup, random) : tryPostflopSpot(setup, random);
@@ -184,20 +190,10 @@ function tableFor(setup) {
   return { game, positions: TABLE_POSITIONS[game.tableSize] };
 }
 
-function buildRecord({ setup, game, positions, state, players, cards, heroSeat }) {
-  return {
-    stakes: { label: game.stakesLabel, sb: game.sb, bb: game.bb, ante: game.ante },
-    tableSize: game.tableSize,
-    positions,
-    heroSeat,
-    players: players.map((p) => ({ ...p, cards: cards[p.seat] ?? [] })),
-    streets: state.streets,
-    board: state.board,
-    winners: [],
-    result: 0,
-    pot: state.pot,
-    practice: { game: game.id, format: setup.format },
-  };
+const heroDecisions = (state) => state.streets.reduce((n, street) => n + street.actions.filter((a) => a.actor === 'Hero').length, 0);
+
+function makeSpot(fields) {
+  return { ...fields, firstDecision: heroDecisions(fields.state), status: 'hero' };
 }
 
 // Preflop: every seat is filled; everyone except you plays the "table" read.
@@ -218,25 +214,42 @@ function tryPreflopSpot(setup, random) {
       profile: isHero ? setup.hero.profile : table.profile,
     };
   });
-  const paramsBySeat = new Map(players.filter((p) => p.role === 'villain').map((p) => [p.seat, params]));
+  const paramsBySeat = new Map(players.map((p) => [p.seat, p.role === 'hero' ? HERO_AUTOPILOT : params]));
   const deck = createDeck(random);
   const cards = {};
   // Your hand: half the time any two cards, otherwise the bottom 40% of hands is redealt (fewer auto-folds).
   cards[heroSeat] = deck.dealHand((codes) => (random() < 0.5 || PREFLOP_BY_CLASS[classOfCodes(codes)].start < 0.6 ? 1 : 0));
   for (const p of players) if (p.seat !== heroSeat) cards[p.seat] = deck.dealHand();
 
+  const tracker = { current: null, previous: null, betRatio: null };
   let state = createHand({ players, positions, sb: game.sb, bb: game.bb, ante: game.ante });
   while (state.phase === 'action') {
     const actor = currentPlayer(state);
-    if (actor.seat === heroSeat) return { state, cards, heroSeat, villainSeats: players.filter((p) => p.role === 'villain').map((p) => p.seat), record: buildRecord({ setup, game, positions, state, players, cards, heroSeat }) };
-    const actions = state.streets[0].actions;
-    const choice = pickWeighted(
-      preflopWeights({ state, actions, seat: actor.seat, cls: classOfCodes(cards[actor.seat]), params, tableSize: game.tableSize, openerWidth: openerWidthFor(state, actions, actor.seat, paramsBySeat) }),
-      random
-    );
-    state = applyAction(state, choice === 'raise' ? preflopRaiseTo(state, game, limpersIn(actions)) : { type: choice });
+    if (actor.seat === heroSeat) {
+      const villainSeats = players.filter((p) => p.role === 'villain').map((p) => p.seat);
+      return makeSpot({ state, cards, deck: deck.cards, heroSeat, villainSeats, players, paramsBySeat, tracker, game, positions, setup });
+    }
+    state = applyTracked(state, preflopMove(state, actor, cards, paramsBySeat, game, random), tracker);
   }
   return null; // everyone folded to your big blind: redeal
+}
+
+// A villain's preflop action with their real cards.
+function preflopMove(state, actor, cards, paramsBySeat, game, random) {
+  const actions = state.streets[0].actions;
+  const choice = pickWeighted(
+    preflopWeights({
+      state,
+      actions,
+      seat: actor.seat,
+      cls: classOfCodes(cards[actor.seat]),
+      params: paramsBySeat.get(actor.seat),
+      tableSize: game.tableSize,
+      openerWidth: openerWidthFor(state, actions, actor.seat, paramsBySeat),
+    }),
+    random
+  );
+  return choice === 'raise' ? preflopRaiseTo(state, game, limpersIn(actions)) : { type: choice };
 }
 
 // Heads-up / 3-way: the first player in preflop order opens, the others call; cards fit those actions.
@@ -292,31 +305,127 @@ function tryPostflopSpot(setup, random) {
 
   // Postflop: play on until it's your turn on the chosen street.
   const target = pickWeighted(TARGET_STREETS, random);
-  let strengths = null;
   while (true) {
     if (state.phase === 'result') return null;
     if (state.phase === 'board') {
       if (state.street === 'River' || state.street === target) return null;
-      tracker.previous = tracker.current ?? tracker.previous;
-      tracker.current = null;
-      tracker.betRatio = null;
-      state = dealBoard(state, deck.deal(BOARD_CARDS[state.street === 'Preflop' ? 'Flop' : state.street === 'Flop' ? 'Turn' : 'River']));
-      strengths = computeStrengths(state.board.map(codeToIndex), []);
+      state = dealNext(state, deck.deal(BOARD_CARDS[nextStreetName(state)]), tracker);
       continue;
     }
     const actor = currentPlayer(state);
     if (actor.seat === heroSeat && state.street === target) {
-      return { state, cards, heroSeat, villainSeats, record: buildRecord({ setup, game, positions, state, players, cards, heroSeat }) };
+      return makeSpot({ state, cards, deck: deck.cards, heroSeat, villainSeats, players, paramsBySeat, tracker, game, positions, setup });
     }
-    const move = postflopAction({ state, seat: actor.seat, cards: cards[actor.seat], params: paramsBySeat.get(actor.seat), strengths, tracker, random });
+    const move = postflopAction({ state, seat: actor.seat, cards: cards[actor.seat], params: paramsBySeat.get(actor.seat), strengths: strengthsFor(state), tracker, random });
     if (actor.seat === heroSeat && move.type === 'fold') return null; // your autopilot gave up: not a spot
     state = applyTracked(state, move, tracker);
     if (state.players.find((p) => p.seat === heroSeat).allIn) return null;
   }
 }
 
-// The finished record for grading: the spot's log plus your action.
-export function recordWithHeroAction(spot, action) {
-  const state = applyAction(spot.state, action);
-  return { ...spot.record, streets: state.streets, pot: state.pot };
+const NEXT_STREET = { Preflop: 'Flop', Flop: 'Turn', Turn: 'River' };
+const nextStreetName = (state) => NEXT_STREET[state.street];
+
+// Deal the next street, and start a new street for the donk-bet tracking.
+function dealNext(state, codes, tracker) {
+  tracker.previous = tracker.current ?? tracker.previous;
+  tracker.current = null;
+  tracker.betRatio = null;
+  return dealBoard(state, codes);
+}
+
+// Strength of every combo on the current board, from the villains' view (your cards aren't known to them).
+const strengthCache = new Map();
+function strengthsFor(state) {
+  const key = state.board.join('');
+  if (!strengthCache.has(key)) {
+    if (strengthCache.size > 20) strengthCache.clear();
+    strengthCache.set(key, computeStrengths(state.board.map(codeToIndex), []));
+  }
+  return strengthCache.get(key);
+}
+
+// ----- Playing the hand out -----
+
+// Plays villains until you're on the clock (status 'hero'), the next street needs dealing ('board', with
+// street and count), or the hand is over ('done'). Never mutates the spot it's given.
+function advance(spot, random) {
+  const tracker = { ...spot.tracker };
+  let state = spot.state;
+  // Once you fold the hand is over for you: no need to deal it out.
+  const hero = state.players.find((p) => p.seat === spot.heroSeat);
+  if (hero.folded) return { ...spot, state, tracker, status: 'done', winners: [], result: -hero.invested, showdown: false, heroFolded: true };
+  while (state.phase === 'action') {
+    const actor = currentPlayer(state);
+    if (actor.seat === spot.heroSeat) return { ...spot, state, tracker, status: 'hero' };
+    const move =
+      state.street === 'Preflop'
+        ? preflopMove(state, actor, spot.cards, spot.paramsBySeat, spot.game, random)
+        : postflopAction({ state, seat: actor.seat, cards: spot.cards[actor.seat], params: spot.paramsBySeat.get(actor.seat), strengths: strengthsFor(state), tracker, random });
+    state = applyTracked(state, move, tracker);
+  }
+  if (state.phase === 'board') {
+    const street = nextStreetName(state);
+    return { ...spot, state, tracker, status: 'board', street, count: BOARD_CARDS[street] };
+  }
+  return { ...spot, state, tracker, status: 'done', ...finish(spot, state) };
+}
+
+// Your action; then villains play on.
+export function heroAct(spot, action, random = Math.random) {
+  const tracker = { ...spot.tracker };
+  const state = applyTracked(spot.state, action, tracker);
+  return advance({ ...spot, state, tracker }, random);
+}
+
+// Deal the next street. codes = the cards you picked, or null for random ones. A picked card that a villain
+// happens to hold is swapped out of their hand for a random card, so picking never reveals their cards.
+export function dealStreet(spot, codes = null, random = Math.random) {
+  const deck = createDeck(random, spot.deck);
+  const cards = { ...spot.cards };
+  let dealt;
+  if (codes) {
+    dealt = codes;
+    const holderOf = (code) => Object.keys(cards).find((seat) => Number(seat) !== spot.heroSeat && cards[seat].includes(code));
+    // Take the free cards out of the deck first, so a swap can't hand a villain one of the picked cards.
+    for (const code of codes) if (holderOf(code) === undefined) deck.take(code);
+    for (const code of codes) {
+      const holder = holderOf(code);
+      if (holder !== undefined) cards[holder] = cards[holder].map((c) => (c === code ? deck.deal(1)[0] : c));
+    }
+  } else {
+    dealt = deck.deal(spot.count);
+  }
+  const tracker = { ...spot.tracker };
+  const state = dealNext(spot.state, dealt, tracker);
+  return advance({ ...spot, cards, deck: deck.cards, state, tracker }, random);
+}
+
+// Cards you've seen: your hand and the board (what the card picker greys out).
+export function seenCards(spot) {
+  return [...spot.cards[spot.heroSeat], ...spot.state.board];
+}
+
+// Hand over: winners (by showdown, or the last player left) and your result.
+function finish(spot, state) {
+  const winners = state.uncontestedWinner !== undefined ? [state.uncontestedWinner] : showdownWinners(state, spot.cards) ?? [];
+  return { winners, result: heroResult(state, winners), showdown: state.uncontestedWinner === undefined };
+}
+
+// The coach's record of the hand so far (the whole hand once it's done).
+export function spotRecord(spot) {
+  const { game, positions, state } = spot;
+  return {
+    stakes: { label: game.stakesLabel, sb: game.sb, bb: game.bb, ante: game.ante },
+    tableSize: game.tableSize,
+    positions,
+    heroSeat: spot.heroSeat,
+    players: spot.players.map((p) => ({ ...p, cards: spot.cards[p.seat] ?? [] })),
+    streets: state.streets,
+    board: state.board,
+    winners: spot.winners ?? [],
+    result: spot.result ?? 0,
+    pot: state.pot,
+    practice: { game: game.id, format: spot.setup.format },
+  };
 }
