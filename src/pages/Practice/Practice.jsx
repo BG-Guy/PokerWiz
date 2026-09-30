@@ -1,14 +1,18 @@
 // Practice mode (/practice): pick a game and a spot, describe your opponents (tendency, skill level, stack),
-// then play random spots against them. Villains act on their real cards using the coach's player models;
-// you make the decision and the coach grades it the same way it grades your own hands.
+// then play random spots against them. Villains act on their real cards using the coach's player models.
+// From the spot on you play the hand to the end (the next cards are random, or picked by you), then the
+// coach grades every decision you made, the same way it grades your own hands.
 import { useEffect, useRef, useState } from 'react';
-import { GAMES, generateSpot, recordWithHeroAction } from '../../practice/generateSpot.js';
+import { GAMES, generateSpot, heroAct, dealStreet, seenCards, spotRecord } from '../../practice/generateSpot.js';
+import { overallAccuracy, accuracyLabel } from '../../coach/grading.js';
 import { applyLevel, applyPreset, defaultProfile, describeProfile } from '../../coach/profiles.js';
 import { formatMoney } from '../../utils/format.js';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import PokerTable from '../../components/HandRecorder/PokerTable.jsx';
 import PromptCarousel from '../../components/HandRecorder/PromptCarousel.jsx';
 import ActionPrompt from '../../components/HandRecorder/prompts/ActionPrompt.jsx';
+import BoardPrompt from '../../components/HandRecorder/prompts/BoardPrompt.jsx';
+import AccuracyGauge from '../Coach/AccuracyGauge.jsx';
 import DecisionCard from '../Coach/DecisionCard.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
@@ -29,13 +33,14 @@ function defaultSetup() {
       { profile: applyLevel(applyPreset(defaultProfile(), 'tag'), 'regular'), stackBB },
     ],
     hero: { profile: defaultProfile(), stackBB },
+    boardMode: 'random', // next cards: 'random' or 'pick'
   };
 }
 
 function loadSetup() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (saved?.villains?.length === 2 && saved.hero && GAMES.some((g) => g.id === saved.game)) return saved;
+    if (saved?.villains?.length === 2 && saved.hero && GAMES.some((g) => g.id === saved.game)) return { boardMode: 'random', ...saved };
   } catch {
     // no saved setup (or storage blocked): use the default
   }
@@ -60,16 +65,27 @@ function actionLines(state) {
   });
 }
 
+// How the hand ended, in words.
+function outcomeText(spot) {
+  const bb = spot.state.bb;
+  const amount = `${formatMoney(Math.abs(spot.result), { sign: false })} (${Math.round((Math.abs(spot.result) / bb) * 10) / 10} bb)`;
+  if (spot.heroFolded) return spot.result < 0 ? `You folded and lost ${amount}.` : 'You folded.';
+  if (spot.result > 0) return `You won ${amount}${spot.showdown ? ' at showdown' : ''}.`;
+  if (spot.result < 0) return `You lost ${amount}${spot.showdown ? ' at showdown' : ''}.`;
+  return 'You broke even.';
+}
+
 export default function Practice() {
   const [setup, setSetup] = useState(loadSetup);
-  const [phase, setPhase] = useState('setup'); // setup | spot | grading | result
+  const [phase, setPhase] = useState('setup'); // setup | play | grading | result
   const [spot, setSpot] = useState(null);
-  const [decision, setDecision] = useState(null);
+  const [review, setReview] = useState(null); // { accuracy, label, decisions }
   const [error, setError] = useState(null);
-  const [tally, setTally] = useState({ spots: 0, total: 0, best: 0 });
-  const [spotNumber, setSpotNumber] = useState(0);
+  const [tally, setTally] = useState({ hands: 0, total: 0, netBB: 0 });
+  const [handNumber, setHandNumber] = useState(0);
   const workerRef = useRef(null);
   const requestRef = useRef(0);
+  const firstDecisionRef = useRef(0);
 
   useEffect(() => {
     try {
@@ -86,39 +102,51 @@ export default function Practice() {
       if (event.data.id !== requestRef.current) return;
       if (event.data.error) {
         setError(event.data.error);
-        setPhase('spot');
+        setPhase('result');
         return;
       }
-      const graded = event.data.report.decisions.at(-1);
-      setDecision(graded);
-      setTally((t) => ({ spots: t.spots + 1, total: t.total + graded.score, best: t.best + (graded.score >= 97 ? 1 : 0) }));
+      const { report } = event.data;
+      // Only your decisions from the spot on count (earlier streets were played for you).
+      const decisions = report.decisions.slice(firstDecisionRef.current);
+      const accuracy = overallAccuracy(decisions, report.stakes.bb);
+      setReview({ accuracy, label: accuracyLabel(accuracy), decisions });
+      setTally((t) => ({ hands: t.hands + 1, total: t.total + (accuracy ?? 0), netBB: t.netBB + report.result / report.stakes.bb }));
       setPhase('result');
     };
     workerRef.current = worker;
     return () => worker.terminate();
   }, []);
 
+  // Random board mode: deal the next street by itself after a short beat, so the action can be read.
+  useEffect(() => {
+    if (phase !== 'play' || spot?.status !== 'board' || setup.boardMode === 'pick') return undefined;
+    const timer = setTimeout(() => setSpot((s) => (s?.status === 'board' ? dealStreet(s) : s)), 700);
+    return () => clearTimeout(timer);
+  }, [phase, spot, setup.boardMode]);
+
+  // Hand over: grade it.
+  useEffect(() => {
+    if (phase !== 'play' || spot?.status !== 'done') return;
+    setPhase('grading');
+    requestRef.current += 1;
+    workerRef.current.postMessage({ id: requestRef.current, record: spotRecord(spot) });
+  }, [phase, spot]);
+
   const deal = () => {
     const next = generateSpot(setup);
     setError(next ? null : 'Could not find a spot with these settings. Try again or change the stacks.');
     setSpot(next);
-    setDecision(null);
-    setSpotNumber((n) => n + 1);
-    setPhase(next ? 'spot' : 'setup');
+    setReview(null);
+    firstDecisionRef.current = next?.firstDecision ?? 0;
+    setHandNumber((n) => n + 1);
+    setPhase(next ? 'play' : 'setup');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const act = (action) => {
-    setSpot((s) => ({ ...s, heroAction: action }));
-    setPhase('grading');
-    requestRef.current += 1;
-    workerRef.current.postMessage({ id: requestRef.current, record: recordWithHeroAction(spot, action) });
   };
 
   if (phase === 'setup') {
     return (
       <div className="practice">
-        <PageHeader title="Practice" subtitle="Describe your opponents, then play spots against them and get graded on every decision." />
+        <PageHeader title="Practice" subtitle="Describe your opponents, then play hands against them and get graded on every decision." />
         {error && (
           <p className="practice-error" role="alert">
             <Icon name="alert" size={16} /> {error}
@@ -130,12 +158,13 @@ export default function Practice() {
   }
 
   const { state, cards, heroSeat } = spot;
-  const reveal = phase === 'result';
-  const isTable = spot.record.practice.format === 'preflop';
-  const inRecord = new Map(spot.record.players.map((p) => [p.seat, p]));
-  const seats = spot.record.positions.map((position, seat) => {
+  const reveal = phase === 'grading' || phase === 'result';
+  const isTable = spot.setup.format === 'preflop';
+  const inHand = new Map(spot.players.map((p) => [p.seat, p]));
+  const winners = new Set(spot.winners ?? []);
+  const seats = spot.positions.map((position, seat) => {
     const player = state.players.find((p) => p.seat === seat);
-    const recorded = inRecord.get(seat);
+    const recorded = inHand.get(seat);
     const role = recorded?.role ?? null;
     return {
       seat,
@@ -150,30 +179,35 @@ export default function Practice() {
       folded: player?.folded,
       bet: player?.streetBet ?? 0,
       lastAction: player?.lastAction,
-      isActive: !reveal && state.queue[0] === seat,
+      isActive: phase === 'play' && spot.status === 'hero' && state.queue[0] === seat,
+      isWinner: reveal && winners.has(seat),
     };
   });
   const bb = state.bb;
-  const heroStackBB = Math.round(((state.players.find((p) => p.seat === heroSeat).stack) / bb) * 10) / 10;
+  const heroStackBB = Math.round((state.players.find((p) => p.seat === heroSeat).stack / bb) * 10) / 10;
 
   return (
     <div className="practice">
-      <PageHeader title="Practice" subtitle={`Spot ${spotNumber} · ${GAMES.find((g) => g.id === setup.game).label}`}>
+      <PageHeader title="Practice" subtitle={`Hand ${handNumber} · ${GAMES.find((g) => g.id === spot.setup.game).label}`}>
         <button type="button" className="btn btn-ghost" onClick={() => setPhase('setup')}>
           <Icon name="chevronLeft" size={16} /> Setup
         </button>
       </PageHeader>
 
-      {tally.spots > 0 && (
+      {tally.hands > 0 && (
         <div className="practice-tally" aria-live="polite">
           <span>
-            <strong className="num">{tally.spots}</strong> spots
+            <strong className="num">{tally.hands}</strong> {tally.hands === 1 ? 'hand' : 'hands'}
           </span>
           <span>
-            Average <strong className="num">{Math.round(tally.total / tally.spots)}</strong>
+            Average accuracy <strong className="num">{Math.round(tally.total / tally.hands)}%</strong>
           </span>
           <span>
-            Best move <strong className="num">{tally.best}</strong>
+            Net{' '}
+            <strong className="num">
+              {tally.netBB >= 0 ? '+' : ''}
+              {Math.round(tally.netBB * 10) / 10} bb
+            </strong>
           </span>
         </div>
       )}
@@ -202,36 +236,65 @@ export default function Practice() {
             ))}
           </ol>
           <p className="practice-stacks">
-            {isTable && <>Table: {describeProfile(setup.villains[0].profile).label} · </>}
+            {isTable && <>Table: {describeProfile(spot.setup.villains[0].profile).label} · </>}
             You started with <span className="num">{heroStackBB} bb</span>
             {state.ante > 0 && <> · Big-blind ante {formatMoney(state.ante, { sign: false })}</>}
           </p>
 
-          {phase === 'spot' && (
-            <PromptCarousel stepKey={`spot-${spotNumber}`} direction="forward">
-              {error && (
-                <p className="practice-error" role="alert">
-                  <Icon name="alert" size={16} /> {error}
-                </p>
-              )}
-              <ActionPrompt hand={state} playerName="You" onAction={act} />
+          {phase === 'play' && spot.status === 'hero' && (
+            <PromptCarousel stepKey={`hand-${handNumber}-${state.streets.length}-${state.streets.at(-1).actions.length}`} direction="forward">
+              <ActionPrompt hand={state} playerName="You" onAction={(action) => setSpot(heroAct(spot, action))} />
             </PromptCarousel>
+          )}
+
+          {phase === 'play' && spot.status === 'board' && setup.boardMode === 'pick' && (
+            <PromptCarousel stepKey={`board-${handNumber}-${spot.street}`} direction="forward">
+              <BoardPrompt street={spot.street} count={spot.count} used={seenCards(spot)} onDeal={(codes) => setSpot(dealStreet(spot, codes))} />
+              <button type="button" className="btn btn-ghost practice-random-card" onClick={() => setSpot(dealStreet(spot))}>
+                <Icon name="cards" size={16} /> Deal {spot.count === 1 ? 'a random card' : 'random cards'}
+              </button>
+            </PromptCarousel>
+          )}
+
+          {phase === 'play' && spot.status === 'board' && setup.boardMode !== 'pick' && (
+            <p className="practice-dealing" aria-live="polite">
+              Dealing the {spot.street.toLowerCase()}...
+            </p>
           )}
 
           {phase === 'grading' && (
             <div className="coach-thinking" aria-live="polite">
               <span className="coach-thinking-spinner" />
-              <p className="coach-thinking-title">Grading your decision</p>
+              <p className="coach-thinking-title">Grading your decisions</p>
               <p className="coach-thinking-text">Reading their ranges and valuing every option.</p>
             </div>
           )}
 
-          {phase === 'result' && decision && (
+          {phase === 'result' && (
             <>
-              <DecisionCard decision={decision} number={spotNumber} />
+              <section className="practice-summary">
+                {review && <AccuracyGauge value={review.accuracy ?? 0} label={review.label} />}
+                <div className="practice-summary-text">
+                  <span className="practice-summary-kicker">Hand over</span>
+                  <p className={`practice-summary-outcome ${spot.result > 0 ? 'is-win' : spot.result < 0 ? 'is-loss' : ''}`}>{outcomeText(spot)}</p>
+                  {review && (
+                    <p className="practice-summary-detail">
+                      {review.decisions.length} {review.decisions.length === 1 ? 'decision' : 'decisions'} graded. Results vary with the cards; the grade is about the decisions.
+                    </p>
+                  )}
+                </div>
+              </section>
+              {error && (
+                <p className="practice-error" role="alert">
+                  <Icon name="alert" size={16} /> {error}
+                </p>
+              )}
+              {review?.decisions.map((decision, index) => (
+                <DecisionCard key={index} decision={decision} number={index + 1} />
+              ))}
               <div className="practice-next">
                 <button type="button" className="btn practice-next-btn" onClick={deal}>
-                  Next spot <Icon name="chevronRight" size={16} />
+                  Next hand <Icon name="chevronRight" size={16} />
                 </button>
               </div>
             </>

@@ -151,7 +151,8 @@ You pick a game (cash: 6-max, $1/$2, 100 bb; tournament: 9-max, 1/2 with a big-b
 
 - **Preflop:** every seat is dealt; players before you act on their real cards, sampling fold / call / raise from the preflop model's likelihoods for their hand. Half the time the bottom 40% of hands is redealt to you, so fewer spots are automatic folds.
 - **Heads-up / 3-way:** the first player in preflop order opens and the others call. Each player's cards are dealt by rejection sampling so they fit that action for their read. Then a street is picked (flop 45%, turn 30%, river 25%) and everyone plays on to your turn: villains sample check/bet (random standard size, overbets for wild players) or fold/call/raise from the postflop model with their real cards. Your earlier streets are played by a solid regular; spots where it would fold are redealt.
-- Your decision is appended to the log and graded by `analyzeHand` like any other hand. Villain cards are revealed with the grade.
+- **Playing it out:** from the spot on you play the hand to the end. After each of your actions villains answer with the same models (preflop chart likelihoods preflop, the postflop model after). The next cards are dealt at random or picked by you. A picked card that a villain holds is swapped out of their hand for a random card, so the picker never reveals their cards. The hand ends at a fold (yours ends it right away) or at showdown.
+- **Grading:** the finished hand goes through `analyzeHand` like any other hand. Only your decisions from the spot on are graded (earlier streets were played for you); the hand's accuracy is the usual pot-weighted average. Villain cards still in the hand are revealed.
 
 ## Reviewing saved hands (the Coach button in Hands)
 

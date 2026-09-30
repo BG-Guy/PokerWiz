@@ -82,3 +82,56 @@
 .practice .prompt-carousel-top {
   display: none;
 }
+
+/* Picking the next card: a shortcut for a random one under the picker */
+.practice-random-card {
+  align-self: flex-start;
+}
+
+.practice-dealing {
+  padding: 14px 16px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* End of hand: accuracy gauge and the outcome */
+.practice-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.practice-summary-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 200px;
+}
+.practice-summary-kicker {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-text);
+}
+.practice-summary-outcome {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+}
+.practice-summary-outcome.is-win {
+  color: var(--positive);
+}
+.practice-summary-outcome.is-loss {
+  color: var(--negative);
+}
+.practice-summary-detail {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
