@@ -8,7 +8,7 @@
 .session-timeline-item {
   position: relative;
   display: grid;
-  grid-template-columns: 34px 1fr;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
   gap: 12px;
   padding-bottom: 18px;
   animation: session-timeline-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.1);
@@ -112,5 +112,56 @@
   border: 2px dashed var(--border);
   text-align: center;
   color: var(--text-muted);
+  font-weight: 700;
+}
+
+/* Edit / remove buttons on notes and rebuys */
+.session-timeline-tools {
+  display: flex;
+  gap: 2px;
+  padding-top: 2px;
+}
+.session-timeline-tool {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--text-faint);
+  transition-property: background-color, color;
+  transition-duration: 150ms;
+}
+.session-timeline-tool:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.session-timeline-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.session-timeline-editor textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent);
+  background: var(--bg);
+  font-size: 16px;
+  resize: vertical;
+}
+.session-timeline-editor textarea:focus {
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.session-timeline-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.session-timeline-error {
+  margin-top: 12px;
+  color: var(--negative);
   font-weight: 700;
 }

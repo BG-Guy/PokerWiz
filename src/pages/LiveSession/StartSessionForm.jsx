@@ -48,7 +48,7 @@ export default function StartSessionForm({ onStarted }) {
 
   return (
     <div className="start-session">
-      <PageHeader title="Start a session" subtitle="Set the table, then log hands, notes and rebuys as you play." />
+      <PageHeader title="Start a session" subtitle="Set the table, then log hands and notes as you play." />
 
       <div className="start-session-layout">
         <form className="start-session-form" onSubmit={handleSubmit}>

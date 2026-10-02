@@ -70,7 +70,7 @@ export default function PracticeSetup({ setup, onChange, onStart }) {
           options={FORMATS.map((f) => ({ value: f.id, label: f.label }))}
         />
         <p className="practice-card-text">
-          {format.description} {game.id === 'mtt' ? 'Blinds 1/2 with a big-blind ante, 9-handed.' : 'Blinds $1/$2, 9-handed.'}
+          {format.description} {game.id === 'mtt' ? 'Blinds 1/2 with a big-blind ante, 8-handed.' : 'Blinds $1/$2, 8-handed.'}
         </p>
         <div className="read-picker-group">
           <span className="read-picker-label">Next cards</span>

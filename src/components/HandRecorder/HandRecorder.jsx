@@ -2,15 +2,17 @@
 // and Coach mode ("coach"), which adds a player-traits step and ends with an analysis instead of saving.
 // Flow: game -> hero seat -> villains -> stacks -> [traits] -> hero cards -> villain cards -> action
 // (street by street, dealing the board between streets) -> showdown -> details (save) or analyze.
-// Every answer is pushed onto a history stack, so Undo steps back exactly one question.
+// Every answer is pushed onto a history stack, so Undo steps back exactly one question, and tapping a step
+// in the hand log jumps back to that question to change it.
 import { useState } from 'react';
-import { STAKES, TABLE_POSITIONS } from '../../constants/poker.js';
+import { STAKES, TABLE_POSITIONS, TABLE_SIZES } from '../../constants/poker.js';
 import { RANKS } from '../../utils/cards.js';
 import { formatMoney, todayIso } from '../../utils/format.js';
 import { defaultProfile, describeProfile } from '../../coach/profiles.js';
 import PokerTable from './PokerTable.jsx';
 import PromptCarousel from './PromptCarousel.jsx';
 import LogEntry from './LogEntry.jsx';
+import Icon from '../Icon/Icon.jsx';
 import GamePrompt from './prompts/GamePrompt.jsx';
 import SeatPickPrompt from './prompts/SeatPickPrompt.jsx';
 import StacksPrompt from './prompts/StacksPrompt.jsx';
@@ -37,7 +39,7 @@ import './HandRecorder.css';
 const INITIAL_WIZARD = {
   step: 'game',
   stakesLabel: '$1/$2',
-  tableSize: 9, // full ring by default; 6-max is one tap away
+  tableSize: TABLE_SIZES[0], // 8-max by default; 6-max is one tap away
   heroSeat: null,
   villainSeats: [],
   stacks: {}, // seat -> starting stack in dollars (string while being typed)
@@ -61,11 +63,13 @@ const secondPerson = (verb) => verb.replace(/s(\sto)?$/, '$1');
 // mode: 'record' | 'coach'
 // onSave(payload) -> Promise   (record mode: persist the hand; reject with an Error to show a message)
 // onAnalyze({ record, payload }) (coach mode: hand the finished hand to the coach)
-export default function HandRecorder({ mode = 'record', initialStakesLabel, onSave, onAnalyze }) {
+// initialTableSize / initialDetails: start values when re-recording a saved hand.
+export default function HandRecorder({ mode = 'record', initialStakesLabel, initialTableSize, initialDetails, onSave, onAnalyze }) {
   const isCoach = mode === 'coach';
   const [wizard, setWizard] = useState(() => ({
     ...INITIAL_WIZARD,
     stakesLabel: STAKES.some((s) => s.label === initialStakesLabel) ? initialStakesLabel : INITIAL_WIZARD.stakesLabel,
+    tableSize: TABLE_SIZES.includes(initialTableSize) ? initialTableSize : INITIAL_WIZARD.tableSize,
   }));
   const [history, setHistory] = useState([]);
   const [direction, setDirection] = useState('forward');
@@ -91,6 +95,14 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
     if (history.length === 0) return;
     setWizard(history[history.length - 1]);
     setHistory((h) => h.slice(0, -1));
+    setDirection('back');
+  };
+  // Go back to the question that produced log entry `index` (everything after it is redone).
+  const jumpTo = (index) => {
+    const at = history.findIndex((past) => past.log.length === index);
+    if (at < 0) return;
+    setWizard(history[at]);
+    setHistory((h) => h.slice(0, at));
     setDirection('back');
   };
 
@@ -353,6 +365,7 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
     prompt = (
       <DetailsPrompt
         defaultTitle={defaultTitle()}
+        initial={initialDetails}
         result={heroResult(hand, winners)}
         pot={hand.pot}
         bb={stakes.bb}
@@ -429,10 +442,14 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
         {wizard.log.length > 0 && (
           <details className="hand-recorder-log">
             <summary>Hand so far ({wizard.log.length} steps)</summary>
+            <p className="hand-recorder-log-hint">Tap a step to go back and change it.</p>
             <ol>
               {wizard.log.map((entry, index) => (
                 <li key={index}>
-                  <LogEntry entry={entry} />
+                  <button type="button" className="hand-recorder-log-step" disabled={saving} onClick={() => jumpTo(index)}>
+                    <LogEntry entry={entry} />
+                    <Icon name="pencil" size={14} className="hand-recorder-log-edit" />
+                  </button>
                 </li>
               ))}
             </ol>

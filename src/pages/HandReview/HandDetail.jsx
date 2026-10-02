@@ -1,5 +1,6 @@
 // Right pane of Hand Review: the table (board, your hand, villain hands), action replay, and your review
-// (verdict, star rating, tilt, notes).
+// (verdict, star rating, tilt, notes). "Edit" opens a sheet to fix the hand's details or delete it.
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { VERDICTS } from '../../constants/poker.js';
 import { bigBlindOf, formatLongDate, formatMoney } from '../../utils/format.js';
@@ -11,6 +12,7 @@ import StarRating from '../../components/StarRating/StarRating.jsx';
 import TiltMeter from '../../components/TiltMeter/TiltMeter.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import ActionTimeline from './ActionTimeline.jsx';
+import EditHandSheet from './EditHandSheet.jsx';
 import { coachSupport } from '../../coach/savedHand.js';
 import { replayStreets } from '../../practice/replaySpot.js';
 import './HandDetail.css';
@@ -34,7 +36,9 @@ function villainsOf(hand) {
   return [...actors.values()].filter((v) => !v.folded);
 }
 
-export default function HandDetail({ hand, backTo, onUpdate }) {
+// onUpdate(changes, persist): review edits. onEdited(hand) / onDeleted(): after the Edit hand sheet saves or deletes.
+export default function HandDetail({ hand, backTo, onUpdate, onEdited, onDeleted }) {
+  const [editOpen, setEditOpen] = useState(false);
   const villains = villainsOf(hand);
   // Every Hold'em hand can be reviewed by the coach (missing details are rebuilt from the log).
   const coach = coachSupport(hand);
@@ -43,10 +47,15 @@ export default function HandDetail({ hand, backTo, onUpdate }) {
 
   return (
     <article className="hand-detail">
-      {/* Back link only shows on phones/tablets, where the list is hidden */}
-      <Link to={backTo} className="hand-detail-back btn btn-ghost">
-        <Icon name="chevronLeft" size={18} /> All hands
-      </Link>
+      <div className="hand-detail-toolbar">
+        {/* Back link only shows on phones/tablets, where the list is hidden */}
+        <Link to={backTo} className="hand-detail-back btn btn-ghost">
+          <Icon name="chevronLeft" size={18} /> All hands
+        </Link>
+        <button type="button" className="btn btn-ghost hand-detail-edit" onClick={() => setEditOpen(true)}>
+          <Icon name="pencil" size={16} /> Edit hand
+        </button>
+      </div>
 
       <header className="hand-detail-header">
         <div>
@@ -182,6 +191,18 @@ export default function HandDetail({ hand, backTo, onUpdate }) {
           ))}
         </div>
       </section>
+
+      {editOpen && (
+        <EditHandSheet
+          hand={hand}
+          onClose={() => setEditOpen(false)}
+          onSaved={(saved) => {
+            setEditOpen(false);
+            onEdited(saved);
+          }}
+          onDeleted={onDeleted}
+        />
+      )}
     </article>
   );
 }

@@ -96,10 +96,10 @@
   font-weight: 600;
 }
 
-/* Three big action tiles */
+/* Two big action tiles */
 .live-view-actions {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
 }
 .live-view-action {
@@ -164,30 +164,6 @@
   justify-content: flex-end;
   gap: 8px;
 }
-.live-view-money {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 16px;
-  min-height: 54px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-.live-view-money input {
-  flex: 1;
-  min-width: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  font: inherit;
-  color: var(--text);
-}
-
 .live-view-error {
   color: var(--negative);
   font-weight: 700;
@@ -199,8 +175,30 @@
   justify-content: space-between;
   gap: 12px;
 }
-.live-view-discard {
-  color: var(--text-muted);
+.live-view-footer .live-view-finish {
+  margin-left: auto;
+}
+
+/* Buy-in in the header card doubles as an edit button */
+.live-view-buyin {
+  display: inline-flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: 6px;
+  margin: -2px -8px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font: inherit;
+  color: inherit;
+  transition-property: background-color;
+  transition-duration: 150ms;
+}
+.live-view-buyin svg {
+  opacity: 0.7;
+}
+.live-view-buyin:hover,
+.live-view-buyin:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
 }
 .live-view-finish {
   flex: 1;

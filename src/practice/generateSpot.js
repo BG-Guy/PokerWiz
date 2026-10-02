@@ -3,7 +3,7 @@
 // cards, so a recreational player's big bet really is a strong hand, and a drunk really does call with anything.
 //
 // Formats:
-//   preflop  a full 9-handed table; everyone before you acts, you make the next decision
+//   preflop  a full 8-handed table; everyone before you acts, you make the next decision
 //   hu       a heads-up pot: one player opens, the other calls, then a decision on the flop, turn or river
 //   3way     the same with three players
 // Streets before the spot are played for you by a solid regular; spots where that player would have folded
@@ -21,8 +21,8 @@ import { comboActionProbabilities } from '../coach/postflopModel.js';
 
 // Blinds are $1/$2 in both games; tournaments add a big-blind ante and play shallower, with smaller opens.
 export const GAMES = [
-  { id: 'cash', label: 'Cash game', tableSize: 9, sb: 1, bb: 2, ante: 0, openBB: 2.5, defaultStackBB: 100, stakesLabel: '$1/$2' },
-  { id: 'mtt', label: 'Tournament', tableSize: 9, sb: 1, bb: 2, ante: 2, openBB: 2.2, defaultStackBB: 30, stakesLabel: '1/2 + ante' },
+  { id: 'cash', label: 'Cash game', tableSize: 8, sb: 1, bb: 2, ante: 0, openBB: 2.5, defaultStackBB: 100, stakesLabel: '$1/$2' },
+  { id: 'mtt', label: 'Tournament', tableSize: 8, sb: 1, bb: 2, ante: 2, openBB: 2.2, defaultStackBB: 30, stakesLabel: '1/2 + ante' },
 ];
 
 export const FORMATS = [

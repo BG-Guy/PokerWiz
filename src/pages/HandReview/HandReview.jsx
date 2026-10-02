@@ -1,7 +1,7 @@
 // Hand Review page: searchable hand list plus a street-by-street replay of the selected hand.
 // Phones show one pane at a time (list, or the opened hand); desktop shows both side by side.
 import { useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getHands, updateHand } from '../../api/hands.js';
 import { getSessions } from '../../api/sessions.js';
 import { useApi } from '../../hooks/useApi.js';
@@ -17,6 +17,7 @@ const loadHandReview = () => Promise.all([getHands(), getSessions()]);
 
 export default function HandReview() {
   const { handId } = useParams();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const sessionId = searchParams.get('session');
   const [verdictFilter, setVerdictFilter] = useState('all');
@@ -49,6 +50,13 @@ export default function HandReview() {
     if (!persist) return;
     setSaveError(null);
     updateHand(id, changes).catch((err) => setSaveError(err.message));
+  };
+
+  // After the Edit hand sheet: swap in the saved hand, or drop a deleted one and go back to the list.
+  const replaceHand = (saved) => setData(([hands, list]) => [hands.map((hand) => (hand.id === saved.id ? saved : hand)), list]);
+  const removeHand = (id) => {
+    setData(([hands, list]) => [hands.filter((hand) => hand.id !== id), list]);
+    navigate(`/hands${search}`);
   };
 
   return (
@@ -91,6 +99,8 @@ export default function HandReview() {
               hand={selectedHand}
               backTo={`/hands${search}`}
               onUpdate={(changes, persist) => updateReview(selectedHand.id, changes, persist)}
+              onEdited={replaceHand}
+              onDeleted={() => removeHand(selectedHand.id)}
             />
           ) : (
             <p className="hand-review-empty">No hands match these filters.</p>

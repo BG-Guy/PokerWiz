@@ -1,4 +1,4 @@
-/* Seat styles. --avatar sets the size; phones get smaller seats so 9-max still fits. */
+/* Seat styles. --avatar sets the size; phones get smaller seats so a full 8-max table still fits. */
 
 .seat {
   --avatar: 40px;
@@ -10,6 +10,7 @@
   transform: translate(-50%, -50%);
   transition: opacity 0.25s ease;
 }
+.is-8-max .seat,
 .is-9-max .seat {
   --avatar: 34px;
 }
@@ -17,6 +18,7 @@
   .seat {
     --avatar: 54px;
   }
+  .is-8-max .seat,
   .is-9-max .seat {
     --avatar: 46px;
   }

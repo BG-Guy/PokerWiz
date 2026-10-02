@@ -3,14 +3,15 @@
 A poker tracker for mobile and desktop: a React frontend and a small Express + SQLite backend.
 
 **Features**
-- **Play (live session):** start a session (game, stakes, venue, buy-in), then log hands, notes and rebuys on a timeline while you play. Finish with cash-out, a draggable 0 to 5 star rating (one decimal) and a 1 to 5 tilt scale with faces.
-- **Add hand:** rebuild a hand on a poker table. You seat the hero and villains, set each stack (exact amount, or Short / Average / Big / Huge), pick known cards, then answer each player's action turn by turn in an animated carousel below the table. All-ins and side pots are handled.
+- **Play (live session):** start a session (game, stakes, venue, buy-in), then log hands and notes on a timeline while you play. Tap the buy-in (or Edit session) to change stakes, venue or buy-in, and edit or remove notes on the timeline. Finish with cash-out, a draggable 0 to 5 star rating (one decimal) and a 1 to 5 tilt scale with faces.
+- **Add hand:** rebuild a hand on an 8-max (or 6-max) No-Limit Hold'em table. You seat the hero and villains, set each stack (exact amount, or Short / Average / Big / Huge), pick known cards, then answer each player's action turn by turn in an animated carousel below the table. All-ins and side pots are handled. Tap any step in "Hand so far" to jump back and change it.
 - **Coach:** record a hand with reads on every player: a tendency (Nit, LAG, calling station, drunk...) and a skill level (Beginner to Pro), plus tilt and form, then get an accuracy score and a review of every decision: the best play, the value of every option in dollars, pot odds, equity against their ranges, and a range grid. Saved hands can be opened in the coach too. See [docs/coach-algorithm.md](docs/coach-algorithm.md).
 - **Practice:** pick cash or tournament and a spot (preflop, heads-up, 3-way), describe each opponent's tendency, skill level and stack, then play random hands against them to the end, with the turn and river dealt at random or picked by you. Villains act on their real cards using the coach's models, and every decision is graded.
 - **Replay a hand:** in any Hold'em hand, pick Flop, Turn or River (or "Replay from here" on the timeline) and play it again from that point. Seats, stacks, reads, the action and the board so far carry over; the next cards come as they did, at random, or picked by you. Villains play their real cards when the hand shows them, otherwise a hand that fits how they played. Compare how it goes with the real result.
 - **Highlights:** Hall of Fame, Wall of Shame, Tilt Tower, Monster Pots and more, from your ratings and results. The top three are on Home.
 - **Hand review:** replay hands street by street with your hand and the villains' (face down unless shown), all-ins highlighted, plus verdict, star rating, tilt and notes. Every Hold'em hand has a **Coach** button (in the list and on the hand). Older hands without stacks are rebuilt from the action log, and the review shows what was assumed. Change the reads and it re-runs; the score is saved onto the hand.
-- **Game history:** past sessions by month, with filters, rating and tilt.
+- **Edit a hand:** "Edit hand" fixes the title, date, stakes, cards, board, pot, result and tags, or deletes the hand. "Re-record the action" goes through the hand again on the table and replaces it, keeping your notes, verdict and rating.
+- **Game history:** past sessions by month, with filters, rating and tilt. Open a session and tap Edit session to correct any of it, or delete it.
 - **Insights:** leaks and strengths plus hourly by venue, stakes, game and day, all from your sessions. Hand insights live in the Hands tab.
 - **Goals:** measured from your real data (hands played, profit, hours, hands reviewed), with pace projections and a "focus next" pick.
 - **Big blinds or dollars:** every amount shows in big blinds by default; the BB / $ switch (header on phones, sidebar on desktop) flips the whole app to dollars. Totals across stakes add up each session's result in its own big blinds.
@@ -78,11 +79,15 @@ src/
 | GET | `/api/sessions` | Finished sessions, newest first |
 | GET | `/api/sessions/live` | The running session with its timeline, or `null` |
 | POST | `/api/sessions` | Start a session `{ game, stakes, bigBlind, venue, buyIn }` |
-| POST | `/api/sessions/:id/events` | Timeline entry `{ type: note \| rebuy \| hand, text?, amount?, handId? }` |
+| PATCH | `/api/sessions/:id` | Edit `{ game, stakes, bigBlind, venue, buyIn, notes }`; finished sessions also `{ date, cashOut, durationMin, hands, rating, tilt }` |
+| POST | `/api/sessions/:id/events` | Timeline entry `{ type: note \| rebuy \| hand, text?, amount?, handId? }` (the app no longer adds rebuys; older ones still show) |
+| PATCH / DELETE | `/api/sessions/:id/events/:eventId` | Edit a note's `text` or a rebuy's `amount` / remove the entry |
 | POST | `/api/sessions/:id/finish` | `{ cashOut, rating (0-5), tilt (1-5), notes, hands }` |
-| DELETE | `/api/sessions/:id` | Discard a live session |
+| DELETE | `/api/sessions/:id` | Delete a session, live or finished (its saved hands are kept) |
 | GET / POST | `/api/hands` | List hands / save a recorded hand |
-| PATCH | `/api/hands/:id` | Update `verdict`, `note`, `title`, `tags` |
+| PATCH | `/api/hands/:id` | Edit review fields (`verdict`, `note`, `rating`, `tilt`, ...) or details (`title`, `date`, `stakes`, `holeCards`, `board`, `potSize`, `result`, `tags`, `players`) |
+| PUT | `/api/hands/:id` | Replace a hand with a re-recorded version (review fields not sent are kept) |
+| DELETE | `/api/hands/:id` | Delete a hand (and its session timeline entry) |
 | GET | `/api/goals`, `/api/player-stats` | Goals; tracker stats for Insights |
 
 ## Design
@@ -90,7 +95,7 @@ src/
 - **Palette:** `#12181B` ink, `#3F5A60` slate, `#7FC8C2` teal, `#D9F0EE` mist, `#F6FBFB` snow. The tokens are in `src/global.css`.
 - **Fonts:** Fredoka for headings and numbers, Nunito for body text.
 - **Breakpoints:**
-  - Phones (below 768px) get bottom tabs with a raised Play button and a More sheet.
+  - Phones (below 768px) get bottom tabs with a raised Play button; More slides the bar up to show the other sections.
   - Tablets (768px and up) get an icon rail.
   - Desktops (1100px and up) get the full sidebar.
 - **Icons**, card suits, card backs, and the hero/villain avatars are all inline SVG. There are no emojis.

@@ -1,4 +1,4 @@
-// One session in Game History. Tapping it expands buy-in, cash-out, notes and a link to its hands.
+// One session in Game History. Tapping it expands buy-in, cash-out, notes, a link to its hands and Edit.
 import { Link } from 'react-router-dom';
 import { sessionProfit } from '../../utils/stats.js';
 import { formatDuration, formatUnits, formatWeekday, parseDate } from '../../utils/format.js';
@@ -8,7 +8,7 @@ import StarRating from '../../components/StarRating/StarRating.jsx';
 import TiltMeter from '../../components/TiltMeter/TiltMeter.jsx';
 import './SessionRow.css';
 
-export default function SessionRow({ session, handCount, isOpen, onToggle }) {
+export default function SessionRow({ session, handCount, isOpen, onToggle, onEdit }) {
   const profit = sessionProfit(session);
   const hourly = profit / (session.durationMin / 60);
   const detailsId = `session-details-${session.id}`;
@@ -75,12 +75,17 @@ export default function SessionRow({ session, handCount, isOpen, onToggle }) {
           )}
 
           {session.notes && <p className="session-row-notes">{session.notes}</p>}
-          {handCount > 0 && (
-            <Link to={`/hands?session=${session.id}`} className="btn session-row-link">
-              Review {handCount} saved {handCount === 1 ? 'hand' : 'hands'}
-              <Icon name="chevronRight" size={16} />
-            </Link>
-          )}
+          <div className="session-row-actions">
+            {handCount > 0 && (
+              <Link to={`/hands?session=${session.id}`} className="btn session-row-link">
+                Review {handCount} saved {handCount === 1 ? 'hand' : 'hands'}
+                <Icon name="chevronRight" size={16} />
+              </Link>
+            )}
+            <button type="button" className="btn btn-ghost" onClick={onEdit}>
+              <Icon name="pencil" size={16} /> Edit session
+            </button>
+          </div>
         </div>
       )}
     </li>

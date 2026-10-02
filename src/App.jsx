@@ -22,12 +22,13 @@ export default function App() {
     <Routes>
       <Route element={<AppLayout />}>
         <Route index element={<Dashboard />} />
-        {/* Hands: the list, highlights, hand insights, the step-by-step recorder, and one opened hand */}
+        {/* Hands: the list, highlights, hand insights, the step-by-step recorder, one opened hand, and re-recording it */}
         <Route path="hands" element={<HandReview />} />
         <Route path="hands/highlights" element={<HandHighlights />} />
         <Route path="hands/insights" element={<HandInsights />} />
         <Route path="hands/new" element={<AddHand />} />
         <Route path="hands/:handId" element={<HandReview />} />
+        <Route path="hands/:handId/edit" element={<AddHand />} />
         <Route path="session" element={<LiveSession />} />
         <Route path="history" element={<GameHistory />} />
         <Route path="insights" element={<Insights />} />

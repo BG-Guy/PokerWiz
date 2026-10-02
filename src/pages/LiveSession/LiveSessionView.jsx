@@ -1,22 +1,23 @@
-// The running session: live clock, quick actions (add hand, note, rebuy), the timeline, and Finish.
+// The running session: live clock, quick actions (add hand, note), the editable timeline, Edit (or discard) and Finish.
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { addSessionEvent, discardSession } from '../../api/sessions.js';
+import { addSessionEvent } from '../../api/sessions.js';
 import { formatClock, formatMoney, formatTime } from '../../utils/format.js';
 import Panel from '../../components/Panel/Panel.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import SessionTimeline from './SessionTimeline.jsx';
 import FinishSessionSheet from './FinishSessionSheet.jsx';
+import EditSessionSheet from '../../components/EditSessionSheet/EditSessionSheet.jsx';
 import './LiveSessionView.css';
 
 export default function LiveSessionView({ session, onChange, onFinished, onDiscarded }) {
   const [now, setNow] = useState(Date.now());
-  const [composer, setComposer] = useState(null); // which inline form is open: 'note' | 'rebuy' | null
+  const [noteOpen, setNoteOpen] = useState(false);
   const [noteText, setNoteText] = useState('');
-  const [rebuyAmount, setRebuyAmount] = useState(String(session.bigBlind * 100));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [finishOpen, setFinishOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   // Tick the session clock every second.
   useEffect(() => {
@@ -30,9 +31,9 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
   const handsDealt = Math.floor((elapsedMs / 3600000) * 30);
   const noteCount = session.events.filter((e) => e.type === 'note').length;
 
-  const toggleComposer = (name) => {
+  const toggleNote = () => {
     setError(null);
-    setComposer((current) => (current === name ? null : name));
+    setNoteOpen((open) => !open);
   };
 
   // Save a timeline entry, then close the inline form.
@@ -41,22 +42,12 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
     setError(null);
     try {
       onChange(await addSessionEvent(session.id, event));
-      setComposer(null);
+      setNoteOpen(false);
       setNoteText('');
     } catch (err) {
       setError(err.message);
     } finally {
       setBusy(false);
-    }
-  };
-
-  const handleDiscard = async () => {
-    if (!window.confirm('Discard this session? Nothing from it will be saved.')) return;
-    try {
-      await discardSession(session.id);
-      onDiscarded();
-    } catch (err) {
-      setError(err.message);
     }
   };
 
@@ -80,7 +71,13 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
           <dl className="live-view-numbers">
             <div>
               <dt>Buy-in</dt>
-              <dd className="num">{formatMoney(session.buyIn, { sign: false, bb: session.bigBlind })}</dd>
+              <dd>
+                {/* Tap the buy-in to change it (e.g. after topping up) */}
+                <button type="button" className="live-view-buyin num" onClick={() => setEditOpen(true)} aria-label="Edit buy-in">
+                  {formatMoney(session.buyIn, { sign: false, bb: session.bigBlind })}
+                  <Icon name="pencil" size={14} />
+                </button>
+              </dd>
             </div>
             <div>
               <dt>Hands dealt</dt>
@@ -103,18 +100,14 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
             <Icon name="cards" size={22} />
             Add hand
           </Link>
-          <button type="button" className={`live-view-action ${composer === 'note' ? 'is-active' : ''}`} onClick={() => toggleComposer('note')}>
+          <button type="button" className={`live-view-action ${noteOpen ? 'is-active' : ''}`} onClick={toggleNote}>
             <Icon name="note" size={22} />
             Add note
-          </button>
-          <button type="button" className={`live-view-action ${composer === 'rebuy' ? 'is-active' : ''}`} onClick={() => toggleComposer('rebuy')}>
-            <Icon name="coins" size={22} />
-            Rebuy
           </button>
         </div>
 
         {/* Inline note form */}
-        {composer === 'note' && (
+        {noteOpen && (
           <form
             className="live-view-composer"
             onSubmit={(event) => {
@@ -131,44 +124,11 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
               onChange={(event) => setNoteText(event.target.value)}
             />
             <div className="live-view-composer-actions">
-              <button type="button" className="btn btn-ghost" onClick={() => setComposer(null)}>
+              <button type="button" className="btn btn-ghost" onClick={() => setNoteOpen(false)}>
                 Cancel
               </button>
               <button type="submit" className="btn" disabled={busy || !noteText.trim()}>
                 Add to timeline
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* Inline rebuy form */}
-        {composer === 'rebuy' && (
-          <form
-            className="live-view-composer"
-            onSubmit={(event) => {
-              event.preventDefault();
-              submitEvent({ type: 'rebuy', amount: Number(rebuyAmount) });
-            }}
-          >
-            <label className="live-view-money">
-              <span aria-hidden="true">$</span>
-              <input
-                autoFocus
-                type="number"
-                inputMode="decimal"
-                min="0"
-                step="any"
-                value={rebuyAmount}
-                aria-label="Rebuy amount in dollars"
-                onChange={(event) => setRebuyAmount(event.target.value)}
-              />
-            </label>
-            <div className="live-view-composer-actions">
-              <button type="button" className="btn btn-ghost" onClick={() => setComposer(null)}>
-                Cancel
-              </button>
-              <button type="submit" className="btn" disabled={busy || !(Number(rebuyAmount) > 0)}>
-                Add rebuy
               </button>
             </div>
           </form>
@@ -181,8 +141,9 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
         )}
 
         <div className="live-view-footer">
-          <button type="button" className="btn btn-ghost live-view-discard" onClick={handleDiscard}>
-            <Icon name="trash" size={16} /> Discard
+          {/* Edit opens the session sheet, which also has Discard */}
+          <button type="button" className="btn btn-ghost" onClick={() => setEditOpen(true)}>
+            <Icon name="pencil" size={16} /> Edit session
           </button>
           <button type="button" className="btn live-view-finish" onClick={() => setFinishOpen(true)}>
             <Icon name="flag" size={18} /> Finish session
@@ -191,7 +152,7 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
       </div>
 
       <Panel title="Timeline" className="live-view-timeline">
-        <SessionTimeline session={session} />
+        <SessionTimeline session={session} onChange={onChange} />
       </Panel>
 
       <FinishSessionSheet
@@ -201,6 +162,18 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
         onClose={() => setFinishOpen(false)}
         onFinished={onFinished}
       />
+
+      {editOpen && (
+        <EditSessionSheet
+          session={session}
+          onClose={() => setEditOpen(false)}
+          onSaved={(updated) => {
+            onChange(updated);
+            setEditOpen(false);
+          }}
+          onDeleted={onDiscarded}
+        />
+      )}
     </div>
   );
 }

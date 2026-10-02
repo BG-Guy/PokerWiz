@@ -39,7 +39,48 @@
 .hand-recorder-log ol {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 2px;
+  margin-top: 8px;
   font-size: 14px;
+}
+.hand-recorder-log-hint {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+
+/* Each logged step is a button that jumps back to it */
+.hand-recorder-log-step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 36px;
+  margin: 0 -8px;
+  padding: 4px 8px;
+  border-radius: 10px;
+  text-align: left;
+  box-sizing: content-box;
+  transition-property: background-color;
+  transition-duration: 150ms;
+}
+.hand-recorder-log-step:hover {
+  background: var(--surface-2);
+}
+.hand-recorder-log-edit {
+  flex-shrink: 0;
+  color: var(--text-faint);
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+.hand-recorder-log-step:hover .hand-recorder-log-edit,
+.hand-recorder-log-step:focus-visible .hand-recorder-log-edit {
+  opacity: 1;
+}
+@media (hover: none) {
+  .hand-recorder-log-edit {
+    opacity: 1;
+  }
 }

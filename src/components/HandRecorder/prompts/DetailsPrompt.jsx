@@ -10,12 +10,13 @@ import Icon from '../../Icon/Icon.jsx';
 
 const VERDICT_OPTIONS = Object.entries(VERDICTS).map(([value, label]) => ({ value, label }));
 
-export default function DetailsPrompt({ defaultTitle, result, pot, bb, saving, error, onSave }) {
-  const [title, setTitle] = useState(defaultTitle);
-  const [verdict, setVerdict] = useState('review');
-  const [note, setNote] = useState('');
-  const [rating, setRating] = useState(0);
-  const [tilt, setTilt] = useState(null);
+// initial: review fields to start from when re-recording a saved hand ({ title, verdict, note, rating, tilt }).
+export default function DetailsPrompt({ defaultTitle, initial = {}, result, pot, bb, saving, error, onSave }) {
+  const [title, setTitle] = useState(initial.title ?? defaultTitle);
+  const [verdict, setVerdict] = useState(initial.verdict ?? 'review');
+  const [note, setNote] = useState(initial.note ?? '');
+  const [rating, setRating] = useState(initial.rating ?? 0);
+  const [tilt, setTilt] = useState(initial.tilt ?? null);
 
   return (
     <>

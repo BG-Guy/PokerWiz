@@ -1,4 +1,5 @@
 // Game History page: every session grouped by month, with game/venue filters and a summary row.
+// Each session can be opened, edited or deleted.
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { getSessions } from '../../api/sessions.js';
@@ -12,6 +13,7 @@ import StatCard from '../../components/StatCard/StatCard.jsx';
 import FilterChips from '../../components/FilterChips/FilterChips.jsx';
 import Money from '../../components/Money/Money.jsx';
 import SessionRow from './SessionRow.jsx';
+import EditSessionSheet from '../../components/EditSessionSheet/EditSessionSheet.jsx';
 import './GameHistory.css';
 
 const GAME_OPTIONS = [
@@ -49,7 +51,8 @@ export default function GameHistory() {
   // A just-finished session arrives as ?open=<id> and starts expanded.
   const [searchParams] = useSearchParams();
   const [openId, setOpenId] = useState(searchParams.get('open'));
-  const { data, error, reload } = useApi(loadHistory);
+  const [editingId, setEditingId] = useState(null);
+  const { data, error, reload, setData } = useApi(loadHistory);
 
   if (!data) return <LoadState error={error} onRetry={reload} />;
   const [rawSessions, hands] = data;
@@ -61,6 +64,10 @@ export default function GameHistory() {
   );
   const summary = summarize(filtered);
   const months = groupByMonth(filtered);
+  // The edit sheet works on the saved (dollar) values, not the display copy.
+  const editing = rawSessions.find((s) => s.id === editingId);
+  const replaceSession = (updated) => setData(([list, h]) => [list.map((s) => (s.id === updated.id ? updated : s)), h]);
+  const removeSession = (id) => setData(([list, h]) => [list.filter((s) => s.id !== id), h.map((hand) => (hand.sessionId === id ? { ...hand, sessionId: null } : hand))]);
 
   return (
     <div className="game-history">
@@ -94,6 +101,7 @@ export default function GameHistory() {
                 handCount={hands.filter((hand) => hand.sessionId === session.id).length}
                 isOpen={openId === session.id}
                 onToggle={() => setOpenId(openId === session.id ? null : session.id)}
+                onEdit={() => setEditingId(session.id)}
               />
             ))}
           </ul>
@@ -101,6 +109,21 @@ export default function GameHistory() {
       ))}
 
       {filtered.length === 0 && <p className="game-history-empty">No sessions match these filters.</p>}
+
+      {editing && (
+        <EditSessionSheet
+          session={editing}
+          onClose={() => setEditingId(null)}
+          onSaved={(updated) => {
+            replaceSession(updated);
+            setEditingId(null);
+          }}
+          onDeleted={() => {
+            removeSession(editing.id);
+            setEditingId(null);
+          }}
+        />
+      )}
     </div>
   );
 }

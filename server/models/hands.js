@@ -1,11 +1,18 @@
 // Hand data access. The full hand lives as JSON; id, session and date are real columns for sorting/filtering.
 import { randomUUID } from 'node:crypto';
-import { db } from '../db/database.js';
+import { db, transaction } from '../db/database.js';
 import { addEvent, findById as findSession } from './sessions.js';
 
-// Fields the Hand Review page is allowed to edit after saving.
+// Fields that can be edited after saving: the review (verdict, notes, ...), the hand's details
+// (stakes, cards, pot, result, ...) from the Edit hand sheet, and players (to correct cards they showed).
 // coachAccuracy / coachReads are written by a coach review (score, and the reads it used).
-const EDITABLE_FIELDS = ['verdict', 'note', 'title', 'tags', 'rating', 'tilt', 'coachAccuracy', 'coachReads'];
+const EDITABLE_FIELDS = [
+  'verdict', 'note', 'title', 'tags', 'rating', 'tilt', 'coachAccuracy', 'coachReads',
+  'stakes', 'heroPosition', 'holeCards', 'board', 'potSize', 'result', 'players',
+];
+
+// Review fields a re-recorded hand keeps from the version it replaces when they aren't sent again.
+const KEPT_ON_REPLACE = ['verdict', 'note', 'title', 'tags', 'rating', 'tilt', 'coachReads'];
 
 function toHand(row) {
   return { ...JSON.parse(row.data), id: row.id, sessionId: row.session_id, date: row.date };
@@ -37,14 +44,42 @@ export function createHand({ id: _ignored, sessionId = null, date, ...data }) {
   return findHand(id);
 }
 
-// Update review fields (verdict, notes, ...) on an existing hand.
+// Edit an existing hand (review fields, details, or its date).
 export function updateHand(id, changes) {
   const hand = findHand(id);
   if (!hand) return null;
-  const { id: _id, sessionId: _s, date: _d, ...data } = hand;
+  const { id: _id, sessionId: _s, date, ...data } = hand;
   for (const field of EDITABLE_FIELDS) {
     if (changes[field] !== undefined) data[field] = changes[field];
   }
-  db.prepare('UPDATE hands SET data = ? WHERE id = ?').run(JSON.stringify(data), id);
+  saveHand(id, changes.date ?? date, data);
   return findHand(id);
+}
+
+// Swap in a re-recorded version of a hand (new seats, cards and action), keeping its id, session,
+// and the review fields the new version doesn't set. The old coach score no longer applies.
+export function replaceHand(id, { id: _ignored, sessionId: _s, date, coachAccuracy: _c, ...next }) {
+  const hand = findHand(id);
+  if (!hand) return null;
+  for (const field of KEPT_ON_REPLACE) {
+    if (next[field] === undefined && hand[field] !== undefined) next[field] = hand[field];
+  }
+  saveHand(id, date ?? hand.date, next);
+  return findHand(id);
+}
+
+// Delete a hand, and its entry on a session timeline.
+export function deleteHand(id) {
+  transaction(() => {
+    db.prepare('DELETE FROM session_events WHERE hand_id = ?').run(id);
+    db.prepare('DELETE FROM hands WHERE id = ?').run(id);
+  });
+}
+
+// Write a hand's data and date; its session timeline entry follows the new title and result.
+function saveHand(id, date, data) {
+  transaction(() => {
+    db.prepare('UPDATE hands SET date = ?, data = ? WHERE id = ?').run(date, JSON.stringify(data), id);
+    db.prepare('UPDATE session_events SET text = ?, amount = ? WHERE hand_id = ?').run(data.title ?? 'Hand', data.result ?? null, id);
+  });
 }

@@ -24,8 +24,13 @@ export const STAKES = [
   { label: '$5/$10', sb: 5, bb: 10 },
 ];
 
-// Seat positions clockwise, starting from the button.
+// Seat positions clockwise, starting from the button. Tables are 8-max (or 6-max);
+// 9-max is only kept so hands saved at a full-ring table before still open.
 export const TABLE_POSITIONS = {
   6: ['BTN', 'SB', 'BB', 'UTG', 'HJ', 'CO'],
+  8: ['BTN', 'SB', 'BB', 'UTG', 'UTG+1', 'LJ', 'HJ', 'CO'],
   9: ['BTN', 'SB', 'BB', 'UTG', 'UTG+1', 'MP', 'LJ', 'HJ', 'CO'],
 };
+
+// Table sizes offered when recording or practising a hand; the first is the default.
+export const TABLE_SIZES = [8, 6];

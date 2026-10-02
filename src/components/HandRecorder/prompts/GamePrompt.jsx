@@ -1,14 +1,11 @@
 // Step 1: stakes and table size.
 import { useState } from 'react';
-import { STAKES } from '../../../constants/poker.js';
+import { STAKES, TABLE_SIZES } from '../../../constants/poker.js';
 import FilterChips from '../../FilterChips/FilterChips.jsx';
 import Icon from '../../Icon/Icon.jsx';
 
 const STAKE_OPTIONS = STAKES.map((s) => ({ value: s.label, label: s.label }));
-const SIZE_OPTIONS = [
-  { value: 9, label: '9-max' },
-  { value: 6, label: '6-max' },
-];
+const SIZE_OPTIONS = TABLE_SIZES.map((size) => ({ value: size, label: `${size}-max` }));
 
 export default function GamePrompt({ stakesLabel, tableSize, onContinue }) {
   const [stakes, setStakes] = useState(stakesLabel);

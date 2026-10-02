@@ -1,4 +1,4 @@
-// Session data access: list, start, add timeline events, finish, discard.
+// Session data access: list, start, edit, timeline events (add, edit, remove), finish, delete.
 // Converts between database rows (snake_case) and API objects (camelCase).
 import { randomUUID } from 'node:crypto';
 import { db, transaction } from '../db/database.js';
@@ -106,7 +106,65 @@ export function finishSession(id, { cashOut, rating = null, tilt = null, notes =
   return findById(id);
 }
 
-// Throw away a live session and its timeline (events cascade).
+// Session fields that can be edited, API name -> column. Live sessions only take the first group
+// (cash-out, duration and the rest are set when the session is finished).
+const LIVE_FIELDS = { game: 'game', stakes: 'stakes', bigBlind: 'big_blind', venue: 'venue', buyIn: 'buy_in', notes: 'notes' };
+const FINISHED_FIELDS = {
+  ...LIVE_FIELDS,
+  date: 'date',
+  cashOut: 'cash_out',
+  durationMin: 'duration_min',
+  hands: 'hands',
+  rating: 'rating',
+  tilt: 'tilt',
+};
+
+// Edit a session. Unknown fields, and fields that don't apply to its status, are ignored.
+export function updateSession(id, changes) {
+  const session = findById(id);
+  const fields = session.status === 'live' ? LIVE_FIELDS : FINISHED_FIELDS;
+  const entries = Object.entries(fields).filter(([key]) => changes[key] !== undefined);
+  if (entries.length > 0) {
+    const assignments = entries.map(([, column]) => `${column} = ?`).join(', ');
+    db.prepare(`UPDATE sessions SET ${assignments} WHERE id = ?`).run(...entries.map(([key]) => changes[key]), id);
+  }
+  return findById(id);
+}
+
+export function findEvent(sessionId, eventId) {
+  const row = db.prepare('SELECT * FROM session_events WHERE id = ? AND session_id = ?').get(eventId, sessionId);
+  return row ? toEvent(row) : null;
+}
+
+// Change a note's text or a rebuy's amount (the session's total buy-in moves with it).
+export function updateEvent(sessionId, eventId, { text, amount }) {
+  const event = findEvent(sessionId, eventId);
+  transaction(() => {
+    if (event.type === 'note' && text !== undefined) {
+      db.prepare('UPDATE session_events SET text = ? WHERE id = ?').run(text, eventId);
+    }
+    if (event.type === 'rebuy' && amount !== undefined) {
+      db.prepare('UPDATE session_events SET amount = ? WHERE id = ?').run(amount, eventId);
+      db.prepare('UPDATE sessions SET buy_in = buy_in + ? WHERE id = ?').run(amount - event.amount, sessionId);
+    }
+  });
+  return findById(sessionId);
+}
+
+// Remove a timeline entry. A removed rebuy comes off the buy-in; a removed hand stays in Hand Review.
+export function deleteEvent(sessionId, eventId) {
+  const event = findEvent(sessionId, eventId);
+  transaction(() => {
+    db.prepare('DELETE FROM session_events WHERE id = ?').run(eventId);
+    if (event.type === 'rebuy') db.prepare('UPDATE sessions SET buy_in = buy_in - ? WHERE id = ?').run(event.amount, sessionId);
+  });
+  return findById(sessionId);
+}
+
+// Delete a session and its timeline (events cascade). Its saved hands stay, no longer tied to it.
 export function deleteSession(id) {
-  db.prepare('DELETE FROM sessions WHERE id = ?').run(id);
+  transaction(() => {
+    db.prepare('UPDATE hands SET session_id = NULL WHERE session_id = ?').run(id);
+    db.prepare('DELETE FROM sessions WHERE id = ?').run(id);
+  });
 }

@@ -151,3 +151,11 @@
 .session-row-link {
   align-self: flex-start;
 }
+
+/* Review hands + Edit session */
+.session-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}

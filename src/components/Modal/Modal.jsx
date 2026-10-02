@@ -14,7 +14,12 @@ export default function Modal({ open, onClose, title, children, className = '' }
   // While open: listen for Escape, lock page scroll, and move focus into the dialog once.
   useEffect(() => {
     if (!open) return undefined;
-    const onKey = (event) => event.key === 'Escape' && onCloseRef.current();
+    // Escape closes only the top dialog (e.g. the card picker over the Edit hand sheet).
+    const onKey = (event) => {
+      if (event.key !== 'Escape') return;
+      const open = document.querySelectorAll('.modal-backdrop');
+      if (open[open.length - 1] === dialogRef.current?.parentElement) onCloseRef.current();
+    };
     const previousOverflow = document.body.style.overflow;
     document.addEventListener('keydown', onKey);
     document.body.style.overflow = 'hidden';

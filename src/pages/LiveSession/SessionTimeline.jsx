@@ -1,5 +1,8 @@
 // Chronological timeline of a live session: start, then every note, rebuy and saved hand in order.
+// With onChange, notes can be edited in place and notes and rebuys removed.
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { deleteSessionEvent, updateSessionEvent } from '../../api/sessions.js';
 import { formatDuration, formatMoney, formatTime } from '../../utils/format.js';
 import Money from '../../components/Money/Money.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
@@ -34,7 +37,53 @@ function EntryContent({ entry, initialBuyIn, bb }) {
   );
 }
 
-export default function SessionTimeline({ session }) {
+// Inline editor for a note's text.
+function NoteEditor({ text, busy, onSave, onCancel }) {
+  const [value, setValue] = useState(text);
+  return (
+    <form
+      className="session-timeline-editor"
+      onSubmit={(event) => {
+        event.preventDefault();
+        onSave(value);
+      }}
+    >
+      <textarea autoFocus rows={3} value={value} aria-label="Note" onChange={(event) => setValue(event.target.value)} />
+      <div className="session-timeline-editor-actions">
+        <button type="button" className="btn btn-ghost" onClick={onCancel}>
+          Cancel
+        </button>
+        <button type="submit" className="btn" disabled={busy || !value.trim()}>
+          Save
+        </button>
+      </div>
+    </form>
+  );
+}
+
+export default function SessionTimeline({ session, onChange }) {
+  const [editingId, setEditingId] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Run a timeline edit and hand the updated session back to the page.
+  const run = async (work) => {
+    setBusy(true);
+    setError(null);
+    try {
+      onChange(await work());
+      setEditingId(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  const removeEntry = (entry) => {
+    const what = entry.type === 'rebuy' ? 'this rebuy (it comes off your buy-in)' : 'this note';
+    if (window.confirm(`Remove ${what}?`)) run(() => deleteSessionEvent(session.id, entry.id));
+  };
+
   const startMs = new Date(session.startedAt).getTime();
   const rebuyTotal = session.events.filter((e) => e.type === 'rebuy').reduce((sum, e) => sum + e.amount, 0);
   const entries = [{ id: 'start', type: 'start', createdAt: session.startedAt }, ...session.events];
@@ -56,15 +105,48 @@ export default function SessionTimeline({ session }) {
                   </span>
                 )}
               </div>
-              <EntryContent entry={entry} initialBuyIn={session.buyIn - rebuyTotal} bb={session.bigBlind} />
+              {editingId === entry.id ? (
+                <NoteEditor
+                  text={entry.text}
+                  busy={busy}
+                  onSave={(text) => run(() => updateSessionEvent(session.id, entry.id, { text }))}
+                  onCancel={() => setEditingId(null)}
+                />
+              ) : (
+                <EntryContent entry={entry} initialBuyIn={session.buyIn - rebuyTotal} bb={session.bigBlind} />
+              )}
             </div>
+
+            {/* Edit / remove buttons for notes and rebuys (saved hands are edited from Hand Review) */}
+            {onChange && (entry.type === 'note' || entry.type === 'rebuy') && editingId !== entry.id && (
+              <span className="session-timeline-tools">
+                {entry.type === 'note' && (
+                  <button type="button" className="session-timeline-tool" aria-label="Edit note" onClick={() => setEditingId(entry.id)}>
+                    <Icon name="pencil" size={16} />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="session-timeline-tool"
+                  aria-label={entry.type === 'note' ? 'Remove note' : 'Remove rebuy'}
+                  disabled={busy}
+                  onClick={() => removeEntry(entry)}
+                >
+                  <Icon name="trash" size={16} />
+                </button>
+              </span>
+            )}
           </li>
         ))}
       </ol>
 
-      {session.events.length === 0 && (
-        <p className="session-timeline-empty">Hands, notes and rebuys you add show up here, in order.</p>
+      {error && (
+        <p className="session-timeline-error" role="alert">
+          {error}
+        </p>
       )}
+
+      {session.events.length === 0 && <p className="session-timeline-empty">Hands and notes you add show up here, in order.</p>}
     </div>
   );
 }

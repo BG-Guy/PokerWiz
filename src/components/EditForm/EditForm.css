@@ -1,0 +1,117 @@
+/* Shared layout for the edit sheets: stacked fields, two-up rows, money inputs and a sticky footer. */
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.edit-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.edit-form-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+.edit-form-hint {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-faint);
+  text-wrap: pretty;
+}
+
+/* Two fields side by side (they stack again on very narrow phones) */
+.edit-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 359px) {
+  .edit-form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.edit-form-input,
+.edit-form-money {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px; /* 16px stops iOS from zooming into the field */
+  transition-property: border-color, box-shadow;
+  transition-duration: 150ms;
+}
+textarea.edit-form-input {
+  padding: 12px 14px;
+  resize: vertical;
+}
+.edit-form-input:focus,
+.edit-form-money:focus-within {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.edit-form-money {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.edit-form-money input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.edit-form-error {
+  color: var(--negative);
+  font-weight: 700;
+}
+
+/* Footer stays in view at the bottom of the sheet while the fields scroll */
+.edit-form-footer {
+  position: sticky;
+  bottom: -20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 -20px -20px;
+  padding: 12px 20px 20px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+@media (min-width: 640px) {
+  .edit-form-footer {
+    bottom: -24px;
+    margin: 0 -24px -24px;
+    padding: 14px 24px 24px;
+  }
+}
+.btn.edit-form-delete {
+  color: var(--negative);
+}
+.btn.edit-form-delete:hover {
+  background: color-mix(in srgb, var(--negative) 12%, transparent);
+}
+.edit-form-save {
+  margin-left: auto;
+  min-height: 46px;
+  padding: 0 20px;
+}

@@ -6,9 +6,10 @@ import { PREFLOP_BY_CLASS } from './preflopTable.js';
 import { COMBOS, COMBO_COUNT } from './combos.js';
 
 // Raise-first-in (open) share of all hands, by table size and position.
-// 6-max: ~15% UTG to ~45% BTN (solver charts); 9-max early seats are tighter.
+// 6-max: ~15% UTG to ~45% BTN (solver charts); 8- and 9-max early seats are tighter.
 const RFI = {
   6: { UTG: 0.15, HJ: 0.21, CO: 0.28, BTN: 0.45, SB: 0.38, BB: 0 },
+  8: { UTG: 0.11, 'UTG+1': 0.13, LJ: 0.16, HJ: 0.21, CO: 0.28, BTN: 0.45, SB: 0.38, BB: 0 },
   9: { UTG: 0.1, 'UTG+1': 0.11, MP: 0.13, LJ: 0.16, HJ: 0.21, CO: 0.28, BTN: 0.45, SB: 0.38, BB: 0 },
 };
 

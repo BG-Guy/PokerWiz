@@ -79,10 +79,10 @@ export function prepareSavedHand(hand) {
   if (!stakes) return { error: "The coach couldn't read this hand's stakes." };
 
   const { players, derived } = playersOf(hand);
-  // Every 6-max seat also exists at a 9-max table, so hands without a table size are read as 9-max (the default).
-  const tableSize = hand.tableSize ?? 9;
+  // Hands without a table size are read as 8-max (the default), or 9-max when a full-ring seat (MP) was used.
+  const tableSize = hand.tableSize ?? (players.every((p) => TABLE_POSITIONS[8].includes(p.position)) ? 8 : 9);
   const positions = TABLE_POSITIONS[tableSize];
-  if (players.some((p) => !positions.includes(p.position))) return { error: "This hand's seats don't fit a 6-max or 9-max table." };
+  if (players.some((p) => !positions.includes(p.position))) return { error: "This hand's seats don't fit a 6-max or 8-max table." };
 
   // Reads saved from an earlier coach review win over reads stored with the hand.
   const reads = hand.coachReads ?? {};
