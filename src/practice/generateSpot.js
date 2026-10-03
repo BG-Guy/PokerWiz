@@ -95,7 +95,7 @@ function preflopWeights({ state, actions, seat, cls, params, tableSize, openerWi
   const choices = opts.canCheck ? ['check'] : ['fold', 'call'];
   if (opts.canRaise) choices.push('raise');
   return choices.map((action) => {
-    const { likelihood } = preflopActionLikelihood({ action, position: actor.position, tableSize, situation, params, openerWidth });
+    const { likelihood } = preflopActionLikelihood({ action, position: actor.position, tableSize, situation, params, openerWidth, asPlayer: true });
     return [action, likelihood[cls]];
   });
 }
@@ -180,8 +180,13 @@ export function applyTracked(state, action, tracker) {
 // everything needed to keep playing: { state, cards: { seat: [codes] }, deck (cards left), heroSeat,
 // villainSeats, players, paramsBySeat, tracker, game, positions, setup, firstDecision, status }.
 // firstDecision = how many of your decisions came before the spot (played for you), so grading can skip them.
+// Heads-up and 3-way hands are redealt until those players really reach the flop together. That can take a few
+// hundred deals for a 3-way pot, but a deal is cheap: it stops at the first fold.
+const ATTEMPTS = { preflop: 60, hu: 8000, '3way': 20000 };
+
 export function generateSpot(setup, random = Math.random) {
-  for (let attempt = 0; attempt < 60; attempt++) {
+  const attempts = ATTEMPTS[setup.format] ?? 60;
+  for (let attempt = 0; attempt < attempts; attempt++) {
     const spot = setup.format === 'preflop' ? tryPreflopSpot(setup, random) : tryPostflopSpot(setup, random);
     if (spot) return spot;
   }
@@ -255,7 +260,9 @@ function preflopMove(state, actor, cards, paramsBySeat, game, random) {
   return choice === 'raise' ? preflopRaiseTo(state, game, limpersIn(actions)) : { type: choice };
 }
 
-// Heads-up / 3-way: the first player in preflop order opens, the others call; cards fit those actions.
+// Heads-up / 3-way: everyone is dealt random cards and plays preflop from their read (opens, limps, 3-bets,
+// 4-bets, calls, folds); you're played by a solid regular. The hand is kept only if all of you see the flop,
+// so single-raised, 3-bet and 4-bet pots come up as often as these players would really play them.
 function tryPostflopSpot(setup, random) {
   const { game, positions } = tableFor(setup);
   const format = FORMATS.find((f) => f.id === setup.format) ?? FORMATS[1];
@@ -283,28 +290,15 @@ function tryPostflopSpot(setup, random) {
   const cards = {};
   const tracker = { current: null, previous: null, betRatio: null };
 
-  // Preflop: open and calls, each player dealt a hand that fits their action.
+  // Preflop: random cards, real decisions. Everyone still in at the flop, nobody all in, or it's redealt.
+  for (const p of players) cards[p.seat] = deck.dealHand();
   let state = createHand({ players, positions, sb: game.sb, bb: game.bb, ante: game.ante });
-  let opened = false;
   while (state.phase === 'action' && state.street === 'Preflop') {
-    const actor = currentPlayer(state);
-    const actions = state.streets[0].actions;
-    const action = opened ? 'call' : 'raise';
-    const situation = preflopSituation(state, actions, actor.seat);
-    const { likelihood } = preflopActionLikelihood({
-      action,
-      position: actor.position,
-      tableSize: game.tableSize,
-      situation,
-      params: paramsBySeat.get(actor.seat),
-      openerWidth: paramsBySeat.get(situation.openerSeat)?.widthMult ?? 1,
-    });
-    cards[actor.seat] = deck.dealHand((codes) => likelihood[classOfCodes(codes)]);
-    const move = opened ? { type: getOptions(state).toCall > 0 ? 'call' : 'check' } : preflopRaiseTo(state, game, 0);
+    const move = preflopMove(state, currentPlayer(state), cards, paramsBySeat, game, random);
+    if (move.type === 'fold' || move.type === 'allin') return null; // someone's out (or all in): redeal
     state = applyTracked(state, move, tracker);
-    opened = true;
   }
-  if (state.phase !== 'board' || state.players.some((p) => p.allIn)) return null;
+  if (state.phase !== 'board') return null;
 
   // Postflop: play on until it's your turn on the chosen street.
   const target = pickWeighted(TARGET_STREETS, random);

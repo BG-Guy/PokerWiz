@@ -2,6 +2,12 @@
 // narrows them, how a villain's preflop action reshapes their range, and what the hero "should" do.
 // Ranges are built from the preflop table: "top X%" = every class whose slice of the 1326 combos starts
 // below X. Edges are soft (a logistic curve) so amateurs blur around the boundary and pros stay sharp.
+//
+// Two uses, one model. The coach reads ranges with it: wide, soft edges are fine there (they encode what we
+// don't know about a player), and the postflop grading is calibrated on those ranges. Practice bots play
+// hands with it (asPlayer), where a soft edge turns into nonsense decisions, so they get sharper rules:
+// premiums are never folded, players who raise everything they play don't limp, and only passive players
+// slow-play much. Real per-hand preflop charts would let both uses share one set of numbers.
 import { PREFLOP_BY_CLASS } from './preflopTable.js';
 import { COMBOS, COMBO_COUNT } from './combos.js';
 
@@ -43,11 +49,16 @@ export function rfiShare(position, tableSize = 6) {
 }
 
 // Soft "is this class inside the top x of hands" weight, 0..1. softness grows with the player's noise.
-function softTop(cls, x, softness) {
+// asPlayer: on the strong side the blur is measured in ratios (log scale, which matches the linear blur at the
+// edge), so a hand ten times better than the edge is all but certain to be in. With the linear blur alone even
+// aces top out around 92% in: harmless for reading a range, but a bot playing from it would fold them.
+function softTop(cls, x, softness, asPlayer = false) {
   const entry = PREFLOP_BY_CLASS[cls];
   const mid = (entry.start + entry.end) / 2;
   const width = Math.max(0.004, softness * Math.max(x, 0.02));
-  return 1 / (1 + Math.exp((mid - x) / width));
+  let z = (x - mid) / width;
+  if (asPlayer && mid < x) z = Math.max(z, (Math.log(x / mid) * x) / width);
+  return 1 / (1 + Math.exp(-z));
 }
 
 const isSuitedClass = (cls) => Math.floor(cls / 13) < cls % 13;
@@ -66,11 +77,17 @@ export function preflopSituation(state, actions, actorSeat) {
   const facingAllIn = state.players.some((p) => p.seat !== actorSeat && p.allIn && !p.folded);
   const remaining = actor.stack - actor.invested;
   const toCall = Math.min(state.currentBet - actor.streetBet, remaining);
+  // How the actor is in the hand so far: the opener, a player who already called, or not yet at all ("cold";
+  // blinds count as cold, their money went in by force).
+  const actorName = actor.role === 'hero' ? 'Hero' : actor.position;
+  const involvement =
+    openerPlayer?.seat === actorSeat ? 'opener' : actions.some((a) => a.actor === actorName && a.verb === 'calls') ? 'caller' : 'cold';
   return {
     raises: state.raises,
     openerPosition: openerPlayer?.position ?? null,
     openerSeat: openerPlayer?.seat ?? null,
     lastRaiserSeat: lastRaiserPlayer?.seat ?? null,
+    involvement,
     limpers,
     facingAllIn,
     toCall,
@@ -103,7 +120,14 @@ export function preflopThresholds({ position, tableSize, situation, params, open
     return { kind: 'vsOpen', raise: threeBet, play: defend };
   }
   if (situation.raises === 3) {
-    // Facing a 3-bet: 4-bet / call / fold, relative to how wide this player opened.
+    // Facing a 3-bet without having opened: caught between the opener and the 3-bettor. A player who only
+    // called the open continues with little; one putting money in for the first time (cold call or cold
+    // 4-bet) only with the very top (about QQ+ and AK, most of it as a 4-bet).
+    if (situation.involvement === 'cold' || situation.involvement === 'caller') {
+      const cont = clamp((situation.involvement === 'cold' ? 0.035 : 0.06) * w * vsOpener, 0.02, 0.12);
+      return { kind: 'vs3bet', raise: clamp(0.02 * aggScale, 0.01, cont), play: cont };
+    }
+    // The opener facing a 3-bet: 4-bet / call / fold, relative to how wide they opened.
     const opened = clamp(rfiShare(position, tableSize) * w, 0.05, 0.6);
     const cont = clamp(opened * 0.45 * vsOpener, 0.04, 0.3);
     const fourBet = clamp((0.025 + opened * 0.06) * aggScale, 0.015, cont);
@@ -116,15 +140,16 @@ export function preflopThresholds({ position, tableSize, situation, params, open
 
 // Likelihood of the observed preflop action for every class (Float64Array(169)); used to narrow a villain's range.
 // action: engine type (fold | check | call | bet | raise | allin).
-export function preflopActionLikelihood({ action, position, tableSize, situation, params, openerWidth }) {
+// asPlayer: the sharper rules a practice bot plays by (see the header); the coach reads ranges without it.
+export function preflopActionLikelihood({ action, position, tableSize, situation, params, openerWidth, asPlayer = false }) {
   const t = preflopThresholds({ position, tableSize, situation, params, openerWidth });
   const softness = 0.15 + params.noise * 2.2;
   const bluffShare = clamp(0.18 * params.bluffMult, 0.03, 0.6);
   const likelihood = new Float64Array(169);
 
   for (let cls = 0; cls < 169; cls++) {
-    const inRaise = softTop(cls, t.raise, softness);
-    const inPlay = softTop(cls, t.play, softness);
+    const inRaise = softTop(cls, t.raise, softness, asPlayer);
+    const inPlay = softTop(cls, t.play, softness, asPlayer);
     // Light raises: suited hands just outside the playing range get some bluff raises.
     const entry = PREFLOP_BY_CLASS[cls];
     const bluffZone = entry.start > t.raise && entry.start < t.play + 0.15 ? 1 : 0;
@@ -135,19 +160,31 @@ export function preflopActionLikelihood({ action, position, tableSize, situation
       value = Math.min(1, inRaise + bluff);
     } else if (action === 'call') {
       if (t.kind === 'unopened') {
-        // A limp: hands good enough to play but not raised (passive players limp a lot).
-        value = Math.max(0.02, inPlay - 0.9 * inRaise);
+        if (asPlayer) {
+          // A limp: hands good enough to play but not raised. Only passive players have those (they raise less
+          // than they play), and they also limp some strong hands to trap. A player who raises everything they
+          // play almost never limps.
+          const passive = clamp(1 - t.raise / Math.max(t.play, 1e-9), 0, 1);
+          value = Math.max(0.003, inPlay - inRaise + 0.3 * passive * inRaise);
+        } else {
+          // A limp: hands good enough to play but not raised (passive players limp a lot).
+          value = Math.max(0.02, inPlay - 0.9 * inRaise);
+        }
       } else if (situation.facingAllIn || situation.callPutsAllIn) {
         // Calling off: roughly the strong part of the continuing range.
-        value = softTop(cls, Math.min(t.play, t.raise * 1.6 + 0.01), softness);
+        value = softTop(cls, Math.min(t.play, t.raise * 1.6 + 0.01), softness, asPlayer);
       } else {
-        // Flat call: the playing range minus most of the raising range (passive players trap more).
-        const trap = clamp(1 - params.pfrRatio, 0.1, 0.6);
-        value = Math.max(0.01, inPlay - (1 - trap) * inRaise);
+        // Flat call: the playing range minus most of the raising range (passive players trap more). As a
+        // player: aggressive players re-raise their strong hands almost always (about 2% traps), an average
+        // player slow-plays about 1 in 10, passive players up to about 1 in 4.
+        // The floor (any hand might call) is a safety net when reading a range; a bot playing from it would
+        // call raises with junk, so it's much lower for players.
+        const trap = asPlayer ? clamp(0.5 * (1 - params.pfrRatio) - 0.12, 0.02, 0.25) : clamp(1 - params.pfrRatio, 0.1, 0.6);
+        value = Math.max(asPlayer ? 0.002 : 0.01, inPlay - (1 - trap) * inRaise);
       }
     } else if (action === 'check') {
       // Big blind checking its option: everything except most of the raising range.
-      value = 1 - 0.85 * softTop(cls, t.raise * 0.5, softness);
+      value = 1 - 0.85 * softTop(cls, t.raise * 0.5, softness, asPlayer);
     } else {
       value = 1 - inPlay; // fold (not used for narrowing: the player is out)
     }
