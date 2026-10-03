@@ -35,3 +35,8 @@
   flex: 1;
   font-size: 16px;
 }
+
+/* App version under the list */
+.more-sheet-version {
+  margin-top: 16px;
+}

@@ -6,6 +6,7 @@ import Icon from '../Icon/Icon.jsx';
 import Brand from '../Brand/Brand.jsx';
 import ThemeToggle from '../ThemeToggle/ThemeToggle.jsx';
 import UnitToggle from '../UnitToggle/UnitToggle.jsx';
+import AppVersion from '../AppVersion/AppVersion.jsx';
 import MoreSheet from './MoreSheet.jsx';
 import './NavBar.css';
 
@@ -64,10 +65,11 @@ export default function NavBar() {
         </li>
       </ul>
 
-      {/* BB/$ and theme switches sit at the bottom of the sidebar (phones have them in the header) */}
+      {/* BB/$ and theme switches sit at the bottom of the sidebar (phones have them in the header), then the version */}
       <div className="navbar-footer">
         <UnitToggle />
         <ThemeToggle showLabel />
+        <AppVersion className="navbar-version" />
       </div>
 
       <MoreSheet open={moreOpen} onClose={() => setMoreOpen(false)} items={MORE_ITEMS} />

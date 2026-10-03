@@ -38,6 +38,12 @@ PokerWiz needs its Node server running, so it can't be hosted on GitHub Pages (s
 runs `npm start` and keeps the SQLite database on a persistent disk (`POKERWIZ_DB=/var/data/pokerwiz.db`).
 Persistent disks need a paid plan. On the free plan the database is reset on every deploy or restart.
 
+## Version
+
+The app's version is `version` in `package.json`. It shows at the bottom of the sidebar (in the More sheet on
+phones) together with the commit it was built from, so you can tell which build is live. For a new release, bump
+it with `npm version minor --no-git-tag-version` (or `patch` for small fixes) and commit.
+
 ## Project structure
 
 ```

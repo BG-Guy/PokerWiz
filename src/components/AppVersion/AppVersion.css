@@ -1,0 +1,23 @@
+/* Version line: small, muted, wraps onto two lines in the narrow tablet rail. */
+
+.app-version {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+/* The commit reads as a code, set apart by a dot on the same line */
+.app-version-commit {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 600;
+}
+.app-version-commit::before {
+  content: '·';
+  margin-right: 6px;
+  font-family: var(--font-body);
+}

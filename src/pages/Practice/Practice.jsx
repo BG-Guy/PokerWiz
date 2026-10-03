@@ -171,7 +171,9 @@ export default function Practice() {
     workerRef.current.postMessage({ id: requestRef.current, record: spotRecord(spot), unit: getMoneyUnit() });
   }, [phase, spot]);
 
+  // Next hand, at any point: a hand still being played or graded is dropped (not graded, not counted).
   const deal = () => {
+    requestRef.current += 1; // a grade still on its way belongs to the old hand: ignore it
     if (replayHand) {
       startReplay();
       return;
@@ -188,6 +190,7 @@ export default function Practice() {
 
   // Start (or restart) a replay: villains dealt from their range get new cards each time.
   function startReplay() {
+    requestRef.current += 1; // drop any grade still coming for the previous run
     const next = spotFromSavedHand(replayHand, replayOptions);
     if (next.error) {
       setError(next.error);
@@ -274,6 +277,12 @@ export default function Practice() {
         <button type="button" className="btn btn-ghost" onClick={() => setPhase(replay ? 'replay' : 'setup')}>
           <Icon name="chevronLeft" size={16} /> Setup
         </button>
+        {/* Every hand can be left for the next one; once it's over, the pinned bar below takes over */}
+        {phase !== 'result' && (
+          <button type="button" className="btn btn-ghost practice-skip" onClick={deal}>
+            {replay ? 'Replay again' : 'Next hand'} <Icon name="chevronRight" size={16} />
+          </button>
+        )}
       </PageHeader>
 
       {tally.hands > 0 && (

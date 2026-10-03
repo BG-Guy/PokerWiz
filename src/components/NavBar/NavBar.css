@@ -175,4 +175,9 @@
     align-items: flex-start;
     justify-content: flex-start;
   }
+  /* The version lines up with the toggles above it */
+  .navbar-version {
+    justify-content: flex-start;
+    padding: 0 10px;
+  }
 }
