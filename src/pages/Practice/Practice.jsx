@@ -247,7 +247,9 @@ export default function Practice() {
       position,
       role,
       name: role === 'hero' ? 'You' : null,
-      cards: role === 'hero' || (reveal && player && !player.folded) ? cards[seat] : [],
+      // Once the hand is over every hand is shown, including the ones that folded (dimmed on the table).
+      cards: role === 'hero' || (reveal && player) ? cards[seat] : [],
+      revealFolded: reveal,
       // Preflop, the whole table shares one read: it's shown once below instead of on every seat.
       badge: role === 'villain' && !isTable ? describeProfile(recorded.profile).label : null,
       stack: player ? player.stack - player.invested : null,
@@ -264,7 +266,7 @@ export default function Practice() {
   const heroStackBB = Math.round((state.players.find((p) => p.seat === heroSeat).stack / bb) * 10) / 10;
 
   return (
-    <div className="practice">
+    <div className={`practice ${phase === 'result' ? 'has-next-bar' : ''}`}>
       <PageHeader
         title={replay ? 'Replay' : 'Practice'}
         subtitle={replay ? `${replay.title} · from the ${replay.street.toLowerCase()}` : `Hand ${handNumber} · ${spot.game.label}`}
@@ -379,6 +381,7 @@ export default function Practice() {
               {review?.decisions.map((decision, index) => (
                 <DecisionCard key={index} decision={decision} number={index + 1} bb={state.bb} />
               ))}
+              {/* Pinned to the bottom of the screen (above the phone tab bar), so it never needs a scroll */}
               <div className="practice-next">
                 {replay && (
                   <Link to={`/hands/${replay.handId}`} className="btn btn-ghost">

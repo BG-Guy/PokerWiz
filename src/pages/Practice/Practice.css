@@ -68,16 +68,59 @@
   font-weight: 700;
 }
 
+/* Next hand: pinned to the bottom of the screen once the hand is over, so it's always one tap away
+   however long the graded decisions run. Phones: full width, clear of the tab bar (68px) and its raised
+   Play button (17px above it). */
 .practice-next {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(96px + env(safe-area-inset-bottom));
+  z-index: 25;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
   gap: 8px;
+  padding: 8px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  animation: practice-next-in 0.25s ease-out;
+}
+.practice-next > * {
+  flex: 1;
 }
 .practice-next-btn {
   min-height: 48px;
   padding: 0 22px;
   font-size: 16px;
+}
+@keyframes practice-next-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .practice-next {
+    animation: none;
+  }
+}
+/* Room under the last decision card so the pinned bar never covers it */
+.practice.has-next-bar {
+  padding-bottom: 80px;
+}
+/* Tablet and desktop: a floating bar in the bottom-right corner (the nav is on the side) */
+@media (min-width: 768px) {
+  .practice-next {
+    left: auto;
+    right: 32px;
+    bottom: 24px;
+  }
+  .practice-next > * {
+    flex: none;
+  }
 }
 
 /* The action card has no "previous step" row here */

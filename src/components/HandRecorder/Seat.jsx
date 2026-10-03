@@ -14,11 +14,14 @@ function actionBubble({ verb, amount, allIn }, bb) {
 }
 
 export default function Seat({ seat, bb = null, position, betPosition, selectable, onClick }) {
-  const { role, name, cards = [], badge, stack, allIn, folded, bet, lastAction, isActive, isWinner } = seat;
+  const { role, name, cards = [], badge, stack, allIn, folded, bet, lastAction, isActive, isWinner, revealFolded } = seat;
+  // revealFolded (Practice, once the hand is over): a folded player's cards are shown face up.
+  const showsFoldedCards = folded && revealFolded && cards.length === 2;
   const classes = [
     'seat',
     `is-${role ?? 'empty'}`,
     folded && 'is-folded',
+    showsFoldedCards && 'shows-cards',
     isActive && 'is-active',
     isWinner && 'is-winner',
     selectable && 'is-selectable',
@@ -31,8 +34,8 @@ export default function Seat({ seat, bb = null, position, betPosition, selectabl
       {/* Coach mode: the read on this player ("LAG", "Nit · Tilted") */}
       {badge && <span className="seat-badge">{badge}</span>}
 
-      {/* Cards: known ones face up, unknown ones show the PokerWiz back */}
-      {role && !folded && (
+      {/* Cards: known ones face up, unknown ones show the PokerWiz back; folded hands only when revealed */}
+      {role && (!folded || showsFoldedCards) && (
         <span className="seat-cards">
           {[0, 1].map((i) => (cards[i] ? <PlayingCard key={i} code={cards[i]} size="xs" /> : <PlayingCard key={i} faceDown size="xs" />))}
         </span>

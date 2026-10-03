@@ -29,6 +29,16 @@
 .seat.is-folded {
   opacity: 0.35 !important;
 }
+/* A folded hand shown at the end (Practice): the seat stays dimmed, the cards stay readable */
+.seat.is-folded.shows-cards {
+  opacity: 1 !important;
+}
+.seat.is-folded.shows-cards > :not(.seat-cards) {
+  opacity: 0.35;
+}
+.seat.is-folded.shows-cards .seat-cards {
+  opacity: 0.85;
+}
 
 /* Cards peek out above the avatar */
 .seat-cards {
