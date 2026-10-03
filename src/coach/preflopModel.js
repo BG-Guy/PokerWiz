@@ -63,6 +63,10 @@ function softTop(cls, x, softness, asPlayer = false) {
 
 const isSuitedClass = (cls) => Math.floor(cls / 13) < cls % 13;
 
+// Hands a practice bot never folds to one raise or a 3-bet, and always raises first in or re-raises against
+// one raise (passive players still slow-play some; see the trap share in preflopActionLikelihood).
+const PREMIUMS = new Set(['AA', 'KK', 'QQ', 'AKs', 'AKo']);
+
 // Preflop situation for the player about to act, read from the betting engine state and the actions so far.
 //   raises:       1 = nobody raised yet (only the big blind), 2 = facing an open, 3 = facing a 3-bet, ...
 //   openerPosition, lastRaiserSeat, limpers, facingAllIn
@@ -148,10 +152,16 @@ export function preflopActionLikelihood({ action, position, tableSize, situation
   const likelihood = new Float64Array(169);
 
   for (let cls = 0; cls < 169; cls++) {
-    const inRaise = softTop(cls, t.raise, softness, asPlayer);
-    const inPlay = softTop(cls, t.play, softness, asPlayer);
-    // Light raises: suited hands just outside the playing range get some bluff raises.
     const entry = PREFLOP_BY_CLASS[cls];
+    let inRaise = softTop(cls, t.raise, softness, asPlayer);
+    let inPlay = softTop(cls, t.play, softness, asPlayer);
+    // As a player, QQ+ and AK are never folded to one raise or a 3-bet, and are raised first in or re-raised
+    // against one raise. Ranges near AK's edge (tight early-position spots) would otherwise blur them.
+    if (asPlayer && PREMIUMS.has(entry.name) && t.kind !== 'vs4bet') {
+      inPlay = 1;
+      if (t.kind === 'unopened' || t.kind === 'vsOpen') inRaise = 1;
+    }
+    // Light raises: suited hands just outside the playing range get some bluff raises.
     const bluffZone = entry.start > t.raise && entry.start < t.play + 0.15 ? 1 : 0;
     const bluff = t.kind === 'unopened' ? 0 : bluffZone * bluffShare * (isSuitedClass(cls) ? 0.35 : 0.06);
 
@@ -175,11 +185,13 @@ export function preflopActionLikelihood({ action, position, tableSize, situation
         value = softTop(cls, Math.min(t.play, t.raise * 1.6 + 0.01), softness, asPlayer);
       } else {
         // Flat call: the playing range minus most of the raising range (passive players trap more). As a
-        // player: aggressive players re-raise their strong hands almost always (about 2% traps), an average
-        // player slow-plays about 1 in 10, passive players up to about 1 in 4.
+        // player, slow-playing is a passive habit: regulars, TAGs, LAGs and maniacs re-raise their strong hands
+        // every time, while a nit flats them about 5% of the time, a loose-passive recreational player about 7%
+        // and a calling station about 14%. (Hands at the edge of the re-raise range, like AKo against an early
+        // open, still mix calls and re-raises, as solvers do.)
         // The floor (any hand might call) is a safety net when reading a range; a bot playing from it would
         // call raises with junk, so it's much lower for players.
-        const trap = asPlayer ? clamp(0.5 * (1 - params.pfrRatio) - 0.12, 0.02, 0.25) : clamp(1 - params.pfrRatio, 0.1, 0.6);
+        const trap = asPlayer ? clamp(0.6 * (1 - params.pfrRatio) - 0.28, 0, 0.2) : clamp(1 - params.pfrRatio, 0.1, 0.6);
         value = Math.max(asPlayer ? 0.002 : 0.01, inPlay - (1 - trap) * inRaise);
       }
     } else if (action === 'check') {
