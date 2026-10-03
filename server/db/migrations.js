@@ -38,6 +38,27 @@ const MIGRATIONS = [
       }
     },
   },
+  {
+    // Imported sessions: cash game or tournament, small blind and ante, expenses, and where they came from.
+    // New databases get the columns from schema.sql; older ones get them here. external_id is unique so
+    // importing the same file twice adds nothing.
+    name: 'session-import-columns-v1',
+    run(db) {
+      const existing = new Set(db.prepare('PRAGMA table_info(sessions)').all().map((column) => column.name));
+      const columns = [
+        ['format', "TEXT NOT NULL DEFAULT 'cash'"],
+        ['small_blind', 'REAL'],
+        ['ante', 'REAL'],
+        ['expenses', 'REAL NOT NULL DEFAULT 0'],
+        ['source', 'TEXT'],
+        ['external_id', 'TEXT'],
+      ];
+      for (const [name, type] of columns) {
+        if (!existing.has(name)) db.exec(`ALTER TABLE sessions ADD COLUMN ${name} ${type}`);
+      }
+      db.exec('CREATE UNIQUE INDEX IF NOT EXISTS sessions_external_id ON sessions (external_id) WHERE external_id IS NOT NULL');
+    },
+  },
 ];
 
 export function runMigrations(db) {

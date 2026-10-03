@@ -1,0 +1,48 @@
+/* Profile totals: headline cards, then results by location. */
+
+.profile-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.profile-locations {
+  margin-top: 20px;
+}
+.profile-locations-title {
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+.profile-locations-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* One location per row: name, sessions/hours/hourly, result */
+.profile-location {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'name net'
+    'meta net';
+  align-items: center;
+  gap: 2px 12px;
+  padding: 10px 4px;
+  border-top: 1px solid var(--border);
+}
+.profile-location:first-child {
+  border-top: 0;
+}
+.profile-location-name {
+  grid-area: name;
+  font-weight: 800;
+}
+.profile-location-meta {
+  grid-area: meta;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.profile-location-net {
+  grid-area: net;
+  font-weight: 800;
+}

@@ -13,6 +13,14 @@
   gap: 12px;
   margin-bottom: 28px;
 }
+
+/* Tournament totals, under the cash-game summary */
+.game-history-tournaments {
+  margin: -16px 4px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
 @media (min-width: 900px) {
   .game-history-summary {
     grid-template-columns: repeat(4, minmax(0, 1fr));

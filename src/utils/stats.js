@@ -1,16 +1,37 @@
-// Session math: profit, win rates, grouping and the bankroll curve.
+// Session math: profit, win rates, grouping and the bankroll curve. Big-blind numbers (bb/100, the BB display
+// unit, hourly rates) are cash-game numbers: tournaments have no big blind and get their own summary.
 
-// Net result of one session in dollars.
+// Net result of one session in dollars: cash-out minus buy-in and expenses (tips, food, fees).
 export function sessionProfit(session) {
-  return session.cashOut - session.buyIn;
+  return session.cashOut - session.buyIn - (session.expenses ?? 0);
 }
 
-// Headline numbers for a list of sessions.
+export const isTournament = (session) => session.format === 'tournament';
+
+// Cash-game sessions only (what the dashboard, history totals, insights and the bankroll chart measure).
+export const cashGames = (sessions) => sessions.filter((s) => !isTournament(s));
+
+// Tournament results in dollars: entries, total buy-ins (with expenses), cashes, net and ROI.
+export function tournamentSummary(sessions) {
+  const list = sessions.filter(isTournament);
+  const spent = list.reduce((sum, s) => sum + s.buyIn + (s.expenses ?? 0), 0);
+  const net = list.reduce((sum, s) => sum + sessionProfit(s), 0);
+  return {
+    count: list.length,
+    spent,
+    net,
+    cashes: list.filter((s) => s.cashOut > 0).length,
+    roi: spent > 0 ? net / spent : 0,
+    hours: list.reduce((sum, s) => sum + s.durationMin, 0) / 60,
+  };
+}
+
+// Headline numbers for a list of sessions (cash games: pass cashGames(sessions) when tournaments may be in).
 export function summarize(sessions) {
   const net = sessions.reduce((sum, s) => sum + sessionProfit(s), 0);
   const minutes = sessions.reduce((sum, s) => sum + s.durationMin, 0);
   const hands = sessions.reduce((sum, s) => sum + s.hands, 0);
-  const bigBlindsWon = sessions.reduce((sum, s) => sum + sessionProfit(s) / s.bigBlind, 0);
+  const bigBlindsWon = sessions.reduce((sum, s) => sum + (s.bigBlind > 0 ? sessionProfit(s) / s.bigBlind : 0), 0);
   const winning = sessions.filter((s) => sessionProfit(s) > 0).length;
   const hours = minutes / 60;
 

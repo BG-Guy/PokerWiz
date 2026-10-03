@@ -1,0 +1,170 @@
+/* Import tool: drop zone, preview of the chosen file, messages, and undo. */
+
+.import-sessions-intro {
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+/* Drop zone: the whole area opens the file picker; the real input covers it invisibly */
+.import-drop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 26px 16px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.import-drop:hover,
+.import-drop.is-dragging,
+.import-drop:focus-within {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.import-drop-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.import-drop-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 4px;
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--accent-text);
+}
+.import-drop-title {
+  font-weight: 800;
+}
+.import-drop-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Preview of a chosen file */
+.import-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.import-preview-file {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+.import-preview-headline {
+  font-size: 17px;
+}
+.import-preview-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.import-preview-facts li {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 13px;
+  font-weight: 700;
+}
+.import-preview-facts .is-positive {
+  color: var(--positive);
+}
+.import-preview-facts .is-negative {
+  color: var(--negative);
+}
+
+/* Filled-in values, collapsed by default */
+.import-details summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--accent-text);
+}
+.import-details ul,
+.import-message ul {
+  margin-top: 6px;
+  padding-left: 18px;
+  list-style: disc;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.import-samples {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.import-samples input {
+  margin-top: 3px;
+  accent-color: var(--accent);
+}
+
+.import-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Messages: success, warning (skipped rows), error */
+.import-message {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+}
+.import-message:is(p) {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 8px;
+}
+.import-message svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.import-message p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.import-message.is-success {
+  background: color-mix(in srgb, var(--positive) 12%, var(--surface));
+}
+.import-message.is-warning {
+  background: color-mix(in srgb, var(--warning) 14%, var(--surface));
+}
+.import-message.is-error {
+  background: color-mix(in srgb, var(--negative) 12%, var(--surface));
+}
+
+/* Undo row */
+.import-undo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.import-undo-confirm {
+  color: var(--negative);
+}

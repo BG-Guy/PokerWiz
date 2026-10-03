@@ -4,8 +4,8 @@ import { useSearchParams } from 'react-router-dom';
 import { getSessions } from '../../api/sessions.js';
 import { getHands } from '../../api/hands.js';
 import { useApi } from '../../hooks/useApi.js';
-import { summarize, newestFirst, sessionProfit } from '../../utils/stats.js';
-import { formatMonth, formatUnits, sessionsForDisplay } from '../../utils/format.js';
+import { summarize, newestFirst, sessionProfit, cashGames, tournamentSummary } from '../../utils/stats.js';
+import { formatMoney, formatMonth, formatUnits, sessionsForDisplay } from '../../utils/format.js';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import StatCard from '../../components/StatCard/StatCard.jsx';
@@ -19,12 +19,13 @@ const GAME_OPTIONS = [
   { value: 'NLH', label: "No-Limit Hold'em" },
   { value: 'PLO', label: 'Pot-Limit Omaha' },
 ];
-const VENUE_OPTIONS = [
-  { value: 'all', label: 'All venues' },
-  { value: 'Casino', label: 'Casino' },
-  { value: 'Online', label: 'Online' },
-  { value: 'Home game', label: 'Home game' },
-];
+// Venue filters come from the sessions themselves (imports bring their own, like "Philly"), most played first.
+function venueOptions(sessions) {
+  const counts = new Map();
+  for (const s of sessions) counts.set(s.venue, (counts.get(s.venue) ?? 0) + 1);
+  const venues = [...counts].sort((a, b) => b[1] - a[1]).map(([venue]) => ({ value: venue, label: venue }));
+  return [{ value: 'all', label: 'All venues' }, ...venues];
+}
 
 const loadHistory = () => Promise.all([getSessions(), getHands()]);
 
@@ -59,7 +60,9 @@ export default function GameHistory() {
   const filtered = newestFirst(sessions).filter(
     (s) => (game === 'all' || s.game === game) && (venue === 'all' || s.venue === venue)
   );
-  const summary = summarize(filtered);
+  // Totals: big-blind numbers are for cash games; tournaments (no big blind) get their own line, in dollars.
+  const summary = summarize(cashGames(filtered));
+  const tournaments = tournamentSummary(filtered);
   const months = groupByMonth(filtered);
 
   return (
@@ -68,7 +71,7 @@ export default function GameHistory() {
 
       <div className="game-history-filters">
         <FilterChips options={GAME_OPTIONS} value={game} onChange={setGame} label="Filter by game" />
-        <FilterChips options={VENUE_OPTIONS} value={venue} onChange={setVenue} label="Filter by venue" />
+        <FilterChips options={venueOptions(rawSessions)} value={venue} onChange={setVenue} label="Filter by venue" />
       </div>
 
       {/* Totals for the current filter */}
@@ -78,13 +81,20 @@ export default function GameHistory() {
         <StatCard label="Hours" value={summary.hours.toFixed(1)} hint={`${summary.hands.toLocaleString('en-US')} hands`} />
         <StatCard label="Hourly" value={`${formatUnits(summary.hourly, { whole: true })}/h`} />
       </div>
+      {tournaments.count > 0 && (
+        <p className="game-history-tournaments">
+          These totals are cash games. Tournaments: {tournaments.count} played, {tournaments.cashes} cashed,{' '}
+          <Money amount={tournaments.net} /> net.
+        </p>
+      )}
 
       {/* Month groups */}
       {months.map((month) => (
         <section key={month.key} className="game-history-month">
           <div className="game-history-month-head">
             <h2>{month.label}</h2>
-            <Money amount={month.sessions.reduce((sum, s) => sum + sessionProfit(s), 0)} bb={1} />
+            {/* Cash games in the BB/$ unit (tournament results are on their own rows, in dollars) */}
+            <Money amount={cashGames(month.sessions).reduce((sum, s) => sum + sessionProfit(s), 0)} bb={1} />
           </div>
           <ul className="game-history-list">
             {month.sessions.map((session) => (

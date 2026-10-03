@@ -46,15 +46,19 @@ export function bigBlindOf(stakesLabel) {
 }
 
 // Sessions for totals and charts: in BB mode every money field is converted to big blinds (by that
-// session's own big blind), so totals across different stakes add up correctly. Display only; never save these.
+// session's own big blind), so totals across different stakes add up correctly. Tournaments have no big
+// blind and stay in dollars (big-blind totals leave them out: see cashGames in stats.js). Display only;
+// never save these.
 export function sessionsForDisplay(sessions) {
   if (moneyUnit !== 'bb') return sessions;
   return sessions.map((s) => {
-    const bb = s.bigBlind > 0 ? s.bigBlind : 1;
+    if (!(s.bigBlind > 0)) return s;
+    const bb = s.bigBlind;
     return {
       ...s,
       bigBlind: 1,
       buyIn: s.buyIn / bb,
+      expenses: (s.expenses ?? 0) / bb,
       cashOut: s.cashOut == null ? s.cashOut : s.cashOut / bb,
       events: s.events?.map((e) => ({ ...e, amount: e.amount == null ? e.amount : e.amount / bb })),
     };

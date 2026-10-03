@@ -1,7 +1,8 @@
-// One session in Game History. Tapping it expands buy-in, cash-out, notes and a link to its hands.
+// One session in Game History. Tapping it expands buy-in, cash-out, expenses, notes and a link to its hands.
+// Tournaments have no big blind, so their amounts are always in dollars.
 import { Link } from 'react-router-dom';
-import { sessionProfit } from '../../utils/stats.js';
-import { formatDuration, formatUnits, formatWeekday, parseDate } from '../../utils/format.js';
+import { isTournament, sessionProfit } from '../../utils/stats.js';
+import { formatDuration, formatMoney, formatUnits, formatWeekday, parseDate } from '../../utils/format.js';
 import Money from '../../components/Money/Money.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import StarRating from '../../components/StarRating/StarRating.jsx';
@@ -9,6 +10,9 @@ import TiltMeter from '../../components/TiltMeter/TiltMeter.jsx';
 import './SessionRow.css';
 
 export default function SessionRow({ session, handCount, isOpen, onToggle }) {
+  const tournament = isTournament(session);
+  const unit = tournament ? null : 1; // cash games arrive converted to the BB/$ unit; tournaments stay in dollars
+  const amount = (value, options) => formatMoney(value, { bb: unit, ...options });
   const profit = sessionProfit(session);
   const hourly = profit / (session.durationMin / 60);
   const detailsId = `session-details-${session.id}`;
@@ -22,15 +26,13 @@ export default function SessionRow({ session, handCount, isOpen, onToggle }) {
           <span className="session-row-weekday">{formatWeekday(session.date)}</span>
         </span>
         <span className="session-row-main">
-          <span className="session-row-game">
-            {session.game} {session.stakes}
-          </span>
+          <span className="session-row-game">{tournament ? `Tournament · ${session.game}` : `${session.game} ${session.stakes}`}</span>
           <span className="session-row-meta">
             {session.venue} · {formatDuration(session.durationMin)}
           </span>
         </span>
         <span className="session-row-hands num">{session.hands} hands</span>
-        <Money amount={profit} bb={1} className="session-row-result" />
+        <Money amount={profit} bb={unit} className="session-row-result" />
         <Icon name="chevronDown" size={18} className="session-row-chevron" />
       </button>
 
@@ -40,20 +42,28 @@ export default function SessionRow({ session, handCount, isOpen, onToggle }) {
           <dl className="session-row-stats">
             <div>
               <dt>Buy-in</dt>
-              <dd className="num">{formatUnits(session.buyIn, { sign: false })}</dd>
+              <dd className="num">{amount(session.buyIn, { sign: false })}</dd>
             </div>
             <div>
               <dt>Cash-out</dt>
-              <dd className="num">{formatUnits(session.cashOut, { sign: false })}</dd>
+              <dd className="num">{amount(session.cashOut, { sign: false })}</dd>
             </div>
             <div>
               <dt>Hourly</dt>
-              <dd className="num">{formatUnits(hourly, { whole: true })}/h</dd>
+              <dd className="num">{tournament ? formatMoney(Math.round(hourly)) : formatUnits(hourly, { whole: true })}/h</dd>
             </div>
-            <div>
-              <dt>Big blinds</dt>
-              <dd className="num">{(profit / session.bigBlind).toFixed(0)} bb</dd>
-            </div>
+            {session.expenses > 0 && (
+              <div>
+                <dt>Expenses</dt>
+                <dd className="num">{amount(session.expenses, { sign: false })}</dd>
+              </div>
+            )}
+            {!tournament && (
+              <div>
+                <dt>Big blinds</dt>
+                <dd className="num">{(profit / session.bigBlind).toFixed(0)} bb</dd>
+              </div>
+            )}
           </dl>
 
           {/* How the session felt: star rating and tilt level (recorded when finishing a live session) */}

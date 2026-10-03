@@ -1,0 +1,48 @@
+/* Session log: filters and search above the list of sessions. */
+
+.session-log-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-bottom: 14px;
+}
+
+.session-log-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 220px;
+  max-width: 360px;
+  padding: 0 12px;
+  min-height: 40px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.session-log-search:focus-within {
+  border-color: var(--accent);
+}
+.session-log-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+}
+
+.session-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.session-log-empty {
+  padding: 32px 16px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-muted);
+}

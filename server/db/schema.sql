@@ -17,7 +17,13 @@ CREATE TABLE IF NOT EXISTS sessions (
   hands        INTEGER NOT NULL DEFAULT 0,
   notes        TEXT NOT NULL DEFAULT '',
   rating       REAL,                       -- 0 to 5, one decimal
-  tilt         INTEGER                     -- 1 (zen) to 5 (full tilt)
+  tilt         INTEGER,                    -- 1 (zen) to 5 (full tilt)
+  format       TEXT NOT NULL DEFAULT 'cash', -- cash | tournament (tournaments have big_blind 0)
+  small_blind  REAL,
+  ante         REAL,
+  expenses     REAL NOT NULL DEFAULT 0,    -- tips, food, fees: counted against the result
+  source       TEXT,                       -- where an imported session came from, e.g. "regroup"
+  external_id  TEXT                        -- the import's own key for the session (unique, see migrations.js)
 );
 
 -- Timeline entries recorded during a live session.

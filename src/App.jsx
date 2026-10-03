@@ -12,6 +12,7 @@ import Goals from './pages/Goals/Goals.jsx';
 import Equity from './pages/Equity/Equity.jsx';
 import Coach from './pages/Coach/Coach.jsx';
 import Practice from './pages/Practice/Practice.jsx';
+import Profile from './pages/Profile/Profile.jsx';
 import HandHighlights from './pages/HandHighlights/HandHighlights.jsx';
 import HandInsights from './pages/HandInsights/HandInsights.jsx';
 
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="equity" element={<Equity />} />
         <Route path="coach" element={<Coach />} />
         <Route path="practice" element={<Practice />} />
+        <Route path="profile" element={<Profile />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

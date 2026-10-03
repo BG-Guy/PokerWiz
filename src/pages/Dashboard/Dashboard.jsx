@@ -5,7 +5,7 @@ import { getSessions, getLiveSession } from '../../api/sessions.js';
 import { getHands } from '../../api/hands.js';
 import { getGoals } from '../../api/goals.js';
 import { useApi } from '../../hooks/useApi.js';
-import { summarize, cumulativeProfit, newestFirst, sessionProfit } from '../../utils/stats.js';
+import { summarize, cumulativeProfit, newestFirst, sessionProfit, cashGames } from '../../utils/stats.js';
 import { analyzeGoal, statusTone, GOAL_STATUS } from '../../utils/goalInsights.js';
 import { formatDate, formatDuration, formatWeekday, formatUnits, sessionsForDisplay, todayIso } from '../../utils/format.js';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
@@ -30,7 +30,7 @@ export default function Dashboard() {
 
   // Derived data for each dashboard block.
   const [rawSessions, hands, goals, liveSession] = data;
-  const sessions = sessionsForDisplay(rawSessions); // amounts in the BB/$ display unit
+  const sessions = sessionsForDisplay(cashGames(rawSessions)); // cash games (tournaments have no big blind), in the BB/$ unit
   const summary = summarize(sessions);
   const bankroll = cumulativeProfit(sessions);
   const recentSessions = newestFirst(sessions).slice(0, 4);

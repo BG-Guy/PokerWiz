@@ -2,7 +2,7 @@
 // (venue, stakes, game, weekday, tilt). Stats that need a hand tracker (VPIP and friends) aren't shown.
 import { getSessions } from '../../api/sessions.js';
 import { useApi } from '../../hooks/useApi.js';
-import { summarize, hourlyBy } from '../../utils/stats.js';
+import { summarize, hourlyBy, cashGames } from '../../utils/stats.js';
 import { sessionFindings, hourlyByWeekday, resultsByTilt } from '../../utils/sessionInsights.js';
 import { formatUnits, sessionsForDisplay } from '../../utils/format.js';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
@@ -15,7 +15,7 @@ import './Insights.css';
 
 export default function Insights() {
   const { data, error, reload } = useApi(getSessions);
-  const sessions = data && sessionsForDisplay(data); // amounts in the BB/$ display unit
+  const sessions = data && sessionsForDisplay(cashGames(data)); // cash games (tournaments have no big blind), in the BB/$ unit
   if (!sessions) return <LoadState error={error} onRetry={reload} />;
   if (sessions.length === 0) return <LoadState error={new Error('Finish a session to unlock insights.')} />;
 

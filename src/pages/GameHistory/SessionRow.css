@@ -146,6 +146,8 @@
 
 .session-row-notes {
   color: var(--text-muted);
+  white-space: pre-line; /* imported notes keep their paragraphs */
+  overflow-wrap: anywhere;
 }
 
 .session-row-link {

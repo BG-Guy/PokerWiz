@@ -21,6 +21,7 @@ const NAV_ITEMS = [
   { to: '/insights', label: 'Insights', icon: 'chart', phone: false },
   { to: '/goals', label: 'Goals', icon: 'target', phone: false },
   { to: '/equity', label: 'Equity', icon: 'calculator', phone: false },
+  { to: '/profile', label: 'Profile', icon: 'hero', phone: false },
 ];
 
 const MORE_ITEMS = NAV_ITEMS.filter((item) => !item.phone);

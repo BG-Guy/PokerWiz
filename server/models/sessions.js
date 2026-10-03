@@ -1,4 +1,4 @@
-// Session data access: list, start, add timeline events, finish, discard.
+// Session data access: list, start, add timeline events, finish, discard, and import finished sessions.
 // Converts between database rows (snake_case) and API objects (camelCase).
 import { randomUUID } from 'node:crypto';
 import { db, transaction } from '../db/database.js';
@@ -27,6 +27,12 @@ function toSession(row) {
     notes: row.notes,
     rating: row.rating,
     tilt: row.tilt,
+    format: row.format ?? 'cash',
+    smallBlind: row.small_blind,
+    ante: row.ante,
+    expenses: row.expenses ?? 0,
+    source: row.source,
+    externalId: row.external_id,
   };
 }
 
@@ -109,4 +115,36 @@ export function finishSession(id, { cashOut, rating = null, tilt = null, notes =
 // Throw away a live session and its timeline (events cascade).
 export function deleteSession(id) {
   db.prepare('DELETE FROM sessions WHERE id = ?').run(id);
+}
+
+// Add finished sessions from an import (see routes/sessions.js for the fields), all or nothing. A session
+// whose externalId is already in the database is skipped, so importing the same file again adds nothing.
+// End time and hands played come from the start and the duration, like live sessions. Returns { imported, skipped }.
+export function importSessions(list, { source }) {
+  const exists = db.prepare('SELECT 1 FROM sessions WHERE external_id = ?');
+  const insert = db.prepare(`
+    INSERT INTO sessions (id, date, game, stakes, big_blind, small_blind, ante, venue, status, started_at, ended_at,
+                          duration_min, buy_in, cash_out, expenses, hands, notes, format, source, external_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'finished', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+  return transaction(() => {
+    let imported = 0;
+    let skipped = 0;
+    for (const s of list) {
+      if (exists.get(s.externalId)) {
+        skipped++;
+        continue;
+      }
+      const ended = new Date(Date.parse(s.startedAt) + s.durationMin * 60000).toISOString();
+      const hands = Math.round((s.durationMin / 60) * HANDS_PER_HOUR);
+      insert.run(randomUUID(), s.date, s.game, s.stakes, s.bigBlind, s.smallBlind ?? null, s.ante ?? null, s.venue, s.startedAt, ended,
+        s.durationMin, s.buyIn, s.cashOut, s.expenses, hands, s.notes, s.format, source, s.externalId);
+      imported++;
+    }
+    return { imported, skipped };
+  });
+}
+
+// Undo an import: delete every session that came from this source. Returns how many were removed.
+export function removeImported(source) {
+  return Number(db.prepare('DELETE FROM sessions WHERE source = ?').run(source).changes);
 }

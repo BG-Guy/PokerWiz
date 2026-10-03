@@ -27,7 +27,7 @@ function metricValue(metric, from, to) {
     case 'hands_played':
       return sessions.reduce((sum, s) => sum + s.hands, 0);
     case 'net_profit':
-      return sessions.reduce((sum, s) => sum + (s.cash_out - s.buy_in), 0);
+      return sessions.reduce((sum, s) => sum + (s.cash_out - s.buy_in - (s.expenses ?? 0)), 0);
     case 'hours_played':
       return Math.round(sessions.reduce((sum, s) => sum + s.duration_min, 0) / 6) / 10;
     case 'sessions_played':

@@ -1,0 +1,20 @@
+/* Profile page layout: totals and the import tool, then the session log. */
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Phones and tablets: one column. Wide screens: totals beside the import tool. */
+.profile-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+@media (min-width: 1100px) {
+  .profile-top {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  }
+}

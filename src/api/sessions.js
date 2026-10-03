@@ -11,3 +11,11 @@ export const addSessionEvent = (id, event) => request(`/sessions/${id}/events`, 
 // result: { cashOut, rating, tilt, notes, hands }
 export const finishSession = (id, result) => request(`/sessions/${id}/finish`, { method: 'POST', body: result });
 export const discardSession = (id) => request(`/sessions/${id}`, { method: 'DELETE' });
+
+// Importing from other apps (see utils/csvImport.js).
+// payload: { source: 'regroup', sessions, removeSamples } -> { imported, skipped, removedSamples }
+export const importSessions = (payload) => request('/sessions/import', { method: 'POST', body: payload });
+// Sample sessions and hands that came with the app and are still there: { sessions, hands }
+export const getSampleData = () => request('/sessions/samples');
+// Undo an import: removes every session from that source -> { removed }
+export const removeImportedSessions = (source) => request(`/sessions/imported/${source}`, { method: 'DELETE' });

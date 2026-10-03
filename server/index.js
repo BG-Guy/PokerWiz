@@ -11,7 +11,7 @@ const PORT = Number(process.env.PORT ?? 3001);
 const distDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 
 const app = express();
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: '5mb' })); // room for a big session import with notes
 
 // API routes
 app.get('/api/health', (req, res) => res.json({ ok: true }));
