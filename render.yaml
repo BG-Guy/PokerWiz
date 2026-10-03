@@ -13,6 +13,10 @@ services:
         value: "22.22.2"
       - key: POKERWIZ_DB
         value: /var/data/pokerwiz.db
+      # The password that opens the app (server/auth/session.js). Set it in Render's dashboard, never in this
+      # file (the repository is public). Until it's set, the deployed app stays locked.
+      - key: APP_PASSWORD
+        sync: false
     disk:
       name: pokerwiz-data
       mountPath: /var/data

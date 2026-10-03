@@ -26,6 +26,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': 'http://localhost:3001',
+      '/login': 'http://localhost:3001', // the password lock's login page (server/views/loginPage.js)
     },
   },
 });

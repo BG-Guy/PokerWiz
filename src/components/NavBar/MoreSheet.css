@@ -36,7 +36,11 @@
   font-size: 16px;
 }
 
-/* App version under the list */
-.more-sheet-version {
+/* Under the list: "Log out" (when the app has a password) and the app version */
+.more-sheet-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   margin-top: 16px;
 }

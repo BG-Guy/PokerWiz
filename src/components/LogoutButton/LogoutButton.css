@@ -1,0 +1,16 @@
+/* Small, quiet "Log out" link-button for the sidebar footer and the phone More sheet. */
+
+.logout-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.logout-button:hover {
+  background: var(--accent-soft);
+  color: var(--text);
+}
