@@ -66,6 +66,8 @@
 /* The table: as wide as the area, unless the height runs out first (38px are the table's own margins) */
 .practice-fs-table {
   grid-area: table;
+  position: relative;
+  z-index: 0; /* its own layer: seats and chips stay under the log drawer's dimming */
   container-type: size;
   display: grid;
   place-items: center;
@@ -141,6 +143,91 @@
   text-overflow: ellipsis;
 }
 
+/* The arrow on the street line points up (opens the log upward), and down while the log is open */
+.practice-fs-peek-chevron {
+  flex: none;
+  transform: rotate(180deg);
+  transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+.practice-fs-peek.is-open {
+  border-color: var(--accent);
+}
+.practice-fs-peek.is-open .practice-fs-peek-chevron {
+  transform: none;
+}
+
+/* Log drawer (phones): over the bottom of the table, sliding up out of the street line with the same spring
+   as the bottom sheets, and back down the same way (the opening keyframes, copied and played in reverse). */
+.practice-fs-scrim {
+  grid-area: table;
+  z-index: 1;
+  background: rgba(18, 24, 27, 0.45);
+  animation: practice-fs-fade 0.2s ease;
+}
+.practice-fs-scrim.is-closing {
+  pointer-events: none;
+  animation: practice-fs-fade-out 0.2s ease 0.1s reverse both;
+}
+.practice-fs-drawer-clip {
+  grid-area: table;
+  align-self: end;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  max-height: 100%;
+  padding: 12px 12px 8px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.practice-fs-drawer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  padding: 14px 14px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.22);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
+  animation: practice-fs-drawer-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+.practice-fs-drawer.is-closing {
+  pointer-events: none;
+  animation: practice-fs-drawer-out 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1) reverse both;
+}
+.practice-fs-drawer-title {
+  font-size: 16px;
+}
+/* The log card inside the drawer loses its own frame */
+.practice-fs-drawer .practice-log {
+  padding: 0;
+  border: 0;
+}
+@keyframes practice-fs-drawer-in {
+  from {
+    transform: translateY(calc(100% + 12px));
+  }
+}
+@keyframes practice-fs-drawer-out {
+  from {
+    transform: translateY(calc(100% + 12px));
+  }
+}
+@keyframes practice-fs-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes practice-fs-fade-out {
+  from {
+    opacity: 0;
+  }
+}
+
 /* After the hand: review the decisions, go back to the hand, or the next hand */
 .practice-fs-result-actions {
   display: flex;
@@ -206,7 +293,9 @@
     min-height: 0;
   }
   .practice-fs-peek,
-  .practice-fs-log-btn {
+  .practice-fs-log-btn,
+  .practice-fs-scrim,
+  .practice-fs-drawer-clip {
     display: none;
   }
 }

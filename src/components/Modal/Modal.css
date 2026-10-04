@@ -1,4 +1,5 @@
-/* Modal: bottom sheet that slides up on phones, centered pop-in card from 640px. */
+/* Modal: bottom sheet that slides up on phones, centered pop-in card from 640px. Closing plays the same
+   animations backwards (MODAL_CLOSE_MS in Modal.jsx matches the 0.3s here). */
 
 .modal-backdrop {
   position: fixed;
@@ -80,8 +81,40 @@
   }
 }
 
+/* Closing: the opening in reverse. The sheet (or card) goes back the way it came, and the backdrop fades
+   out over the last part, as it faded in over the first. Copies of the opening keyframes under new names,
+   so the animation starts over instead of jumping to its end. */
+.modal-backdrop.is-closing {
+  pointer-events: none;
+  animation: modal-fade-out 0.2s ease 0.1s reverse both;
+}
+.modal-backdrop.is-closing .modal {
+  animation: modal-sheet-out 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1) reverse both;
+}
+@media (min-width: 640px) {
+  .modal-backdrop.is-closing .modal {
+    animation: modal-pop-out 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2) reverse both;
+  }
+}
+
 @keyframes modal-fade {
   from {
+    opacity: 0;
+  }
+}
+@keyframes modal-fade-out {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes modal-sheet-out {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes modal-pop-out {
+  from {
+    transform: scale(0.94);
     opacity: 0;
   }
 }

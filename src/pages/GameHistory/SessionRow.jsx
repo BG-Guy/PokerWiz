@@ -8,12 +8,14 @@ import Money from '../../components/Money/Money.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import StarRating from '../../components/StarRating/StarRating.jsx';
 import TiltMeter from '../../components/TiltMeter/TiltMeter.jsx';
+import { useClosingValue } from '../../hooks/useClosingValue.js';
 import EditSessionSheet from './EditSessionSheet.jsx';
 import './SessionRow.css';
 
 // session is the display copy (BB/$ unit); rawSession is the saved one in dollars, which the edit sheet changes.
 export default function SessionRow({ session, rawSession, handCount, isOpen, onToggle, onSaved, onDeleted }) {
   const [editing, setEditing] = useState(false);
+  const [editSheet, editOpen] = useClosingValue(editing); // stays up while it slides closed
   const tournament = isTournament(session);
   const unit = tournament ? null : 1; // cash games arrive converted to the BB/$ unit; tournaments stay in dollars
   const amount = (value, options) => formatMoney(value, { bb: unit, ...options });
@@ -105,11 +107,11 @@ export default function SessionRow({ session, rawSession, handCount, isOpen, onT
         </div>
       )}
 
-      {editing && (
+      {editSheet && (
         <EditSessionSheet
           session={rawSession}
           handCount={handCount}
-          open
+          open={editOpen}
           onClose={() => setEditing(false)}
           onSaved={onSaved}
           onDeleted={onDeleted}

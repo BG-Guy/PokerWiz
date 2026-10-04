@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getGoals } from '../../api/goals.js';
 import { useApi } from '../../hooks/useApi.js';
+import { useClosingValue } from '../../hooks/useClosingValue.js';
 import { todayIso } from '../../utils/format.js';
 import { analyzeGoal, findFocusGoal } from '../../utils/goalInsights.js';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
@@ -24,6 +25,7 @@ const CATEGORY_ACTIONS = {
 export default function Goals() {
   const { data: goals, error, reload, setData } = useApi(getGoals);
   const [sheet, setSheet] = useState(null); // 'new', the goal being edited, or null
+  const [goalSheet, goalSheetOpen] = useClosingValue(sheet); // stays up while it slides closed
   if (!goals) return <LoadState error={error} onRetry={reload} />;
 
   // Keep the list in step with the sheet: add or replace the saved goal, or drop a deleted one.
@@ -94,14 +96,14 @@ export default function Goals() {
         ))}
       </div>
 
-      {sheet && (
+      {goalSheet && (
         <GoalSheet
-          key={sheet === 'new' ? 'new' : sheet.id}
-          goal={sheet === 'new' ? null : sheet}
-          open
+          key={goalSheet === 'new' ? 'new' : goalSheet.id}
+          goal={goalSheet === 'new' ? null : goalSheet}
+          open={goalSheetOpen}
           onClose={() => setSheet(null)}
           onSaved={saveGoal}
-          onDeleted={() => removeGoal(sheet.id)}
+          onDeleted={() => removeGoal(goalSheet.id)}
         />
       )}
     </div>

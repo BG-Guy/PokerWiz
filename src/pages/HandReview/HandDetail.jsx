@@ -11,6 +11,7 @@ import FilterChips from '../../components/FilterChips/FilterChips.jsx';
 import StarRating from '../../components/StarRating/StarRating.jsx';
 import TiltMeter from '../../components/TiltMeter/TiltMeter.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
+import { useClosingValue } from '../../hooks/useClosingValue.js';
 import ActionTimeline from './ActionTimeline.jsx';
 import EditHandSheet from './EditHandSheet.jsx';
 import { coachSupport } from '../../coach/savedHand.js';
@@ -39,6 +40,7 @@ function villainsOf(hand) {
 // onUpdate(changes, persist) for the review fields; onSaved(hand) after the edit sheet saves; onDeleted().
 export default function HandDetail({ hand, backTo, onUpdate, onSaved, onDeleted }) {
   const [editing, setEditing] = useState(false);
+  const [editSheet, editOpen] = useClosingValue(editing); // stays up while it slides closed
   const villains = villainsOf(hand);
   // Every Hold'em hand can be reviewed by the coach (missing details are rebuilt from the log).
   const coach = coachSupport(hand);
@@ -68,7 +70,7 @@ export default function HandDetail({ hand, backTo, onUpdate, onSaved, onDeleted 
         </div>
       </header>
 
-      {editing && <EditHandSheet hand={hand} open onClose={() => setEditing(false)} onSaved={onSaved} onDeleted={onDeleted} />}
+      {editSheet && <EditHandSheet hand={hand} open={editOpen} onClose={() => setEditing(false)} onSaved={onSaved} onDeleted={onDeleted} />}
 
       {coach.ok ? (
         <Link to={`/coach?hand=${hand.id}`} className="btn hand-detail-coach">

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { addSessionEvent, discardSession } from '../../api/sessions.js';
 import { formatClock, formatMoney, formatTime } from '../../utils/format.js';
+import { useClosingValue } from '../../hooks/useClosingValue.js';
 import Panel from '../../components/Panel/Panel.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog.jsx';
@@ -22,6 +23,7 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
   const [error, setError] = useState(null);
   const [finishOpen, setFinishOpen] = useState(false);
   const [editing, setEditing] = useState(null); // 'setup', a timeline entry, or null
+  const [sheet, sheetOpen] = useClosingValue(editing); // stays up while it slides closed
   const [confirmDiscard, setConfirmDiscard] = useState(false);
 
   // Tick the session clock every second.
@@ -200,9 +202,9 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
       </Panel>
 
       {/* Edit sheets: the setup, or one note or rebuy */}
-      {editing === 'setup' && <EditLiveSessionSheet session={session} open onClose={() => setEditing(null)} onSaved={onChange} />}
-      {editing && editing !== 'setup' && (
-        <EditEntrySheet key={editing.id} session={session} entry={editing} open onClose={() => setEditing(null)} onSaved={onChange} />
+      {sheet === 'setup' && <EditLiveSessionSheet session={session} open={sheetOpen} onClose={() => setEditing(null)} onSaved={onChange} />}
+      {sheet && sheet !== 'setup' && (
+        <EditEntrySheet key={sheet.id} session={session} entry={sheet} open={sheetOpen} onClose={() => setEditing(null)} onSaved={onChange} />
       )}
 
       <ConfirmDialog
