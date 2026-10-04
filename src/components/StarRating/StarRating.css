@@ -103,6 +103,10 @@
   display: flex;
   align-items: baseline;
   gap: 8px;
+  min-height: 36px; /* same height rated or not, so the stars don't jump */
+}
+.star-rating-readout:has(.is-unrated) {
+  align-items: center;
 }
 .star-rating-value {
   font-size: 28px;
@@ -111,6 +115,9 @@
 .star-rating-label {
   font-weight: 800;
   color: var(--accent-text);
+}
+.star-rating-label.is-unrated {
+  color: var(--text-faint);
 }
 .star-rating-hint {
   font-size: 12px;

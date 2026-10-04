@@ -50,7 +50,7 @@ export default function GameHistory() {
   // A just-finished session arrives as ?open=<id> and starts expanded.
   const [searchParams] = useSearchParams();
   const [openId, setOpenId] = useState(searchParams.get('open'));
-  const { data, error, reload } = useApi(loadHistory);
+  const { data, error, reload, setData } = useApi(loadHistory);
 
   if (!data) return <LoadState error={error} onRetry={reload} />;
   const [rawSessions, hands] = data;
@@ -65,9 +65,19 @@ export default function GameHistory() {
   const tournaments = tournamentSummary(filtered);
   const months = groupByMonth(filtered);
 
+  // After an edit: swap in the saved session. After a delete: drop it (its hands stay, without a session).
+  const replaceSession = (saved) => setData(([list, allHands]) => [list.map((s) => (s.id === saved.id ? saved : s)), allHands]);
+  const removeSession = (id) => {
+    setOpenId(null);
+    setData(([list, allHands]) => [
+      list.filter((s) => s.id !== id),
+      allHands.map((hand) => (hand.sessionId === id ? { ...hand, sessionId: null } : hand)),
+    ]);
+  };
+
   return (
     <div className="game-history">
-      <PageHeader title="Game History" subtitle="Every session you logged, newest first." />
+      <PageHeader title="Game History" subtitle="Every session you logged, newest first. Open one to edit it." />
 
       <div className="game-history-filters">
         <FilterChips options={GAME_OPTIONS} value={game} onChange={setGame} label="Filter by game" />
@@ -101,9 +111,12 @@ export default function GameHistory() {
               <SessionRow
                 key={session.id}
                 session={session}
+                rawSession={rawSessions.find((s) => s.id === session.id)}
                 handCount={hands.filter((hand) => hand.sessionId === session.id).length}
                 isOpen={openId === session.id}
                 onToggle={() => setOpenId(openId === session.id ? null : session.id)}
+                onSaved={replaceSession}
+                onDeleted={() => removeSession(session.id)}
               />
             ))}
           </ul>

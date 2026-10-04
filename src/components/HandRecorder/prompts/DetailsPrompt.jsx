@@ -1,4 +1,5 @@
-// Final step: result summary, title, verdict, star rating, tilt and notes, then save.
+// Final step: result summary, title, verdict, star rating, tilt and notes, then save. When editing a saved
+// hand, `initial` fills them in with what the hand had.
 import { useState } from 'react';
 import { VERDICTS } from '../../../constants/poker.js';
 import { formatMoney } from '../../../utils/format.js';
@@ -10,12 +11,12 @@ import Icon from '../../Icon/Icon.jsx';
 
 const VERDICT_OPTIONS = Object.entries(VERDICTS).map(([value, label]) => ({ value, label }));
 
-export default function DetailsPrompt({ defaultTitle, result, pot, bb, saving, error, onSave }) {
-  const [title, setTitle] = useState(defaultTitle);
-  const [verdict, setVerdict] = useState('review');
-  const [note, setNote] = useState('');
-  const [rating, setRating] = useState(0);
-  const [tilt, setTilt] = useState(null);
+export default function DetailsPrompt({ defaultTitle, initial = null, saveLabel = 'Save hand', result, pot, bb, saving, error, onSave }) {
+  const [title, setTitle] = useState(initial?.title ?? defaultTitle);
+  const [verdict, setVerdict] = useState(initial?.verdict ?? 'review');
+  const [note, setNote] = useState(initial?.note ?? '');
+  const [rating, setRating] = useState(initial?.rating ?? 0);
+  const [tilt, setTilt] = useState(initial?.tilt ?? null);
 
   return (
     <>
@@ -66,7 +67,7 @@ export default function DetailsPrompt({ defaultTitle, result, pot, bb, saving, e
           disabled={saving}
           onClick={() => onSave({ title: title.trim() || defaultTitle, verdict, note: note.trim(), rating: rating > 0 ? rating : null, tilt })}
         >
-          {saving ? 'Saving' : 'Save hand'} <Icon name="check" size={16} />
+          {saving ? 'Saving' : saveLabel} <Icon name="check" size={16} />
         </button>
       </div>
     </>

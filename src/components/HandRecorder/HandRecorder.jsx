@@ -1,17 +1,20 @@
-// Hand recorder: rebuild a hand on a poker table, one question at a time. Used by Add Hand ("record")
-// and Coach mode ("coach"), which adds a player-traits step and ends with an analysis instead of saving.
+// Hand recorder: rebuild a hand on a poker table, one question at a time. Used by Add Hand ("record"), by
+// editing a saved hand (record mode started from the replayed hand, see restoreHand.js), and by Coach mode
+// ("coach"), which adds a player-traits step and ends with an analysis instead of saving.
 // Flow: game -> hero seat -> villains -> stacks -> [traits] -> hero cards -> villain cards -> action
 // (street by street, dealing the board between streets) -> showdown -> details (save) or analyze.
-// Every answer is pushed onto a history stack, so Undo steps back exactly one question.
+// Every answer is pushed onto a history stack, so Undo steps back exactly one question, and tapping a step in
+// "Hand so far" goes back to just before it.
 import { useState } from 'react';
 import { STAKES, TABLE_POSITIONS } from '../../constants/poker.js';
 import { RANKS } from '../../utils/cards.js';
-import { formatMoney, todayIso } from '../../utils/format.js';
+import { todayIso } from '../../utils/format.js';
 import { defaultProfile, describeProfile } from '../../coach/profiles.js';
 import { PLAYER_READS } from '../../gto/config.js';
 import PokerTable from './PokerTable.jsx';
 import PromptCarousel from './PromptCarousel.jsx';
 import LogEntry from './LogEntry.jsx';
+import Icon from '../Icon/Icon.jsx';
 import GamePrompt from './prompts/GamePrompt.jsx';
 import SeatPickPrompt from './prompts/SeatPickPrompt.jsx';
 import StacksPrompt from './prompts/StacksPrompt.jsx';
@@ -22,32 +25,22 @@ import BoardPrompt from './prompts/BoardPrompt.jsx';
 import ResultPrompt from './prompts/ResultPrompt.jsx';
 import DetailsPrompt from './prompts/DetailsPrompt.jsx';
 import AnalyzePrompt from './prompts/AnalyzePrompt.jsx';
+import { BOARD_CARDS, autoTags, createHand, currentPlayer, heroResult, nextStreet, showdownWinners } from '../../utils/handEngine.js';
 import {
-  BOARD_CARDS,
-  applyAction,
-  autoTags,
-  createHand,
-  currentPlayer,
-  dealBoard,
-  heroResult,
-  nextStreet,
-  showdownWinners,
-} from '../../utils/handEngine.js';
+  actionStep,
+  dealStep,
+  gameEntry,
+  heroCardsEntry,
+  heroSeatEntry,
+  seatName,
+  showdownEntry,
+  stacksEntry,
+  startEntry,
+  villainsEntry,
+  INITIAL_WIZARD,
+} from './recorderSteps.js';
 import './HandRecorder.css';
 
-const INITIAL_WIZARD = {
-  step: 'game',
-  stakesLabel: '$1/$2',
-  tableSize: 9, // full ring by default; 6-max is one tap away
-  heroSeat: null,
-  villainSeats: [],
-  stacks: {}, // seat -> starting stack in dollars (string while being typed)
-  profiles: {}, // seat -> player profile (coach mode)
-  cards: {}, // seat -> [codes]
-  hand: null, // betting engine state, from the action step on
-  winners: [],
-  log: [], // answered steps, shown in the carousel and the hand log
-};
 
 // "AKs", "QQ", "K9o"
 function shorthand(cards) {
@@ -56,34 +49,39 @@ function shorthand(cards) {
   return high[0] + low[0] + (high[1] === low[1] ? 's' : 'o');
 }
 
-// Log verbs are third person ("raises to"); for the hero say "You raise to".
-const secondPerson = (verb) => verb.replace(/s(\sto)?$/, '$1');
-
 // mode: 'record' | 'coach'
 // onSave(payload) -> Promise   (record mode: persist the hand; reject with an Error to show a message)
 // onAnalyze({ record, payload }) (coach mode: hand the finished hand to the coach)
-export default function HandRecorder({ mode = 'record', initialStakesLabel, onSave, onAnalyze }) {
+// Editing a saved hand: initial = { wizard, history } (restoreHand.js), initialDetails = the hand's title,
+// verdict, note, rating and tilt for the last step, and saveLabel for its button.
+export default function HandRecorder({ mode = 'record', initialStakesLabel, initial = null, initialDetails = null, saveLabel, onSave, onAnalyze }) {
   const isCoach = mode === 'coach';
-  const [wizard, setWizard] = useState(() => ({
-    ...INITIAL_WIZARD,
-    stakesLabel: STAKES.some((s) => s.label === initialStakesLabel) ? initialStakesLabel : INITIAL_WIZARD.stakesLabel,
-  }));
-  const [history, setHistory] = useState([]);
+  const [wizard, setWizard] = useState(
+    () =>
+      initial?.wizard ?? {
+        ...INITIAL_WIZARD,
+        stakesLabel: STAKES.some((s) => s.label === initialStakesLabel) ? initialStakesLabel : INITIAL_WIZARD.stakesLabel,
+      }
+  );
+  const [history, setHistory] = useState(initial?.history ?? []);
   const [direction, setDirection] = useState('forward');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
   const { step, hand, heroSeat, villainSeats, stacks, profiles, cards, winners } = wizard;
   const positions = TABLE_POSITIONS[wizard.tableSize];
-  const stakes = STAKES.find((s) => s.label === wizard.stakesLabel);
-  const nameOf = (seat) => (seat === heroSeat ? 'You' : `Villain ${villainSeats.indexOf(seat) + 1}`);
+  // Stakes from the list, or a saved hand's own stakes when they aren't in it.
+  const stakes = STAKES.find((s) => s.label === wizard.stakesLabel) ?? wizard.customStakes;
+  const nameOf = (seat) => seatName(seat, heroSeat, villainSeats);
   const usedCards = [...Object.values(cards).flat(), ...(hand?.board ?? [])];
   const finalStep = isCoach ? 'analyze' : 'details';
 
-  // Move to the next question: remember the current state for Undo and log the answer.
+  // Move to the next question: remember the current state for Undo and log the answer. Each log line keeps
+  // where it sits in the history (at), so tapping it can go back to just before it.
   const advance = (changes, entry) => {
+    const at = history.length;
     setHistory((h) => [...h, wizard]);
-    setWizard((w) => ({ ...w, ...changes, log: entry ? [...w.log, entry] : w.log }));
+    setWizard((w) => ({ ...w, ...changes, log: entry ? [...w.log, { ...entry, at }] : w.log }));
     setDirection('forward');
   };
   // Change something within the current question (no Undo step).
@@ -92,6 +90,13 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
     if (history.length === 0) return;
     setWizard(history[history.length - 1]);
     setHistory((h) => h.slice(0, -1));
+    setDirection('back');
+  };
+  // Go back to just before a logged step, to answer it again (everything after it is redone from there).
+  const rewindTo = (at) => {
+    if (at === undefined || at >= history.length) return;
+    setWizard(history[at]);
+    setHistory((h) => h.slice(0, at));
     setDirection('back');
   };
 
@@ -167,18 +172,14 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
 
   const handleSeatClick = (seat) => {
     if (step === 'hero') {
-      advance(
-        { heroSeat: seat, villainSeats: villainSeats.filter((s) => s !== seat), step: 'villains' },
-        { text: `You sit in the ${positions[seat]}`, role: 'hero' }
-      );
+      advance({ heroSeat: seat, villainSeats: villainSeats.filter((s) => s !== seat), step: 'villains' }, heroSeatEntry(positions[seat]));
     } else if (step === 'villains' && seat !== heroSeat) {
       edit({ villainSeats: villainSeats.includes(seat) ? villainSeats.filter((s) => s !== seat) : [...villainSeats, seat] });
     }
   };
 
   const finishStacks = () => {
-    const depths = [...new Set(inHand.map((p) => Math.round(Number(stacks[p.seat]) / stakes.bb)))];
-    const entry = { text: depths.length === 1 ? `Everyone ${depths[0]} bb deep` : 'Stacks set' };
+    const entry = stacksEntry(inHand.map((p) => stacks[p.seat]), stakes.bb);
     if (isCoach && PLAYER_READS) {
       // Every player starts with a neutral profile unless one was already set.
       const withDefaults = Object.fromEntries(inHand.map((p) => [p.seat, profiles[p.seat] ?? defaultProfile()]));
@@ -191,42 +192,19 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
   const startAction = () => {
     const players = inHand.map(({ seat, position, role, name }) => ({ seat, position, role, name, stack: Number(stacks[seat]) }));
     const known = villainSeats.filter((s) => cards[s]?.length === 2).length;
-    advance(
-      { hand: createHand({ players, positions, sb: stakes.sb, bb: stakes.bb }), step: 'action' },
-      { text: known ? `${known} villain ${known === 1 ? 'hand' : 'hands'} known` : 'Villain cards unknown', role: 'villain' }
-    );
+    advance({ hand: createHand({ players, positions, sb: stakes.sb, bb: stakes.bb }), step: 'action' }, startEntry(known));
   };
 
   const handleAction = (action) => {
-    const actor = currentPlayer(hand);
-    if (!actor) return;
-    const next = applyAction(hand, action);
-    const logged = next.streets[next.streets.length - 1].actions.at(-1);
-    const isHero = actor.role === 'hero';
-    const who = isHero ? 'You' : actor.position;
-    const amount = logged.amount ? ` ${formatMoney(logged.amount, { sign: false, bb: stakes.bb })}` : '';
-    let text = `${who} ${isHero ? secondPerson(logged.verb) : logged.verb}${amount}`;
-    if (logged.allIn) {
-      const verb = logged.verb === 'calls' ? (isHero ? 'call' : 'calls') : isHero ? 'go' : 'goes';
-      text = `${who} ${verb} all in for${amount}`;
-    }
-    const entry = { text, role: actor.role, allIn: logged.allIn };
-
-    if (next.phase === 'result' && next.uncontestedWinner !== undefined) {
-      advance({ hand: next, winners: [next.uncontestedWinner], step: finalStep }, entry);
-    } else if (next.phase === 'result') {
-      advance({ hand: next, winners: showdownWinners(next, cards) ?? [], step: 'result' }, entry);
-    } else {
-      advance({ hand: next, step: next.phase === 'board' ? 'board' : 'action' }, entry);
-    }
+    if (!currentPlayer(hand)) return;
+    const { next, entry, step: nextStep, winners: ended } = actionStep(hand, action, { bb: stakes.bb, cards, finalStep });
+    advance({ hand: next, step: nextStep, ...(ended ? { winners: ended } : {}) }, entry);
   };
 
   // Deal a street. If nobody can bet any more (all-in), go straight to the next card or the showdown.
   const handleDeal = (codes) => {
-    const next = dealBoard(hand, codes);
-    const entry = { text: nextStreet(hand), cards: codes };
-    if (next.phase === 'result') advance({ hand: next, winners: showdownWinners(next, cards) ?? [], step: 'result' }, entry);
-    else advance({ hand: next, step: next.phase }, entry);
+    const { next, entry, step: nextStep, winners: ended } = dealStep(hand, codes, cards);
+    advance({ hand: next, step: nextStep, ...(ended ? { winners: ended } : {}) }, entry);
   };
 
   const revealCards = (seat, codes) => {
@@ -235,8 +213,7 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
   };
 
   const finishShowdown = () => {
-    const text = winners.length > 1 ? 'Split pot' : `${nameOf(winners[0])} won ${formatMoney(hand.pot, { sign: false, bb: stakes.bb })}`;
-    advance({ step: finalStep }, { text, role: winners.includes(heroSeat) ? 'hero' : 'villain' });
+    advance({ step: finalStep }, showdownEntry(winners, hand, heroSeat, nameOf, stakes.bb));
   };
 
   const handleSave = async (details) => {
@@ -259,10 +236,7 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
         stakesLabel={wizard.stakesLabel}
         tableSize={wizard.tableSize}
         onContinue={(label, size) =>
-          advance(
-            { stakesLabel: label, tableSize: size, heroSeat: null, villainSeats: [], cards: {}, profiles: {}, step: 'hero' },
-            { text: `${label} · ${size}-max` }
-          )
+          advance({ stakesLabel: label, tableSize: size, heroSeat: null, villainSeats: [], cards: {}, profiles: {}, step: 'hero' }, gameEntry(label, size))
         }
       />
     );
@@ -277,7 +251,7 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
         onContinue={() => {
           // Everyone starts at 100 big blinds unless a stack was already entered.
           const defaults = Object.fromEntries([heroSeat, ...villainSeats].map((seat) => [seat, stacks[seat] ?? String(stakes.bb * 100)]));
-          advance({ step: 'stacks', stacks: defaults }, { text: `Villains: ${villainSeats.map((s) => positions[s]).join(', ')}`, role: 'villain' });
+          advance({ step: 'stacks', stacks: defaults }, villainsEntry(villainSeats.map((s) => positions[s])));
         }}
       />
     );
@@ -310,7 +284,7 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
         mode="hero"
         players={inHand}
         used={usedCards}
-        onHeroCards={(codes) => advance({ cards: { ...cards, [heroSeat]: codes }, step: 'villainCards' }, { text: 'Your hand', cards: codes, role: 'hero' })}
+        onHeroCards={(codes) => advance({ cards: { ...cards, [heroSeat]: codes }, step: 'villainCards' }, heroCardsEntry(codes))}
       />
     );
   } else if (step === 'villainCards') {
@@ -354,6 +328,8 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
     prompt = (
       <DetailsPrompt
         defaultTitle={defaultTitle()}
+        initial={initialDetails}
+        saveLabel={saveLabel}
         result={heroResult(hand, winners)}
         pot={hand.pot}
         bb={stakes.bb}
@@ -426,14 +402,23 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
           {prompt}
         </PromptCarousel>
 
-        {/* Everything recorded so far */}
+        {/* Everything recorded so far; tap a step to go back and answer it again */}
         {wizard.log.length > 0 && (
-          <details className="hand-recorder-log">
-            <summary>Hand so far ({wizard.log.length} steps)</summary>
+          <details className="hand-recorder-log" open={Boolean(initial)}>
+            <summary>
+              Hand so far ({wizard.log.length} steps) <span className="hand-recorder-log-hint">Tap a step to change it</span>
+            </summary>
             <ol>
               {wizard.log.map((entry, index) => (
                 <li key={index}>
-                  <LogEntry entry={entry} />
+                  {entry.at !== undefined && entry.at < history.length && !saving ? (
+                    <button type="button" className="hand-recorder-log-step" onClick={() => rewindTo(entry.at)} title="Go back to this step">
+                      <LogEntry entry={entry} />
+                      <Icon name="undo" size={14} className="hand-recorder-log-rewind" />
+                    </button>
+                  ) : (
+                    <LogEntry entry={entry} />
+                  )}
                 </li>
               ))}
             </ol>

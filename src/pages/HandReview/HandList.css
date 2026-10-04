@@ -67,21 +67,25 @@
   border-radius: 16px;
   background: var(--surface);
   border: 1px solid var(--border);
-  overflow: hidden;
   transition: border-color 0.15s ease;
 }
 .hand-list-row:hover {
   border-color: var(--accent);
 }
 
-.hand-list-item {
+/* The hand link on top, the rating footer under it */
+.hand-list-body {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.hand-list-item {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  padding: 12px;
+  padding: 12px 12px 8px;
   transition: transform 0.15s ease;
 }
 .hand-list-item:active {
@@ -106,6 +110,7 @@
   flex-shrink: 0;
   width: 58px;
   border-left: 1px solid var(--border);
+  border-radius: 0 15px 15px 0;
   background: var(--accent-soft);
   color: var(--accent-text);
   font-size: 11px;
@@ -123,8 +128,7 @@
 }
 
 .hand-list-coach-score {
-  margin-left: 4px;
-  padding: 1px 6px;
+  padding: 3px 9px;
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent-text);
@@ -174,16 +178,65 @@
   font-weight: 600;
 }
 
-/* Rating and tilt peek */
-.hand-list-feel {
+/* Footer under the title: rating pill, tilt face, coach score (lined up with the title, after the cards) */
+.hand-list-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 12px 76px;
+}
+.hand-list-tilt {
+  display: inline-grid;
+  place-items: center;
+}
+
+/* Sort select and the rated count */
+.hand-list-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+.hand-list-sort {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  margin-top: 2px;
-  font-size: 12px;
-  font-weight: 700;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 800;
   color: var(--text-muted);
 }
-.hand-list-feel .star-rating.is-readonly {
-  --star: 13px;
+.hand-list-sort select {
+  appearance: none;
+  min-height: 36px;
+  padding: 0 32px 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.hand-list-sort select:focus {
+  outline: 0;
+  border-color: var(--accent);
+}
+.hand-list-sort svg {
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
+}
+.hand-list-rated {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+.hand-list-rated svg {
+  fill: currentColor;
 }

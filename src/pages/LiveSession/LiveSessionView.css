@@ -25,6 +25,7 @@
 
 /* Felt header card */
 .live-view-hero {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,6 +36,26 @@
   color: var(--snow);
   text-align: center;
   box-shadow: var(--shadow);
+}
+/* Edit button in the header card's corner, light on the felt */
+.live-view-edit {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--snow);
+  font-size: 13px;
+  font-weight: 800;
+  transition: background 0.15s ease;
+}
+.live-view-edit:hover {
+  background: rgba(255, 255, 255, 0.22);
 }
 .live-view-status {
   display: inline-flex;

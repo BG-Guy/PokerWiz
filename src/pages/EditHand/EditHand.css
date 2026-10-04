@@ -1,0 +1,33 @@
+/* Edit Hand page: header spacing and the how-to hint; the recorder has its own layout styles. */
+
+.edit-hand-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.edit-hand-hint svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--accent);
+}
+
+/* Phones: drop the subtitle and keep the hint short so the table stays in view */
+@media (max-width: 639px) {
+  .edit-hand .page-header {
+    margin-bottom: 4px;
+  }
+  .edit-hand .page-header-subtitle {
+    display: none;
+  }
+  .edit-hand-hint {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+}

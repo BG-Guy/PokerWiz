@@ -1,5 +1,7 @@
 // Goals, measured from real data. Each goal counts its metric between its start date and today
-// (or its deadline, if that has passed), with weekly checkpoints for the trend line.
+// (or its deadline, if that has passed), with weekly checkpoints for the trend line. Goals can be added,
+// edited and removed (the Goals page).
+import { randomUUID } from 'node:crypto';
 import { db } from '../db/database.js';
 
 const DAY = 86400000;
@@ -52,4 +54,41 @@ export function listGoals() {
       history.push(current);
       return { ...goal, start: 0, current, history };
     });
+}
+
+// What each metric counts, its unit and the kind of goal it is (the category picks the goal's advice).
+export const GOAL_METRICS = {
+  hands_played: { unit: 'hands', category: 'Volume' },
+  hours_played: { unit: 'hours', category: 'Volume' },
+  sessions_played: { unit: 'sessions', category: 'Volume' },
+  net_profit: { unit: '$', category: 'Results' },
+  hands_reviewed: { unit: 'hands', category: 'Study' },
+};
+
+// A goal's stored fields from the editor's: title, metric, target, startDate, deadline.
+function goalData({ title, metric, target, startDate, deadline }) {
+  const { unit, category } = GOAL_METRICS[metric];
+  return { title: title.trim(), metric, unit, category, target, startDate, deadline };
+}
+const findGoal = (id) => listGoals().find((goal) => goal.id === id) ?? null;
+
+// New goal, added at the end of the list.
+export function createGoal(fields) {
+  const id = randomUUID();
+  const position = (db.prepare('SELECT MAX(position) AS last FROM goals').get().last ?? -1) + 1;
+  db.prepare('INSERT INTO goals (id, position, data) VALUES (?, ?, ?)').run(id, position, JSON.stringify(goalData(fields)));
+  return findGoal(id);
+}
+
+// Change a goal (any editor fields; the rest stay as they were).
+export function updateGoal(id, fields) {
+  const row = db.prepare('SELECT data FROM goals WHERE id = ?').get(id);
+  if (!row) return null;
+  db.prepare('UPDATE goals SET data = ? WHERE id = ?').run(JSON.stringify(goalData({ ...JSON.parse(row.data), ...fields })), id);
+  return findGoal(id);
+}
+
+// Remove a goal. Returns false if there was no such goal.
+export function removeGoal(id) {
+  return Number(db.prepare('DELETE FROM goals WHERE id = ?').run(id).changes) > 0;
 }

@@ -1,5 +1,5 @@
-// Main navigation: bottom tab bar on phones (with a raised "Play" button and a "More" sheet),
-// icon rail on tablets, labelled sidebar on desktop.
+// Main navigation: bottom tab bar on phones (with a raised "Practice" button and a "More" sheet),
+// icon rail on tablets, labelled sidebar on desktop. "Log session" (the live session log) is first in More.
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import Icon from '../Icon/Icon.jsx';
@@ -14,9 +14,9 @@ import './NavBar.css';
 const NAV_ITEMS = [
   { to: '/', label: 'Home', icon: 'home', end: true, phone: true },
   { to: '/hands', label: 'Hands', icon: 'cards', phone: true },
-  { to: '/session', label: 'Play', icon: 'play', phone: true, primary: true },
+  { to: '/practice', label: 'Practice', icon: 'zap', phone: true, primary: true },
   { to: '/coach', label: 'Coach', icon: 'coach', phone: true },
-  { to: '/practice', label: 'Practice', icon: 'zap', phone: false },
+  { to: '/session', label: 'Log session', icon: 'log', phone: false },
   { to: '/history', label: 'History', icon: 'clock', phone: false },
   { to: '/insights', label: 'Insights', icon: 'chart', phone: false },
   { to: '/goals', label: 'Goals', icon: 'target', phone: false },

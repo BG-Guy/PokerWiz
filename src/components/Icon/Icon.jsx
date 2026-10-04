@@ -70,6 +70,20 @@ const ICONS = {
     </>
   ),
   trash: <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />,
+  pencil: (
+    <>
+      <path d="M4 20h4L19 9a2.83 2.83 0 0 0-4-4L4 16z" />
+      <path d="M13.5 6.5l4 4" />
+    </>
+  ),
+  // Clipboard: logging a session
+  log: (
+    <>
+      <path d="M9 3h6v4H9z" />
+      <path d="M15 5h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2" />
+      <path d="M9 12h6M9 16h4" />
+    </>
+  ),
   note: (
     <>
       <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />

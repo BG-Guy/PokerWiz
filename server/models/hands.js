@@ -1,11 +1,15 @@
 // Hand data access. The full hand lives as JSON; id, session and date are real columns for sorting/filtering.
 import { randomUUID } from 'node:crypto';
-import { db } from '../db/database.js';
+import { db, transaction } from '../db/database.js';
 import { addEvent, findById as findSession } from './sessions.js';
 
-// Fields the Hand Review page is allowed to edit after saving.
-// coachAccuracy / coachReads are written by a coach review (score, and the reads it used).
-const EDITABLE_FIELDS = ['verdict', 'note', 'title', 'tags', 'rating', 'tilt', 'coachAccuracy', 'coachReads'];
+// Fields that can change after a hand is saved: your review (verdict, notes, rating, tilt, tags), the coach's
+// score and the reads it used, and the hand itself (title, stakes, cards, board, amounts, and a re-recorded
+// action: streets and players). The date is a column of its own (see updateHand).
+const EDITABLE_FIELDS = [
+  'verdict', 'note', 'title', 'tags', 'rating', 'tilt', 'coachAccuracy', 'coachReads',
+  'game', 'stakes', 'tableSize', 'heroPosition', 'holeCards', 'board', 'potSize', 'result', 'streets', 'players',
+];
 
 function toHand(row) {
   return { ...JSON.parse(row.data), id: row.id, sessionId: row.session_id, date: row.date };
@@ -37,14 +41,26 @@ export function createHand({ id: _ignored, sessionId = null, date, ...data }) {
   return findHand(id);
 }
 
-// Update review fields (verdict, notes, ...) on an existing hand.
+// Change an existing hand (any of EDITABLE_FIELDS, plus its date). Its entry on a session timeline follows
+// the new title and result.
 export function updateHand(id, changes) {
   const hand = findHand(id);
   if (!hand) return null;
-  const { id: _id, sessionId: _s, date: _d, ...data } = hand;
+  const { id: _id, sessionId: _s, date, ...data } = hand;
   for (const field of EDITABLE_FIELDS) {
     if (changes[field] !== undefined) data[field] = changes[field];
   }
-  db.prepare('UPDATE hands SET data = ? WHERE id = ?').run(JSON.stringify(data), id);
+  transaction(() => {
+    db.prepare('UPDATE hands SET data = ?, date = ? WHERE id = ?').run(JSON.stringify(data), changes.date ?? date, id);
+    db.prepare('UPDATE session_events SET text = ?, amount = ? WHERE hand_id = ?').run(data.title ?? 'Hand', data.result ?? null, id);
+  });
   return findHand(id);
+}
+
+// Delete a hand, and its entry on a session timeline. Returns false if there was no such hand.
+export function deleteHand(id) {
+  return transaction(() => {
+    db.prepare('DELETE FROM session_events WHERE hand_id = ?').run(id);
+    return Number(db.prepare('DELETE FROM hands WHERE id = ?').run(id).changes) > 0;
+  });
 }

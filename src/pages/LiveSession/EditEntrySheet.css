@@ -1,0 +1,21 @@
+/* Edit-timeline-entry sheet: the note or the rebuy amount, save, and remove from the timeline. */
+
+.edit-entry-sheet {
+  max-width: 480px;
+}
+.edit-entry-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.edit-entry-error {
+  color: var(--negative);
+  font-weight: 700;
+}
+.edit-entry-save {
+  min-height: 50px;
+  font-size: 15px;
+}
+.edit-entry-delete {
+  align-self: center;
+}

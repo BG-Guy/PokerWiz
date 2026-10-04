@@ -1,0 +1,112 @@
+/* Edit-hand sheet: fields, card slots, tags, then save, "Edit the action" and the delete button. */
+
+.edit-hand-sheet {
+  max-width: 560px;
+}
+.edit-hand-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Your hand and the board side by side when there's room */
+.edit-hand-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+}
+.edit-hand-slots {
+  display: flex;
+  gap: 6px;
+}
+
+/* Tags as removable chips, with an input at the end */
+.edit-hand-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 46px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg);
+}
+.edit-hand-tags:focus-within {
+  border-color: var(--accent);
+}
+.edit-hand-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px 3px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  font-size: 13px;
+  font-weight: 700;
+}
+.edit-hand-tag button {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+.edit-hand-tag button:hover {
+  background: var(--surface);
+}
+.edit-hand-tag-input {
+  flex: 1;
+  min-width: 110px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+}
+
+.edit-hand-error {
+  color: var(--negative);
+  font-weight: 700;
+}
+.edit-hand-save {
+  min-height: 50px;
+  font-size: 15px;
+}
+
+/* "Edit the action": a card-like link to the recorder */
+.edit-hand-action {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  transition: border-color 0.15s ease;
+}
+.edit-hand-action:hover {
+  border-color: var(--accent);
+}
+.edit-hand-action > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.edit-hand-action > span span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.edit-hand-action-off {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+
+.edit-hand-delete {
+  align-self: center;
+}

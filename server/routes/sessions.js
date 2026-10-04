@@ -1,5 +1,5 @@
-// /api/sessions: session history plus the live-session lifecycle (start, timeline events, finish, discard),
-// and importing finished sessions from other apps (parsed from a CSV in the browser).
+// /api/sessions: session history (edit, delete) plus the live-session lifecycle (start, timeline events,
+// finish, discard), and importing finished sessions from other apps (parsed from a CSV in the browser).
 import { Router } from 'express';
 import * as Sessions from '../models/sessions.js';
 import { countSampleData, removeSampleData } from '../models/sampleData.js';
@@ -113,9 +113,56 @@ sessionsRouter.post('/:id/finish', (req, res) => {
   res.json(Sessions.finishSession(req.params.id, { cashOut, rating, tilt, notes: String(notes) }));
 });
 
-// Discard a live session (finished sessions are kept).
+// What's wrong with edits to a session, or null (only the fields present are checked).
+function editProblem(c) {
+  if (!c || typeof c !== 'object') return 'No changes sent';
+  if (c.date !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(c.date)) return 'The date must look like 2026-10-04';
+  for (const key of ['game', 'stakes', 'venue']) {
+    if (c[key] !== undefined && (!isText(c[key], 80) || !c[key].trim())) return `The ${key} can't be empty`;
+  }
+  if (c.bigBlind !== undefined && (!isNumber(c.bigBlind) || c.bigBlind < 0)) return 'The big blind must be zero or more';
+  for (const key of ['buyIn', 'cashOut', 'expenses', 'startBuyIn']) {
+    if (c[key] !== undefined && (!isNumber(c[key]) || c[key] < 0)) return 'Amounts must be zero or more';
+  }
+  if (c.durationMin !== undefined && (!Number.isInteger(c.durationMin) || c.durationMin < 0 || c.durationMin > 72 * 60)) return 'The length must be up to 72 hours';
+  if (c.hands !== undefined && (!Number.isInteger(c.hands) || c.hands < 0)) return 'Hands played must be a whole number';
+  if (c.notes !== undefined && !isText(c.notes, 20000)) return 'Notes are too long';
+  if (c.rating != null && (!isNumber(c.rating) || c.rating < 0 || c.rating > 5)) return 'Rating must be between 0 and 5';
+  if (c.tilt != null && (!Number.isInteger(c.tilt) || c.tilt < 1 || c.tilt > 5)) return 'Tilt must be 1 to 5';
+  return null;
+}
+
+// Edit a session: everything about a finished one; the setup and starting buy-in of a live one.
+sessionsRouter.patch('/:id', (req, res) => {
+  const problem = editProblem(req.body);
+  if (problem) return res.status(400).json({ error: problem });
+  const session = Sessions.updateSession(req.params.id, req.body);
+  if (!session) return res.status(404).json({ error: 'Session not found' });
+  res.json(session);
+});
+
+// Delete a session: discard a live one, or remove a finished one from your history. Its hands are kept.
 sessionsRouter.delete('/:id', (req, res) => {
-  if (!requireLiveSession(req, res)) return;
+  if (!Sessions.findById(req.params.id)) return res.status(404).json({ error: 'Session not found' });
   Sessions.deleteSession(req.params.id);
   res.status(204).end();
+});
+
+// Edit a live session's timeline entry: a note's text or a rebuy's amount.
+sessionsRouter.patch('/:id/events/:eventId', (req, res) => {
+  if (!requireLiveSession(req, res)) return;
+  const { text, amount } = req.body ?? {};
+  if (text !== undefined && !String(text).trim()) return res.status(400).json({ error: 'A note needs some text' });
+  if (amount !== undefined && (!isNumber(amount) || amount <= 0)) return res.status(400).json({ error: 'Rebuy amount must be positive' });
+  const session = Sessions.updateEvent(req.params.id, req.params.eventId, { text: text === undefined ? undefined : String(text).trim(), amount });
+  if (!session) return res.status(404).json({ error: 'Timeline entry not found' });
+  res.json(session);
+});
+
+// Remove an entry from a live session's timeline.
+sessionsRouter.delete('/:id/events/:eventId', (req, res) => {
+  if (!requireLiveSession(req, res)) return;
+  const session = Sessions.deleteEvent(req.params.id, req.params.eventId);
+  if (!session) return res.status(404).json({ error: 'Timeline entry not found' });
+  res.json(session);
 });

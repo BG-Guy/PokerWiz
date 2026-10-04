@@ -1,0 +1,84 @@
+/* Edit-sheet fields: label above, roomy inputs with big tap targets, short fields two to a row. */
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.form-field-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+.form-field-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+
+/* Inputs, selects and textareas */
+.form-input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+}
+textarea.form-input {
+  min-height: 92px;
+  resize: vertical;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.form-input:focus,
+.form-money:focus-within {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* Money: a $ (or bb) before the number */
+.form-money {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  font-weight: 800;
+  color: var(--text-muted);
+}
+.form-money input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+}
+
+/* Short fields side by side (one column on narrow phones) */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+@media (max-width: 360px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Chip rows inside a form wrap onto more lines instead of scrolling sideways */
+.form-field .filter-chips {
+  flex-wrap: wrap;
+  overflow: visible;
+}

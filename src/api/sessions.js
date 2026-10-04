@@ -10,7 +10,17 @@ export const addSessionEvent = (id, event) => request(`/sessions/${id}/events`, 
 
 // result: { cashOut, rating, tilt, notes, hands }
 export const finishSession = (id, result) => request(`/sessions/${id}/finish`, { method: 'POST', body: result });
+// Discard a live session, or delete a finished one (its saved hands are kept).
 export const discardSession = (id) => request(`/sessions/${id}`, { method: 'DELETE' });
+export const deleteSession = discardSession;
+
+// Edit a session. Finished: date, game, stakes, bigBlind, venue, durationMin, buyIn, cashOut, expenses, hands,
+// notes, rating, tilt. Live: game, stakes, bigBlind, venue, startBuyIn (what you sat down with).
+export const updateSession = (id, changes) => request(`/sessions/${id}`, { method: 'PATCH', body: changes });
+
+// A live session's timeline entries: edit a note's text or a rebuy's amount, or remove an entry.
+export const updateSessionEvent = (id, eventId, changes) => request(`/sessions/${id}/events/${eventId}`, { method: 'PATCH', body: changes });
+export const deleteSessionEvent = (id, eventId) => request(`/sessions/${id}/events/${eventId}`, { method: 'DELETE' });
 
 // Importing from other apps (see utils/csvImport.js).
 // payload: { source: 'regroup', sessions, removeSamples } -> { imported, skipped, removedSamples }

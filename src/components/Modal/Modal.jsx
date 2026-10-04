@@ -5,6 +5,10 @@ import { createPortal } from 'react-dom';
 import Icon from '../Icon/Icon.jsx';
 import './Modal.css';
 
+// Open dialogs, newest last. A dialog can open over another (a confirm over an edit sheet): Escape closes
+// only the one on top.
+const openDialogs = [];
+
 export default function Modal({ open, onClose, title, children, className = '' }) {
   const dialogRef = useRef(null);
   // Keep the latest onClose in a ref so re-renders of the parent don't re-run the open effect.
@@ -14,12 +18,15 @@ export default function Modal({ open, onClose, title, children, className = '' }
   // While open: listen for Escape, lock page scroll, and move focus into the dialog once.
   useEffect(() => {
     if (!open) return undefined;
-    const onKey = (event) => event.key === 'Escape' && onCloseRef.current();
+    const token = {};
+    openDialogs.push(token);
+    const onKey = (event) => event.key === 'Escape' && openDialogs.at(-1) === token && onCloseRef.current();
     const previousOverflow = document.body.style.overflow;
     document.addEventListener('keydown', onKey);
     document.body.style.overflow = 'hidden';
     dialogRef.current?.focus();
     return () => {
+      openDialogs.splice(openDialogs.indexOf(token), 1);
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = previousOverflow;
     };

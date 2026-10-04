@@ -188,6 +188,12 @@
   align-items: flex-end;
   gap: 6px;
 }
+/* Edit: an outlined pill so it reads as a button next to the verdict badge */
+.hand-detail-edit {
+  border: 1px solid var(--border);
+  min-height: 36px;
+  padding: 0 14px;
+}
 .hand-detail-coach-score {
   font-size: 12px;
   font-weight: 800;

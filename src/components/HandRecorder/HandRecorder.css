@@ -39,7 +39,45 @@
 .hand-recorder-log ol {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
   margin-top: 12px;
   font-size: 14px;
+}
+.hand-recorder-log-hint {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+/* A step you can go back to: the whole line is a button, with a rewind icon on hover */
+.hand-recorder-log-step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: calc(100% + 16px); /* the hover background reaches past the text on both sides */
+  padding: 5px 8px;
+  margin: 0 -8px;
+  border-radius: 10px;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+.hand-recorder-log-step .hand-recorder-log-rewind {
+  flex-shrink: 0;
+  color: var(--text-faint);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.hand-recorder-log-step:hover,
+.hand-recorder-log-step:focus-visible {
+  background: var(--accent-soft);
+}
+.hand-recorder-log-step:hover .hand-recorder-log-rewind,
+.hand-recorder-log-step:focus-visible .hand-recorder-log-rewind {
+  opacity: 1;
+}
+@media (pointer: coarse) {
+  .hand-recorder-log-step .hand-recorder-log-rewind {
+    opacity: 0.6;
+  }
 }

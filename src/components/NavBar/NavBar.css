@@ -51,7 +51,7 @@
   background: var(--accent-soft);
 }
 
-/* Phone: the Play button is a raised teal circle in the middle of the bar */
+/* Phone: the Practice button is a raised teal circle in the middle of the bar */
 .navbar-link.is-primary .navbar-link-icon,
 .navbar-link.is-primary.active .navbar-link-icon {
   width: 54px;

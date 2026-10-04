@@ -1,0 +1,25 @@
+/* Edit-live-session sheet: chip rows for the setup, the starting buy-in with its depth, then save. */
+
+.edit-live-sheet {
+  max-width: 520px;
+}
+.edit-live-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* "100 bb" at the end of the buy-in field */
+.edit-live-depth {
+  font-size: 13px;
+  color: var(--text-faint);
+}
+
+.edit-live-error {
+  color: var(--negative);
+  font-weight: 700;
+}
+.edit-live-save {
+  min-height: 50px;
+  font-size: 15px;
+}

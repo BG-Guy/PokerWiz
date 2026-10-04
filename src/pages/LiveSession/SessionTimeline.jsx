@@ -1,4 +1,5 @@
 // Chronological timeline of a live session: start, then every note, rebuy and saved hand in order.
+// The start, notes and rebuys have an edit button (onEdit); saved hands open their own page, where they're edited.
 import { Link } from 'react-router-dom';
 import { formatDuration, formatMoney, formatTime } from '../../utils/format.js';
 import Money from '../../components/Money/Money.jsx';
@@ -34,7 +35,7 @@ function EntryContent({ entry, initialBuyIn, bb }) {
   );
 }
 
-export default function SessionTimeline({ session }) {
+export default function SessionTimeline({ session, onEdit }) {
   const startMs = new Date(session.startedAt).getTime();
   const rebuyTotal = session.events.filter((e) => e.type === 'rebuy').reduce((sum, e) => sum + e.amount, 0);
   const entries = [{ id: 'start', type: 'start', createdAt: session.startedAt }, ...session.events];
@@ -54,6 +55,16 @@ export default function SessionTimeline({ session }) {
                   <span className="session-timeline-offset">
                     +{formatDuration(Math.round((new Date(entry.createdAt).getTime() - startMs) / 60000))}
                   </span>
+                )}
+                {onEdit && entry.type !== 'hand' && (
+                  <button
+                    type="button"
+                    className="session-timeline-edit"
+                    onClick={() => onEdit(entry)}
+                    aria-label={entry.type === 'start' ? 'Edit the session setup' : `Edit this ${entry.type}`}
+                  >
+                    <Icon name="pencil" size={14} /> Edit
+                  </button>
                 )}
               </div>
               <EntryContent entry={entry} initialBuyIn={session.buyIn - rebuyTotal} bb={session.bigBlind} />

@@ -70,7 +70,7 @@
 
 /* Next hand: pinned to the bottom of the screen once the hand is over, so it's always one tap away
    however long the graded decisions run. Phones: full width, clear of the tab bar (68px) and its raised
-   Play button (17px above it). */
+   Practice button (17px above it). */
 .practice-next {
   position: fixed;
   left: 16px;

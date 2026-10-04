@@ -1,4 +1,4 @@
-// One goal: current vs. target, progress against time, weekly trend, and generated insights.
+// One goal: current vs. target, progress against time, weekly trend, and generated insights. Edit opens the goal sheet.
 import { GOAL_STATUS, statusTone } from '../../utils/goalInsights.js';
 import { formatGoalValue, formatLongDate } from '../../utils/format.js';
 import ProgressBar from '../../components/ProgressBar/ProgressBar.jsx';
@@ -6,7 +6,7 @@ import LineChart from '../../components/LineChart/LineChart.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import './GoalCard.css';
 
-export default function GoalCard({ goal, analysis }) {
+export default function GoalCard({ goal, analysis, onEdit }) {
   const trend = goal.history.map((value, week) => ({ label: `Week ${week + 1}`, value }));
 
   return (
@@ -14,6 +14,9 @@ export default function GoalCard({ goal, analysis }) {
       <div className="goal-card-top">
         <span className="goal-card-category">{goal.category}</span>
         <span className={`goal-card-status is-${analysis.status}`}>{GOAL_STATUS[analysis.status]}</span>
+        <button type="button" className="btn-icon goal-card-edit" onClick={onEdit} aria-label={`Edit goal: ${goal.title}`}>
+          <Icon name="pencil" size={16} />
+        </button>
       </div>
 
       <h3 className="goal-card-title">{goal.title}</h3>

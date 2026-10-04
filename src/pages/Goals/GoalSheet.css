@@ -1,0 +1,35 @@
+/* Goal sheet (add or edit): metric chips, target with its unit, name, dates with quick deadlines, save and delete. */
+
+.goal-sheet {
+  max-width: 520px;
+}
+.goal-sheet-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* "hands" / "hours" after the target number */
+.goal-sheet-unit {
+  font-size: 13px;
+  color: var(--text-faint);
+}
+
+.goal-sheet-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: -6px;
+}
+
+.goal-sheet-error {
+  color: var(--negative);
+  font-weight: 700;
+}
+.goal-sheet-save {
+  min-height: 50px;
+  font-size: 15px;
+}
+.goal-sheet-delete {
+  align-self: center;
+}

@@ -1,0 +1,21 @@
+/* Confirmation dialog: a short message, then Cancel and a red confirm button. */
+
+.confirm-dialog {
+  max-width: 440px;
+}
+.confirm-dialog-message {
+  color: var(--text-muted);
+  font-weight: 600;
+  line-height: 1.5;
+}
+.confirm-dialog-error {
+  margin-top: 10px;
+  color: var(--negative);
+  font-weight: 700;
+}
+.confirm-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}

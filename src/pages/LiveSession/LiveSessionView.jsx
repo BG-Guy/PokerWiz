@@ -1,12 +1,16 @@
 // The running session: live clock, quick actions (add hand, note, rebuy), the timeline, and Finish.
+// Edit (on the header card, or on a timeline entry) changes the setup, a note or a rebuy; Discard throws it away.
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { addSessionEvent, discardSession } from '../../api/sessions.js';
 import { formatClock, formatMoney, formatTime } from '../../utils/format.js';
 import Panel from '../../components/Panel/Panel.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
+import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog.jsx';
 import SessionTimeline from './SessionTimeline.jsx';
 import FinishSessionSheet from './FinishSessionSheet.jsx';
+import EditLiveSessionSheet from './EditLiveSessionSheet.jsx';
+import EditEntrySheet from './EditEntrySheet.jsx';
 import './LiveSessionView.css';
 
 export default function LiveSessionView({ session, onChange, onFinished, onDiscarded }) {
@@ -17,6 +21,8 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [finishOpen, setFinishOpen] = useState(false);
+  const [editing, setEditing] = useState(null); // 'setup', a timeline entry, or null
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
 
   // Tick the session clock every second.
   useEffect(() => {
@@ -50,14 +56,10 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
     }
   };
 
+  // Throw the session away (asked first, in the confirm dialog).
   const handleDiscard = async () => {
-    if (!window.confirm('Discard this session? Nothing from it will be saved.')) return;
-    try {
-      await discardSession(session.id);
-      onDiscarded();
-    } catch (err) {
-      setError(err.message);
-    }
+    await discardSession(session.id);
+    onDiscarded();
   };
 
   return (
@@ -65,6 +67,9 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
       <div className="live-view-main">
         {/* Header card on felt: status, stakes and the running clock */}
         <section className="live-view-hero">
+          <button type="button" className="live-view-edit" onClick={() => setEditing('setup')} aria-label="Edit the session setup">
+            <Icon name="pencil" size={16} /> Edit
+          </button>
           <span className="live-view-status">
             <span className="live-view-dot" aria-hidden="true" /> Live
           </span>
@@ -181,7 +186,7 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
         )}
 
         <div className="live-view-footer">
-          <button type="button" className="btn btn-ghost live-view-discard" onClick={handleDiscard}>
+          <button type="button" className="btn btn-ghost live-view-discard" onClick={() => setConfirmDiscard(true)}>
             <Icon name="trash" size={16} /> Discard
           </button>
           <button type="button" className="btn live-view-finish" onClick={() => setFinishOpen(true)}>
@@ -191,8 +196,25 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
       </div>
 
       <Panel title="Timeline" className="live-view-timeline">
-        <SessionTimeline session={session} />
+        <SessionTimeline session={session} onEdit={(entry) => setEditing(entry.type === 'start' ? 'setup' : entry)} />
       </Panel>
+
+      {/* Edit sheets: the setup, or one note or rebuy */}
+      {editing === 'setup' && <EditLiveSessionSheet session={session} open onClose={() => setEditing(null)} onSaved={onChange} />}
+      {editing && editing !== 'setup' && (
+        <EditEntrySheet key={editing.id} session={session} entry={editing} open onClose={() => setEditing(null)} onSaved={onChange} />
+      )}
+
+      <ConfirmDialog
+        open={confirmDiscard}
+        title="Discard this session?"
+        message={`Nothing from it will be saved to your history.${
+          handCount ? ` The ${handCount} ${handCount === 1 ? 'hand' : 'hands'} you saved stay in your hands list.` : ''
+        }`}
+        confirmLabel="Discard session"
+        onConfirm={handleDiscard}
+        onClose={() => setConfirmDiscard(false)}
+      />
 
       <FinishSessionSheet
         open={finishOpen}

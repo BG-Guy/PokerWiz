@@ -3,16 +3,17 @@
 A poker tracker for mobile and desktop: a React frontend and a small Express + SQLite backend.
 
 **Features**
-- **Play (live session):** start a session (game, stakes, venue, buy-in), then log hands, notes and rebuys on a timeline while you play. Finish with cash-out, a draggable 0 to 5 star rating (one decimal) and a 1 to 5 tilt scale with faces.
-- **Add hand:** rebuild a hand on a poker table. You seat the hero and villains, set each stack (exact amount, or Short / Average / Big / Huge), pick known cards, then answer each player's action turn by turn in an animated carousel below the table. All-ins and side pots are handled.
+- **Log session (live):** start a session (game, stakes, venue, buy-in), then log hands, notes and rebuys on a timeline while you play. Finish with cash-out, a draggable 0 to 5 star rating (one decimal) and a 1 to 5 tilt scale with faces. Edit the setup or what you sat down with, fix or remove a note or rebuy (the buy-in follows), or discard the session.
+- **Add hand:** rebuild a hand on a poker table. You seat the hero and villains, set each stack (exact amount, or Short / Average / Big / Huge), pick known cards, then answer each player's action turn by turn in an animated carousel below the table, with a dealer button on the felt. All-ins and side pots are handled. Tap any step in "Hand so far" to go back to it.
 - **Coach:** record a hand and get every decision graded against GTO: solved 8-max preflop charts for the hand's stack depth (cash or tournament with antes), and each postflop street solved from the ranges the players arrived with, heads-up or 3-way, with the hand's real bet sizes. For your hand you see how often GTO takes each option and what each is worth, plus pot odds, equity against their ranges and their range grids. Saved hands can be opened in the coach too. See [docs/coach-algorithm.md](docs/coach-algorithm.md).
 - **Practice:** pick cash or tournament, a spot (preflop, heads-up, 3-way) and the stacks, then play random hands to the end against an 8-handed table of GTO opponents (they play the solved strategy with their real cards), with the turn and river dealt at random or picked by you. Every decision is graded.
 - **Replay a hand:** in any Hold'em hand, pick Flop, Turn or River (or "Replay from here" on the timeline) and play it again from that point against GTO opponents. Seats, stacks, the action and the board so far carry over; the next cards come as they did, at random, or picked by you. Villains play their real cards when the hand shows them, otherwise a hand from the range GTO plays the way they did. Compare how it goes with the real result.
 - **Highlights:** Hall of Fame, Wall of Shame, Tilt Tower, Monster Pots and more, from your ratings and results. The top three are on Home.
-- **Hand review:** replay hands street by street with your hand and the villains' (face down unless shown), all-ins highlighted, plus verdict, star rating, tilt and notes. Every Hold'em hand has a **Coach** button (in the list and on the hand). Older hands without stacks are rebuilt from the action log, and the review shows what was assumed. The score is saved onto the hand.
-- **Game history:** past sessions by month, with filters, rating and tilt.
+- **Hand review:** replay hands street by street with your hand and the villains' (face down unless shown), all-ins highlighted, plus verdict, star rating, tilt and notes. Every Hold'em hand has a **Coach** button (in the list and on the hand). Older hands without stacks are rebuilt from the action log, and the review shows what was assumed. The score is saved onto the hand. Each hand in the list shows its rating as a colored pill (tap it to rate or re-rate right there), its tilt and coach score, and the list sorts by rating.
+- **Edit anything:** a hand's title, date, stakes, cards, board, result and tags (Edit on the hand), or its whole action: "Edit the action" reopens the hand in the recorder at its last step. Sessions, goals and live-session entries have Edit too, and anything can be deleted (with a confirm).
+- **Game history:** past sessions by month, with filters, rating and tilt. Open a session to edit or delete it (its saved hands stay).
 - **Insights:** leaks and strengths plus hourly by venue, stakes, game and day, all from your sessions. Hand insights live in the Hands tab.
-- **Goals:** measured from your real data (hands played, profit, hours, hands reviewed), with pace projections and a "focus next" pick.
+- **Goals:** measured from your real data (hands played, hours, sessions, profit, hands reviewed), with pace projections and a "focus next" pick. Add, edit and delete goals.
 - **Big blinds or dollars:** every amount shows in big blinds by default; the BB / $ switch (header on phones, sidebar on desktop) flips the whole app to dollars. Totals across stakes add up each session's result in its own big blinds.
 - **Bankroll chart:** bankroll against hours played. Hover or tap it to read any point.
 - **Equity calculator:** 2 to 6 hands plus an optional board. It gives exact results when possible and otherwise simulates random boards (in a web worker).
@@ -72,11 +73,12 @@ src/
   coach/                 The coach: grades your decisions against the GTO engine, equity, notes
   practice/              Practice spots: an 8-handed table of GTO opponents (runs in a web worker)
   components/            Reusable UI, one folder each with its CSS
-                         (PlayingCard, CardPicker, StarRating, TiltMeter, Modal, NavBar, ...)
+                         (PlayingCard, CardPicker, StarRating, TiltMeter, Modal, ConfirmDialog, FormField, NavBar, ...)
   pages/
     Dashboard/           Home, with a live-session banner
-    LiveSession/         Start form, live view, timeline, finish sheet
+    LiveSession/         Start form, live view, timeline, finish sheet, edit sheets (setup, note or rebuy)
     AddHand/             Records a hand with components/HandRecorder (table, seats, prompts)
+    EditHand/            Reopens a saved hand in the recorder (HandRecorder/restoreHand.js) to change its action
     Coach/               Coach mode and its report (accuracy gauge, decision cards, range grid)
     HandHighlights/ HandInsights/
     HandReview/  GameHistory/  Insights/  Goals/
@@ -92,17 +94,22 @@ src/
 | POST | `/api/sessions` | Start a session `{ game, stakes, bigBlind, venue, buyIn }` |
 | POST | `/api/sessions/:id/events` | Timeline entry `{ type: note \| rebuy \| hand, text?, amount?, handId? }` |
 | POST | `/api/sessions/:id/finish` | `{ cashOut, rating (0-5), tilt (1-5), notes, hands }` |
-| DELETE | `/api/sessions/:id` | Discard a live session |
+| PATCH | `/api/sessions/:id` | Edit a session: everything on a finished one; `game`, `stakes`, `bigBlind`, `venue`, `startBuyIn` on a live one |
+| DELETE | `/api/sessions/:id` | Discard a live session or delete a finished one (its hands are kept) |
+| PATCH / DELETE | `/api/sessions/:id/events/:eventId` | Edit a live session's note `{ text }` or rebuy `{ amount }`, or remove it |
 | GET / POST | `/api/hands` | List hands / save a recorded hand |
-| PATCH | `/api/hands/:id` | Update `verdict`, `note`, `title`, `tags` |
-| GET | `/api/goals`, `/api/player-stats` | Goals; tracker stats for Insights |
+| PATCH | `/api/hands/:id` | Edit a hand: review fields, `title`, `date`, `stakes`, `holeCards`, `board`, `potSize`, `result`, `tags`, `streets`, `players` (checked) |
+| DELETE | `/api/hands/:id` | Delete a hand (and its line on a session timeline) |
+| GET / POST | `/api/goals` | List goals / add one `{ title, metric, target, startDate, deadline }` |
+| PATCH / DELETE | `/api/goals/:id` | Edit or delete a goal |
+| GET | `/api/player-stats` | Tracker stats for Insights |
 
 ## Design
 
 - **Palette:** `#12181B` ink, `#3F5A60` slate, `#7FC8C2` teal, `#D9F0EE` mist, `#F6FBFB` snow. The tokens are in `src/global.css`.
 - **Fonts:** Fredoka for headings and numbers, Nunito for body text.
 - **Breakpoints:**
-  - Phones (below 768px) get bottom tabs with a raised Play button and a More sheet.
+  - Phones (below 768px) get bottom tabs with a raised Practice button and a More sheet (Log session is first in it).
   - Tablets (768px and up) get an icon rail.
   - Desktops (1100px and up) get the full sidebar.
 - **Icons**, card suits, card backs, and the hero/villain avatars are all inline SVG. There are no emojis.

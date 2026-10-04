@@ -150,6 +150,12 @@
   overflow-wrap: anywhere;
 }
 
-.session-row-link {
-  align-self: flex-start;
+.session-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.session-row-edit {
+  margin-left: auto;
 }

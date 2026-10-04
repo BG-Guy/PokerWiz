@@ -1,4 +1,4 @@
-// Play page (/session): shows the start form when nothing is running, otherwise the live session.
+// Log session page (/session): shows the start form when nothing is running, otherwise the live session.
 import { useNavigate } from 'react-router-dom';
 import { getLiveSession } from '../../api/sessions.js';
 import { useApi } from '../../hooks/useApi.js';

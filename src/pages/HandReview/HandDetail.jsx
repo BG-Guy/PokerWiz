@@ -1,5 +1,6 @@
 // Right pane of Hand Review: the table (board, your hand, villain hands), action replay, and your review
-// (verdict, star rating, tilt, notes).
+// (verdict, star rating, tilt, notes). "Edit" opens the hand's edit sheet (details, the action, delete).
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { VERDICTS } from '../../constants/poker.js';
 import { bigBlindOf, formatLongDate, formatMoney } from '../../utils/format.js';
@@ -11,6 +12,7 @@ import StarRating from '../../components/StarRating/StarRating.jsx';
 import TiltMeter from '../../components/TiltMeter/TiltMeter.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import ActionTimeline from './ActionTimeline.jsx';
+import EditHandSheet from './EditHandSheet.jsx';
 import { coachSupport } from '../../coach/savedHand.js';
 import { replayStreets } from '../../practice/replaySpot.js';
 import './HandDetail.css';
@@ -34,7 +36,9 @@ function villainsOf(hand) {
   return [...actors.values()].filter((v) => !v.folded);
 }
 
-export default function HandDetail({ hand, backTo, onUpdate }) {
+// onUpdate(changes, persist) for the review fields; onSaved(hand) after the edit sheet saves; onDeleted().
+export default function HandDetail({ hand, backTo, onUpdate, onSaved, onDeleted }) {
+  const [editing, setEditing] = useState(false);
   const villains = villainsOf(hand);
   // Every Hold'em hand can be reviewed by the coach (missing details are rebuilt from the log).
   const coach = coachSupport(hand);
@@ -56,10 +60,15 @@ export default function HandDetail({ hand, backTo, onUpdate }) {
           <h2 className="hand-detail-title">{hand.title}</h2>
         </div>
         <div className="hand-detail-header-side">
+          <button type="button" className="btn btn-ghost hand-detail-edit" onClick={() => setEditing(true)}>
+            <Icon name="pencil" size={16} /> Edit
+          </button>
           <VerdictBadge verdict={hand.verdict} />
           {hand.coachAccuracy != null && <span className="hand-detail-coach-score">Coach {hand.coachAccuracy}%</span>}
         </div>
       </header>
+
+      {editing && <EditHandSheet hand={hand} open onClose={() => setEditing(false)} onSaved={onSaved} onDeleted={onDeleted} />}
 
       {coach.ok ? (
         <Link to={`/coach?hand=${hand.id}`} className="btn hand-detail-coach">

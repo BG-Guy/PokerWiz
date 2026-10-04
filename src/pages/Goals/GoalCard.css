@@ -29,6 +29,7 @@
 /* Status pill colors follow the progress bar tones */
 .goal-card-status {
   --status-color: var(--accent-text);
+  margin-left: auto;
   padding: 3px 10px;
   border-radius: 999px;
   font-size: 12px;
@@ -114,4 +115,11 @@
   .goal-card {
     padding: 24px;
   }
+}
+
+/* Edit button at the end of the top row */
+.goal-card-edit {
+  width: 36px;
+  height: 36px;
+  margin: -6px -8px -6px 0;
 }

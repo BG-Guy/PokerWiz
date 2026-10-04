@@ -73,6 +73,21 @@
 .session-timeline-offset {
   color: var(--accent-text);
 }
+/* Edit button at the end of the time line: small, but a full-height tap target */
+.session-timeline-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: -8px -6px -8px auto;
+  padding: 8px 6px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font: inherit;
+}
+.session-timeline-edit:hover {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
 
 .session-timeline-text {
   font-weight: 600;

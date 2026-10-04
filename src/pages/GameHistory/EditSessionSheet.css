@@ -1,0 +1,66 @@
+/* Edit-session sheet: fields in short rows, the money with its net result, rating and tilt, then save and delete. */
+
+.edit-session-sheet {
+  max-width: 560px;
+}
+.edit-session-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Hours and minutes side by side in one field */
+.edit-session-length {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.edit-session-length .form-money {
+  padding: 0 10px;
+}
+
+/* Buy-in, cash-out and expenses: three across, two per row on narrow phones */
+.edit-session-money {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+@media (max-width: 420px) {
+  .edit-session-money {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.edit-session-net {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: -6px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.edit-session-net .money {
+  font-size: 18px;
+}
+
+/* Stars with their "Clear" link; the tilt "Clear" sits under the meter */
+.edit-session-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.edit-session-clear {
+  align-self: flex-start;
+}
+
+.edit-session-error {
+  color: var(--negative);
+  font-weight: 700;
+}
+.edit-session-save {
+  min-height: 50px;
+  font-size: 15px;
+}
+.edit-session-delete {
+  align-self: center;
+}

@@ -157,6 +157,47 @@ h4 {
 .btn-ghost:hover {
   background: var(--accent-soft);
 }
+/* Destructive action (delete): red, used in confirmations and danger zones */
+.btn-danger {
+  background: var(--negative);
+  color: #fff;
+}
+.btn-danger-ghost {
+  background: transparent;
+  color: var(--negative);
+}
+.btn-danger-ghost:hover {
+  background: color-mix(in srgb, var(--negative) 12%, transparent);
+}
+/* Round icon-only button (edit, delete) with a 40px tap target */
+.btn-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.btn-icon:hover {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+/* Small text button inside forms ("Clear", "Edit") */
+.btn-link {
+  padding: 4px 2px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-text);
+}
+.btn-link:hover {
+  text-decoration: underline;
+}
+.btn:disabled,
+.btn-icon:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
 
 /* Respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {

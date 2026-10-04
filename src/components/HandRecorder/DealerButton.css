@@ -1,0 +1,30 @@
+/* Dealer button puck: sized to the table, with a soft shadow so it reads as an object on the felt. */
+
+.dealer-button {
+  position: absolute;
+  z-index: 1;
+  width: clamp(28px, 7.5vw, 44px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) rotate(-8deg);
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.45)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.18));
+  transition: left 0.4s ease, top 0.4s ease;
+  pointer-events: none;
+}
+.dealer-button svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.dealer-button-rim {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  fill: #12181b;
+}
+.dealer-button-d {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 700;
+  fill: #12181b;
+}

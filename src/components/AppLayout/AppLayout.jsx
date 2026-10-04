@@ -1,10 +1,11 @@
 // App shell: navigation (sidebar on desktop, bottom tabs on mobile) plus the active page.
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import NavBar from '../NavBar/NavBar.jsx';
 import Brand from '../Brand/Brand.jsx';
 import ThemeToggle from '../ThemeToggle/ThemeToggle.jsx';
 import UnitToggle from '../UnitToggle/UnitToggle.jsx';
+import LoadState from '../LoadState/LoadState.jsx';
 import './AppLayout.css';
 
 export default function AppLayout() {
@@ -29,8 +30,11 @@ export default function AppLayout() {
           </span>
         </header>
 
+        {/* Pages that load on first visit show the loading state meanwhile */}
         <main className="app-main">
-          <Outlet />
+          <Suspense fallback={<LoadState />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

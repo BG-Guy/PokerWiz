@@ -1,4 +1,5 @@
-// Session data access: list, start, add timeline events, finish, discard, and import finished sessions.
+// Session data access: list, start, timeline events (add, edit, remove), finish, edit, delete, and import
+// finished sessions.
 // Converts between database rows (snake_case) and API objects (camelCase).
 import { randomUUID } from 'node:crypto';
 import { db, transaction } from '../db/database.js';
@@ -112,9 +113,78 @@ export function finishSession(id, { cashOut, rating = null, tilt = null, notes =
   return findById(id);
 }
 
-// Throw away a live session and its timeline (events cascade).
+// Delete a session and its timeline (events cascade). Its saved hands stay in Hands, no longer tied to it.
 export function deleteSession(id) {
-  db.prepare('DELETE FROM sessions WHERE id = ?').run(id);
+  transaction(() => {
+    db.prepare('UPDATE hands SET session_id = NULL WHERE session_id = ?').run(id);
+    db.prepare('DELETE FROM sessions WHERE id = ?').run(id);
+  });
+}
+
+// What can be edited, as API field -> column. A finished session can change everything it records; a live one
+// only its setup (game, stakes, venue) and its starting buy-in (startBuyIn, see updateSession).
+const FINISHED_COLUMNS = {
+  date: 'date',
+  game: 'game',
+  stakes: 'stakes',
+  bigBlind: 'big_blind',
+  venue: 'venue',
+  durationMin: 'duration_min',
+  buyIn: 'buy_in',
+  cashOut: 'cash_out',
+  expenses: 'expenses',
+  hands: 'hands',
+  notes: 'notes',
+  rating: 'rating',
+  tilt: 'tilt',
+};
+const LIVE_COLUMNS = { game: 'game', stakes: 'stakes', bigBlind: 'big_blind', venue: 'venue' };
+
+// Edit a session. For a live session, startBuyIn sets what you sat down with (rebuys stay on top of it).
+export function updateSession(id, changes) {
+  const session = findById(id);
+  if (!session) return null;
+  const columns = session.status === 'live' ? LIVE_COLUMNS : FINISHED_COLUMNS;
+  const sets = [];
+  const values = [];
+  for (const [field, column] of Object.entries(columns)) {
+    if (changes[field] === undefined) continue;
+    sets.push(`${column} = ?`);
+    values.push(changes[field]);
+  }
+  if (session.status === 'live' && changes.startBuyIn !== undefined) {
+    const rebuys = session.events.filter((e) => e.type === 'rebuy').reduce((sum, e) => sum + e.amount, 0);
+    sets.push('buy_in = ?');
+    values.push(changes.startBuyIn + rebuys);
+  }
+  if (sets.length) db.prepare(`UPDATE sessions SET ${sets.join(', ')} WHERE id = ?`).run(...values, id);
+  return findById(id);
+}
+
+// Edit a timeline entry: a note's text or a rebuy's amount (the buy-in total follows). Returns the session,
+// or null if the entry isn't on it.
+export function updateEvent(sessionId, eventId, { text, amount }) {
+  const event = findById(sessionId)?.events.find((e) => e.id === eventId);
+  if (!event) return null;
+  transaction(() => {
+    if (event.type === 'note' && text !== undefined) db.prepare('UPDATE session_events SET text = ? WHERE id = ?').run(text, eventId);
+    if (event.type === 'rebuy' && amount !== undefined) {
+      db.prepare('UPDATE session_events SET amount = ? WHERE id = ?').run(amount, eventId);
+      db.prepare('UPDATE sessions SET buy_in = buy_in + ? WHERE id = ?').run(amount - event.amount, sessionId);
+    }
+  });
+  return findById(sessionId);
+}
+
+// Take an entry off the timeline. A rebuy comes off the buy-in; a hand stays saved in Hands.
+export function deleteEvent(sessionId, eventId) {
+  const event = findById(sessionId)?.events.find((e) => e.id === eventId);
+  if (!event) return null;
+  transaction(() => {
+    db.prepare('DELETE FROM session_events WHERE id = ?').run(eventId);
+    if (event.type === 'rebuy') db.prepare('UPDATE sessions SET buy_in = buy_in - ? WHERE id = ?').run(event.amount, sessionId);
+  });
+  return findById(sessionId);
 }
 
 // Add finished sessions from an import (see routes/sessions.js for the fields), all or nothing. A session

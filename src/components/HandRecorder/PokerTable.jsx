@@ -3,6 +3,7 @@
 import { formatMoney } from '../../utils/format.js';
 import PlayingCard from '../PlayingCard/PlayingCard.jsx';
 import Seat from './Seat.jsx';
+import DealerButton from './DealerButton.jsx';
 import './PokerTable.css';
 
 const BOARD_SLOTS = [0, 1, 2, 3, 4];
@@ -18,6 +19,13 @@ function pointOnRail(visualIndex, count, radiusX, radiusY) {
 export default function PokerTable({ seats, board, pot, bb = null, rotation = 0, selectable = null, onSeatClick }) {
   const count = seats.length;
   const someoneActive = seats.some((s) => s.isActive);
+  // The dealer button lies on the felt in front of the button's seat, halfway toward a neighbor so it stays
+  // clear of the cards and bet chips. Seats on the right half have their name tags hanging toward the next
+  // seat, so there it goes toward the previous one.
+  const button = seats.find((s) => s.position === 'BTN');
+  const buttonIndex = button ? (button.seat - rotation + count) % count : null;
+  const onRightHalf = button && pointOnRail(buttonIndex, count, 1, 1).x > 50.3;
+  const buttonPosition = button ? pointOnRail(buttonIndex + (onRightHalf ? -0.5 : 0.5), count, 31, 26) : null;
 
   return (
     <div className={`poker-table is-${count}-max ${someoneActive ? 'has-active' : ''}`}>
@@ -37,6 +45,8 @@ export default function PokerTable({ seats, board, pot, bb = null, rotation = 0,
           )}
         </div>
       </div>
+
+      {buttonPosition && <DealerButton position={buttonPosition} />}
 
       {/* Seats around the rail; bet chips sit between each seat and the center */}
       {seats.map((seat) => {

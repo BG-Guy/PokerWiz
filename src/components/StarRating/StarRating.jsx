@@ -103,7 +103,7 @@ export default function StarRating({ value, onChange, onChangeEnd, readOnly = fa
         aria-valuemin={0}
         aria-valuemax={5}
         aria-valuenow={value}
-        aria-valuetext={`${value.toFixed(1)} stars, ${ratingLabel(value)}`}
+        aria-valuetext={value > 0 ? `${value.toFixed(1)} stars, ${ratingLabel(value)}` : 'Not rated'}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={stopDragging}
@@ -121,9 +121,16 @@ export default function StarRating({ value, onChange, onChangeEnd, readOnly = fa
         </span>
       </div>
 
+      {/* The value and its word; zero stars means not rated yet */}
       <div className="star-rating-readout">
-        <span className="star-rating-value num">{value.toFixed(1)}</span>
-        <span className="star-rating-label">{ratingLabel(value)}</span>
+        {value > 0 ? (
+          <>
+            <span className="star-rating-value num">{value.toFixed(1)}</span>
+            <span className="star-rating-label">{ratingLabel(value)}</span>
+          </>
+        ) : (
+          <span className="star-rating-label is-unrated">Not rated</span>
+        )}
       </div>
       <p className="star-rating-hint">{isTouch ? 'Slide your finger across the stars' : 'Drag across the stars, or use the arrow keys'}</p>
     </div>
