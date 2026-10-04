@@ -3,7 +3,6 @@ import { NavLink } from 'react-router-dom';
 import Modal from '../Modal/Modal.jsx';
 import Icon from '../Icon/Icon.jsx';
 import AppVersion from '../AppVersion/AppVersion.jsx';
-import LogoutButton from '../LogoutButton/LogoutButton.jsx';
 import './MoreSheet.css';
 
 export default function MoreSheet({ open, onClose, items }) {
@@ -22,11 +21,8 @@ export default function MoreSheet({ open, onClose, items }) {
           </li>
         ))}
       </ul>
-      {/* Phones have no sidebar, so signing out and the version live at the bottom of this sheet */}
-      <div className="more-sheet-footer">
-        <LogoutButton />
-        <AppVersion className="more-sheet-version" />
-      </div>
+      {/* Phones have no sidebar, so the version lives at the bottom of this sheet */}
+      <AppVersion className="more-sheet-version" />
     </Modal>
   );
 }

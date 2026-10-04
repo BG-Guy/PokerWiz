@@ -41,11 +41,6 @@ PokerWiz needs its Node server running, so it can't be hosted on GitHub Pages (s
 runs `npm start` and keeps the SQLite database on a persistent disk (`POKERWIZ_DB=/var/data/pokerwiz.db`).
 Persistent disks need a paid plan. On the free plan the database is reset on every deploy or restart.
 
-**Password.** The deployed app is private: set `APP_PASSWORD` in the service's Environment on Render (the
-Blueprint asks for it; it's never stored in the repository). Every page, script and API call needs the password
-first; signing in lasts 30 days, and "Log out" is in the sidebar. Until `APP_PASSWORD` is set, the deployed app stays
-locked. Locally the lock is off unless you set it, e.g. `APP_PASSWORD=... npm run dev`.
-
 ## Version
 
 The app's version is `version` in `package.json`. It shows at the bottom of the sidebar (in the More sheet on

@@ -6,24 +6,15 @@ import { fileURLToPath } from 'node:url';
 import { sessionsRouter } from './routes/sessions.js';
 import { handsRouter } from './routes/hands.js';
 import { goalsRouter } from './routes/goals.js';
-import { authRouter } from './routes/auth.js';
-import { lock, requireLogin } from './auth/session.js';
 
 const PORT = Number(process.env.PORT ?? 3001);
 const distDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 
 const app = express();
-app.set('trust proxy', 1); // behind Render's proxy: the real client address, and HTTPS for secure cookies
 app.use(express.json({ limit: '5mb' })); // room for a big session import with notes
 
-// Open to everyone: the health check Render polls, and the login page and sign-in.
-app.get('/api/health', (req, res) => res.json({ ok: true }));
-app.use(authRouter);
-
-// Everything below (API and the app itself) needs the password when one is set (see auth/session.js).
-app.use(requireLogin);
-
 // API routes
+app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.use('/api/sessions', sessionsRouter);
 app.use('/api/hands', handsRouter);
 app.use('/api/goals', goalsRouter);
@@ -43,8 +34,4 @@ app.use((error, req, res, _next) => {
 
 app.listen(PORT, () => {
   console.log(`PokerWiz API running on http://localhost:${PORT}`);
-  // Say whether the app is password-protected, so a missing APP_PASSWORD is easy to spot in the logs.
-  if (lock.on) console.log('Password lock: on (APP_PASSWORD is set).');
-  else if (lock.locked) console.log('Password lock: LOCKED. Set APP_PASSWORD in the environment to open the app.');
-  else console.log('Password lock: off (no APP_PASSWORD; fine for local development).');
 });

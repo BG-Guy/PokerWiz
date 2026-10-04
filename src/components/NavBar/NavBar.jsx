@@ -7,7 +7,6 @@ import Brand from '../Brand/Brand.jsx';
 import ThemeToggle from '../ThemeToggle/ThemeToggle.jsx';
 import UnitToggle from '../UnitToggle/UnitToggle.jsx';
 import AppVersion from '../AppVersion/AppVersion.jsx';
-import LogoutButton from '../LogoutButton/LogoutButton.jsx';
 import MoreSheet from './MoreSheet.jsx';
 import './NavBar.css';
 
@@ -71,7 +70,6 @@ export default function NavBar() {
       <div className="navbar-footer">
         <UnitToggle />
         <ThemeToggle showLabel />
-        <LogoutButton />
         <AppVersion className="navbar-version" />
       </div>
 
