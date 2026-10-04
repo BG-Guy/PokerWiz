@@ -1,15 +1,16 @@
-// Practice mode (/practice): pick a game and a spot, describe your opponents (tendency, skill level, stack),
-// then play random spots against them. Villains act on their real cards using the coach's player models.
-// From the spot on you play the hand to the end (the next cards are random, or picked by you), then the
-// coach grades every decision you made, the same way it grades your own hands.
+// Practice mode (/practice): pick a game, a spot and the stacks, then play random spots against opponents who
+// all play GTO with their real cards (src/gto). From the spot on you play the hand to the end (the next cards
+// are random, or picked by you), then the coach grades every decision you made against GTO.
 // /practice?hand=<id>&street=Turn replays a saved hand from that street instead (see ReplaySetup).
-import { useEffect, useRef, useState } from 'react';
+// Two web workers do the heavy lifting: practice.worker.js plays the opponents (they solve their spots), and
+// the coach worker grades the hand when it's over.
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { getHand } from '../../api/hands.js';
-import { replayStreets, spotFromSavedHand } from '../../practice/replaySpot.js';
-import { GAMES, generateSpot, heroAct, dealStreet, seenCards, spotRecord } from '../../practice/generateSpot.js';
+import { replayStreets } from '../../practice/replaySpot.js';
+import { GAMES, seenCards, spotRecord } from '../../practice/generateSpot.js';
 import { overallAccuracy, accuracyLabel } from '../../coach/grading.js';
-import { applyLevel, applyPreset, defaultProfile, describeProfile } from '../../coach/profiles.js';
+import { defaultProfile } from '../../coach/profiles.js';
 import { formatMoney, getMoneyUnit } from '../../utils/format.js';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import PokerTable from '../../components/HandRecorder/PokerTable.jsx';
@@ -34,10 +35,7 @@ function defaultSetup() {
   return {
     game: 'cash',
     format: 'hu',
-    villains: [
-      { profile: applyLevel(applyPreset(defaultProfile(), 'fish'), 'rec'), stackBB },
-      { profile: applyLevel(applyPreset(defaultProfile(), 'tag'), 'regular'), stackBB },
-    ],
+    villains: [{ stackBB }],
     hero: { profile: defaultProfile(), stackBB },
     boardMode: 'random', // next cards: 'random' or 'pick'
   };
@@ -46,7 +44,7 @@ function defaultSetup() {
 function loadSetup() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (saved?.villains?.length === 2 && saved.hero && GAMES.some((g) => g.id === saved.game)) return { boardMode: 'random', ...saved };
+    if (saved?.villains?.length && saved.hero && GAMES.some((g) => g.id === saved.game)) return { boardMode: 'random', ...defaultSetup(), ...saved };
   } catch {
     // no saved setup (or storage blocked): use the default
   }
@@ -85,16 +83,21 @@ export default function Practice() {
   const [searchParams] = useSearchParams();
   const replayId = searchParams.get('hand');
   const [setup, setSetup] = useState(loadSetup);
-  const [phase, setPhase] = useState(replayId ? 'loading' : 'setup'); // setup | loading | replay | play | grading | result
+  // setup | loading | replay | dealing | play | grading | result
+  const [phase, setPhase] = useState(replayId ? 'loading' : 'setup');
   const [replayHand, setReplayHand] = useState(null);
   const [replayOptions, setReplayOptions] = useState(null);
   const [spot, setSpot] = useState(null);
+  const [thinking, setThinking] = useState(false); // the opponents are deciding (practice worker busy)
   const [review, setReview] = useState(null); // { accuracy, label, decisions }
+  const [progress, setProgress] = useState(null); // what the coach is solving while grading
   const [error, setError] = useState(null);
   const [tally, setTally] = useState({ hands: 0, total: 0, netBB: 0 });
   const [handNumber, setHandNumber] = useState(0);
-  const workerRef = useRef(null);
-  const requestRef = useRef(0);
+  const coachRef = useRef(null);
+  const coachRequest = useRef(0);
+  const practiceRef = useRef(null);
+  const practiceRequest = useRef({ id: 0, type: null });
   const firstDecisionRef = useRef(0);
 
   useEffect(() => {
@@ -105,11 +108,50 @@ export default function Practice() {
     }
   }, [setup]);
 
-  // The coach runs in a worker; only the latest request's answer counts.
+  // ----- The opponents' worker: only the latest request's answer counts -----
+  const onPracticeMessage = useCallback((event) => {
+    const { id, spot: next, error: failure } = event.data;
+    if (id !== practiceRequest.current.id) return;
+    const { type } = practiceRequest.current;
+    setThinking(false);
+    if (failure || !next) {
+      setError(failure ?? 'Could not find a spot with these settings. Try again or change the stacks.');
+      setPhase(type === 'replay' ? 'replay' : type === 'new' ? 'setup' : 'play');
+      return;
+    }
+    setError(null);
+    setSpot(next);
+    if (type === 'new' || type === 'replay') {
+      firstDecisionRef.current = next.firstDecision ?? 0;
+      setHandNumber((n) => n + 1);
+      setPhase('play');
+    }
+  }, []);
+
+  const startPracticeWorker = useCallback(() => {
+    practiceRef.current?.terminate();
+    const worker = new Worker(new URL('../../practice/practice.worker.js', import.meta.url), { type: 'module' });
+    worker.onmessage = onPracticeMessage;
+    practiceRef.current = worker;
+  }, [onPracticeMessage]);
+
+  // Send a request to the opponents. A new hand while they're still thinking restarts the worker (instant).
+  const send = (message, { restart = false } = {}) => {
+    if (!practiceRef.current || (restart && thinking)) startPracticeWorker();
+    practiceRequest.current = { id: practiceRequest.current.id + 1, type: message.type };
+    setThinking(true);
+    practiceRef.current.postMessage({ id: practiceRequest.current.id, ...message });
+  };
+
+  // ----- The coach's worker (grading); only the latest request's answer counts -----
   useEffect(() => {
     const worker = new Worker(new URL('../../coach/coach.worker.js', import.meta.url), { type: 'module' });
     worker.onmessage = (event) => {
-      if (event.data.id !== requestRef.current) return;
+      if (event.data.id !== coachRequest.current) return;
+      if (event.data.progress) {
+        setProgress(event.data.progress);
+        return;
+      }
       if (event.data.error) {
         setError(event.data.error);
         setPhase('result');
@@ -118,14 +160,19 @@ export default function Practice() {
       const { report } = event.data;
       // Only your decisions from the spot on count (earlier streets were played for you).
       const decisions = report.decisions.slice(firstDecisionRef.current);
-      const accuracy = overallAccuracy(decisions, report.stakes.bb);
+      const accuracy = overallAccuracy(decisions.filter((d) => d.graded), report.stakes.bb);
       setReview({ accuracy, label: accuracyLabel(accuracy), decisions });
       setTally((t) => ({ hands: t.hands + 1, total: t.total + (accuracy ?? 0), netBB: t.netBB + report.result / report.stakes.bb }));
       setPhase('result');
     };
-    workerRef.current = worker;
-    return () => worker.terminate();
-  }, []);
+    coachRef.current = worker;
+    startPracticeWorker();
+    return () => {
+      worker.terminate();
+      practiceRef.current?.terminate();
+      practiceRef.current = null;
+    };
+  }, [startPracticeWorker]);
 
   // Replay of a saved hand: load it and pick sensible defaults (the street from the link, the real runout).
   useEffect(() => {
@@ -158,52 +205,42 @@ export default function Practice() {
   // can be read (replays use the cards that really came when that's the choice).
   const boardMode = spot?.setup.boardMode ?? setup.boardMode;
   useEffect(() => {
-    if (phase !== 'play' || spot?.status !== 'board' || boardMode === 'pick') return undefined;
-    const timer = setTimeout(() => setSpot((s) => (s?.status === 'board' ? dealStreet(s) : s)), 700);
+    if (phase !== 'play' || thinking || spot?.status !== 'board' || boardMode === 'pick') return undefined;
+    const timer = setTimeout(() => send({ type: 'deal', codes: null }), 700);
     return () => clearTimeout(timer);
-  }, [phase, spot, boardMode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, spot, boardMode, thinking]);
 
   // Hand over: grade it.
   useEffect(() => {
     if (phase !== 'play' || spot?.status !== 'done') return;
     setPhase('grading');
-    requestRef.current += 1;
-    workerRef.current.postMessage({ id: requestRef.current, record: spotRecord(spot), unit: getMoneyUnit() });
+    setProgress(null);
+    coachRequest.current += 1;
+    coachRef.current.postMessage({ id: coachRequest.current, record: spotRecord(spot), unit: getMoneyUnit(), detail: 'fast' });
   }, [phase, spot]);
 
   // Next hand, at any point: a hand still being played or graded is dropped (not graded, not counted).
   const deal = () => {
-    requestRef.current += 1; // a grade still on its way belongs to the old hand: ignore it
+    coachRequest.current += 1; // a grade still on its way belongs to the old hand: ignore it
+    setReview(null);
+    setError(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     if (replayHand) {
       startReplay();
       return;
     }
-    const next = generateSpot(setup);
-    setError(next ? null : 'Could not find a spot with these settings. Try again or change the stacks.');
-    setSpot(next);
-    setReview(null);
-    firstDecisionRef.current = next?.firstDecision ?? 0;
-    setHandNumber((n) => n + 1);
-    setPhase(next ? 'play' : 'setup');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setPhase('dealing');
+    send({ type: 'new', setup }, { restart: true });
   };
 
   // Start (or restart) a replay: villains dealt from their range get new cards each time.
   function startReplay() {
-    requestRef.current += 1; // drop any grade still coming for the previous run
-    const next = spotFromSavedHand(replayHand, replayOptions);
-    if (next.error) {
-      setError(next.error);
-      setPhase('replay');
-      return;
-    }
+    coachRequest.current += 1; // drop any grade still coming for the previous run
     setError(null);
-    setSpot(next);
     setReview(null);
-    firstDecisionRef.current = next.firstDecision;
-    setHandNumber((n) => n + 1);
-    setPhase('play');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setPhase('dealing');
+    send({ type: 'replay', hand: replayHand, options: replayOptions }, { restart: true });
   }
 
   if (phase === 'loading') return <LoadState />;
@@ -225,7 +262,7 @@ export default function Practice() {
   if (phase === 'setup') {
     return (
       <div className="practice">
-        <PageHeader title="Practice" subtitle="Describe your opponents, then play hands against them and get graded on every decision." />
+        <PageHeader title="Practice" subtitle="Play spots against opponents who all play GTO, and get graded on every decision." />
         {error && (
           <p className="practice-error" role="alert">
             <Icon name="alert" size={16} /> {error}
@@ -236,9 +273,25 @@ export default function Practice() {
     );
   }
 
+  if (phase === 'dealing' || !spot) {
+    return (
+      <div className="practice">
+        <PageHeader title={replayHand ? 'Replay' : 'Practice'} subtitle={replayHand ? replayHand.title : 'Dealing a hand'}>
+          <button type="button" className="btn btn-ghost" onClick={() => setPhase(replayHand ? 'replay' : 'setup')}>
+            <Icon name="chevronLeft" size={16} /> Setup
+          </button>
+        </PageHeader>
+        <div className="coach-thinking" aria-live="polite">
+          <span className="coach-thinking-spinner" />
+          <p className="coach-thinking-title">Dealing</p>
+          <p className="coach-thinking-text">The GTO players are playing the hand up to your spot. Postflop spots are solved on the way, so this can take a few seconds.</p>
+        </div>
+      </div>
+    );
+  }
+
   const { state, cards, heroSeat } = spot;
   const reveal = phase === 'grading' || phase === 'result';
-  const isTable = spot.setup.format === 'preflop';
   const inHand = new Map(spot.players.map((p) => [p.seat, p]));
   const winners = new Set(spot.winners ?? []);
   const seats = spot.positions.map((position, seat) => {
@@ -251,16 +304,15 @@ export default function Practice() {
       role,
       name: role === 'hero' ? 'You' : null,
       // Once the hand is over every hand is shown, including the ones that folded (dimmed on the table).
-      cards: role === 'hero' || (reveal && player) ? cards[seat] : [],
+      cards: role === 'hero' || (reveal && player) ? cards[seat] ?? [] : [],
       revealFolded: reveal,
-      // Preflop, the whole table shares one read: it's shown once below instead of on every seat.
-      badge: role === 'villain' && !isTable ? describeProfile(recorded.profile).label : null,
+      badge: null,
       stack: player ? player.stack - player.invested : null,
       allIn: player?.allIn,
       folded: player?.folded,
       bet: player?.streetBet ?? 0,
       lastAction: player?.lastAction,
-      isActive: phase === 'play' && spot.status === 'hero' && state.queue[0] === seat,
+      isActive: phase === 'play' && spot.status === 'hero' && !thinking && state.queue[0] === seat,
       isWinner: reveal && winners.has(seat),
     };
   });
@@ -327,27 +379,32 @@ export default function Practice() {
             ))}
           </ol>
           <p className="practice-stacks">
-            {isTable && <>Table: {describeProfile(spot.setup.villains[0].profile).label} · </>}
-            You started with <span className="num">{heroStackBB} bb</span>
+            Opponents play GTO · You started with <span className="num">{heroStackBB} bb</span>
             {state.ante > 0 && <> · Big-blind ante {formatMoney(state.ante, { sign: false, bb: state.bb })}</>}
           </p>
 
-          {phase === 'play' && spot.status === 'hero' && (
+          {phase === 'play' && thinking && (
+            <p className="practice-dealing" aria-live="polite">
+              <span className="coach-thinking-spinner is-small" /> Opponents are thinking...
+            </p>
+          )}
+
+          {phase === 'play' && !thinking && spot.status === 'hero' && (
             <PromptCarousel stepKey={`hand-${handNumber}-${state.streets.length}-${state.streets.at(-1).actions.length}`} direction="forward">
-              <ActionPrompt hand={state} playerName="You" onAction={(action) => setSpot(heroAct(spot, action))} />
+              <ActionPrompt hand={state} playerName="You" onAction={(action) => send({ type: 'act', action })} />
             </PromptCarousel>
           )}
 
-          {phase === 'play' && spot.status === 'board' && boardMode === 'pick' && (
+          {phase === 'play' && !thinking && spot.status === 'board' && boardMode === 'pick' && (
             <PromptCarousel stepKey={`board-${handNumber}-${spot.street}`} direction="forward">
-              <BoardPrompt street={spot.street} count={spot.count} used={seenCards(spot)} onDeal={(codes) => setSpot(dealStreet(spot, codes))} />
-              <button type="button" className="btn btn-ghost practice-random-card" onClick={() => setSpot(dealStreet(spot))}>
+              <BoardPrompt street={spot.street} count={spot.count} used={seenCards(spot)} onDeal={(codes) => send({ type: 'deal', codes })} />
+              <button type="button" className="btn btn-ghost practice-random-card" onClick={() => send({ type: 'deal', codes: null })}>
                 <Icon name="cards" size={16} /> Deal {spot.count === 1 ? 'a random card' : 'random cards'}
               </button>
             </PromptCarousel>
           )}
 
-          {phase === 'play' && spot.status === 'board' && boardMode !== 'pick' && (
+          {phase === 'play' && !thinking && spot.status === 'board' && boardMode !== 'pick' && (
             <p className="practice-dealing" aria-live="polite">
               Dealing the {spot.street.toLowerCase()}...
             </p>
@@ -357,7 +414,7 @@ export default function Practice() {
             <div className="coach-thinking" aria-live="polite">
               <span className="coach-thinking-spinner" />
               <p className="coach-thinking-title">Grading your decisions</p>
-              <p className="coach-thinking-text">Reading their ranges and valuing every option.</p>
+              <p className="coach-thinking-text">{progress ? `${progress}...` : 'Comparing every decision with GTO.'}</p>
             </div>
           )}
 
@@ -377,7 +434,8 @@ export default function Practice() {
                   )}
                   {review && (
                     <p className="practice-summary-detail">
-                      {review.decisions.length} {review.decisions.length === 1 ? 'decision' : 'decisions'} graded. Results vary with the cards; the grade is about the decisions.
+                      {review.decisions.length} {review.decisions.length === 1 ? 'decision' : 'decisions'} graded against GTO. Results vary with the cards; the grade is about the
+                      decisions.
                     </p>
                   )}
                 </div>

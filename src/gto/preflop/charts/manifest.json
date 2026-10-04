@@ -1,0 +1,737 @@
+[
+  {
+    "name": "cash-20",
+    "stack": 20,
+    "ante": 0,
+    "iterations": 600,
+    "seconds": 156,
+    "decisions": 1982,
+    "kept": 1078,
+    "size": 84005,
+    "opens": {
+      "UTG": {
+        "fold": 85.5,
+        "raise": 14.4,
+        "allin": 0.1
+      },
+      "UTG+1": {
+        "fold": 83.8,
+        "raise": 16.1,
+        "allin": 0.1
+      },
+      "LJ": {
+        "fold": 81.2,
+        "raise": 18.7,
+        "allin": 0.1
+      },
+      "HJ": {
+        "fold": 78.7,
+        "raise": 21.2,
+        "allin": 0.2
+      },
+      "CO": {
+        "fold": 73.5,
+        "raise": 26.4,
+        "allin": 0.1
+      },
+      "BTN": {
+        "fold": 66.1,
+        "raise": 33.6,
+        "allin": 0.2
+      },
+      "SB": {
+        "fold": 28.5,
+        "call": 41.1,
+        "raise": 16.8,
+        "allin": 13.6
+      }
+    },
+    "premiums": [
+      "AA 100%",
+      "KK 100%",
+      "QQ 100%",
+      "AKs 100%",
+      "AKo 100%"
+    ]
+  },
+  {
+    "name": "cash-30",
+    "stack": 30,
+    "ante": 0,
+    "iterations": 600,
+    "seconds": 311,
+    "decisions": 3835,
+    "kept": 1496,
+    "size": 130538,
+    "opens": {
+      "UTG": {
+        "fold": 84,
+        "raise": 15.9,
+        "allin": 0.1
+      },
+      "UTG+1": {
+        "fold": 82,
+        "raise": 17.9,
+        "allin": 0.1
+      },
+      "LJ": {
+        "fold": 79.1,
+        "raise": 20.8,
+        "allin": 0.1
+      },
+      "HJ": {
+        "fold": 75.2,
+        "raise": 24.7,
+        "allin": 0.1
+      },
+      "CO": {
+        "fold": 70,
+        "raise": 29.9,
+        "allin": 0.1
+      },
+      "BTN": {
+        "fold": 62.3,
+        "raise": 37.6,
+        "allin": 0.1
+      },
+      "SB": {
+        "fold": 30.2,
+        "call": 38.6,
+        "raise": 31.1,
+        "allin": 0.1
+      }
+    },
+    "premiums": [
+      "AA 100%",
+      "KK 100%",
+      "QQ 100%",
+      "AKs 100%",
+      "AKo 100%"
+    ]
+  },
+  {
+    "name": "cash-40",
+    "stack": 40,
+    "ante": 0,
+    "iterations": 600,
+    "seconds": 339,
+    "decisions": 4571,
+    "kept": 1712,
+    "size": 173590,
+    "opens": {
+      "UTG": {
+        "fold": 84.9,
+        "raise": 15,
+        "allin": 0.1
+      },
+      "UTG+1": {
+        "fold": 83.4,
+        "raise": 16.5,
+        "allin": 0.1
+      },
+      "LJ": {
+        "fold": 79.4,
+        "raise": 20.5,
+        "allin": 0.1
+      },
+      "HJ": {
+        "fold": 75.1,
+        "raise": 24.8,
+        "allin": 0.1
+      },
+      "CO": {
+        "fold": 68.8,
+        "raise": 31.1,
+        "allin": 0.1
+      },
+      "BTN": {
+        "fold": 60.8,
+        "raise": 39.1,
+        "allin": 0.1
+      },
+      "SB": {
+        "fold": 33,
+        "call": 34.2,
+        "raise": 32.7,
+        "allin": 0.1
+      }
+    },
+    "premiums": [
+      "AA 100%",
+      "KK 100%",
+      "QQ 100%",
+      "AKs 100%",
+      "AKo 100%"
+    ]
+  },
+  {
+    "name": "cash-60",
+    "stack": 60,
+    "ante": 0,
+    "iterations": 600,
+    "seconds": 377,
+    "decisions": 4260,
+    "kept": 1232,
+    "size": 175125,
+    "opens": {
+      "UTG": {
+        "fold": 87.7,
+        "raise": 12.3
+      },
+      "UTG+1": {
+        "fold": 86.1,
+        "raise": 13.9
+      },
+      "LJ": {
+        "fold": 83.4,
+        "raise": 16.6
+      },
+      "HJ": {
+        "fold": 78.5,
+        "raise": 21.5
+      },
+      "CO": {
+        "fold": 72.4,
+        "raise": 27.6
+      },
+      "BTN": {
+        "fold": 60.2,
+        "raise": 39.8
+      },
+      "SB": {
+        "fold": 37.7,
+        "call": 33.8,
+        "raise": 28.5
+      }
+    },
+    "premiums": [
+      "AA 100%",
+      "KK 100%",
+      "QQ 99%",
+      "AKs 100%",
+      "AKo 100%"
+    ]
+  },
+  {
+    "name": "cash-100",
+    "stack": 100,
+    "ante": 0,
+    "iterations": 600,
+    "seconds": 522,
+    "decisions": 6446,
+    "kept": 1351,
+    "size": 193537,
+    "opens": {
+      "UTG": {
+        "fold": 88.3,
+        "raise": 11.7
+      },
+      "UTG+1": {
+        "fold": 86.4,
+        "raise": 13.6
+      },
+      "LJ": {
+        "fold": 83.5,
+        "raise": 16.5
+      },
+      "HJ": {
+        "fold": 79,
+        "raise": 21
+      },
+      "CO": {
+        "fold": 72.4,
+        "raise": 27.6
+      },
+      "BTN": {
+        "fold": 58.4,
+        "raise": 41.6
+      },
+      "SB": {
+        "fold": 34.5,
+        "call": 42.2,
+        "raise": 23.3
+      }
+    },
+    "premiums": [
+      "AA 100%",
+      "KK 100%",
+      "QQ 100%",
+      "AKs 100%",
+      "AKo 100%"
+    ]
+  },
+  {
+    "name": "cash-150",
+    "stack": 150,
+    "ante": 0,
+    "iterations": 600,
+    "seconds": 527,
+    "decisions": 6446,
+    "kept": 1310,
+    "size": 166664,
+    "opens": {
+      "UTG": {
+        "fold": 87.9,
+        "raise": 12.1
+      },
+      "UTG+1": {
+        "fold": 86.1,
+        "raise": 13.9
+      },
+      "LJ": {
+        "fold": 82.9,
+        "raise": 17.1
+      },
+      "HJ": {
+        "fold": 78.6,
+        "raise": 21.4
+      },
+      "CO": {
+        "fold": 71.8,
+        "raise": 28.2
+      },
+      "BTN": {
+        "fold": 58.1,
+        "raise": 41.9
+      },
+      "SB": {
+        "fold": 34.8,
+        "call": 43.1,
+        "raise": 22.1
+      }
+    },
+    "premiums": [
+      "AA 100%",
+      "KK 100%",
+      "QQ 100%",
+      "AKs 100%",
+      "AKo 100%"
+    ]
+  },
+  {
+    "name": "cash-200",
+    "stack": 200,
+    "ante": 0,
+    "iterations": 600,
+    "seconds": 525,
+    "decisions": 6446,
+    "kept": 1324,
+    "size": 160475,
+    "opens": {
+      "UTG": {
+        "fold": 87.4,
+        "raise": 12.6
+      },
+      "UTG+1": {
+        "fold": 85.7,
+        "raise": 14.3
+      },
+      "LJ": {
+        "fold": 83.1,
+        "raise": 16.9
+      },
+      "HJ": {
+        "fold": 78.5,
+        "raise": 21.5
+      },
+      "CO": {
+        "fold": 71.9,
+        "raise": 28.1
+      },
+      "BTN": {
+        "fold": 57.2,
+        "raise": 42.8
+      },
+      "SB": {
+        "fold": 35,
+        "call": 42.3,
+        "raise": 22.7
+      }
+    },
+    "premiums": [
+      "AA 100%",
+      "KK 100%",
+      "QQ 99%",
+      "AKs 100%",
+      "AKo 100%"
+    ]
+  },
+  {
+    "name": "ante-10",
+    "stack": 10,
+    "ante": 1,
+    "iterations": 600,
+    "seconds": 103,
+    "decisions": 1103,
+    "kept": 386,
+    "size": 25612,
+    "opens": {
+      "UTG": {
+        "fold": 82.7,
+        "raise": 0,
+        "allin": 17.3
+      },
+      "UTG+1": {
+        "fold": 79.7,
+        "raise": 0,
+        "allin": 20.3
+      },
+      "LJ": {
+        "fold": 76.4,
+        "raise": 0,
+        "allin": 23.5
+      },
+      "HJ": {
+        "fold": 70,
+        "raise": 0,
+        "allin": 30
+      },
+      "CO": {
+        "fold": 65.8,
+        "raise": 0,
+        "allin": 34.2
+      },
+      "BTN": {
+        "fold": 57,
+        "raise": 0,
+        "allin": 43
+      },
+      "SB": {
+        "fold": 19.1,
+        "call": 17.5,
+        "raise": 0,
+        "allin": 63.4
+      }
+    },
+    "premiums": [
+      "AA 100%",
+      "KK 100%",
+      "QQ 71%",
+      "AKs 99%",
+      "AKo 99%"
+    ]
+  },
+  {
+    "name": "ante-15",
+    "stack": 15,
+    "ante": 1,
+    "iterations": 600,
+    "seconds": 106,
+    "decisions": 1403,
+    "kept": 1053,
+    "size": 81187,
+    "opens": {
+      "UTG": {
+        "fold": 86,
+        "raise": 8,
+        "allin": 6.1
+      },
+      "UTG+1": {
+        "fold": 83.9,
+        "raise": 7.1,
+        "allin": 9
+      },
+      "LJ": {
+        "fold": 80.8,
+        "raise": 7,
+        "allin": 12.1
+      },
+      "HJ": {
+        "fold": 76.6,
+        "raise": 6.4,
+        "allin": 17
+      },
+      "CO": {
+        "fold": 69.6,
+        "raise": 6.1,
+        "allin": 24.3
+      },
+      "BTN": {
+        "fold": 61.7,
+        "raise": 6.7,
+        "allin": 31.6
+      },
+      "SB": {
+        "fold": 16.1,
+        "call": 39.6,
+        "raise": 0,
+        "allin": 44.3
+      }
+    },
+    "premiums": [
+      "AA 100%",
+      "KK 100%",
+      "QQ 100%",
+      "AKs 100%",
+      "AKo 100%"
+    ]
+  },
+  {
+    "name": "ante-20",
+    "stack": 20,
+    "ante": 1,
+    "iterations": 600,
+    "seconds": 157,
+    "decisions": 1982,
+    "kept": 1215,
+    "size": 103094,
+    "opens": {
+      "UTG": {
+        "fold": 83.6,
+        "raise": 16.2,
+        "allin": 0.2
+      },
+      "UTG+1": {
+        "fold": 81.7,
+        "raise": 18,
+        "allin": 0.3
+      },
+      "LJ": {
+        "fold": 79.6,
+        "raise": 19.1,
+        "allin": 1.3
+      },
+      "HJ": {
+        "fold": 76,
+        "raise": 20.5,
+        "allin": 3.5
+      },
+      "CO": {
+        "fold": 69.9,
+        "raise": 22.7,
+        "allin": 7.5
+      },
+      "BTN": {
+        "fold": 59.6,
+        "raise": 28.1,
+        "allin": 12.3
+      },
+      "SB": {
+        "fold": 11.6,
+        "call": 58.9,
+        "raise": 0,
+        "allin": 29.5
+      }
+    },
+    "premiums": [
+      "AA 100%",
+      "KK 100%",
+      "QQ 100%",
+      "AKs 100%",
+      "AKo 100%"
+    ]
+  },
+  {
+    "name": "ante-25",
+    "stack": 25,
+    "ante": 1,
+    "iterations": 600,
+    "seconds": 239,
+    "decisions": 2888,
+    "kept": 1353,
+    "size": 122288,
+    "opens": {
+      "UTG": {
+        "fold": 82.1,
+        "raise": 17.7,
+        "allin": 0.1
+      },
+      "UTG+1": {
+        "fold": 80.1,
+        "raise": 19.8,
+        "allin": 0.2
+      },
+      "LJ": {
+        "fold": 77.8,
+        "raise": 22.1,
+        "allin": 0.2
+      },
+      "HJ": {
+        "fold": 73.3,
+        "raise": 26.5,
+        "allin": 0.1
+      },
+      "CO": {
+        "fold": 67.4,
+        "raise": 32.5,
+        "allin": 0.1
+      },
+      "BTN": {
+        "fold": 57.8,
+        "raise": 39.6,
+        "allin": 2.6
+      },
+      "SB": {
+        "fold": 9.5,
+        "call": 63.7,
+        "raise": 3.8,
+        "allin": 23
+      }
+    },
+    "premiums": [
+      "AA 100%",
+      "KK 100%",
+      "QQ 100%",
+      "AKs 100%",
+      "AKo 100%"
+    ]
+  },
+  {
+    "name": "ante-30",
+    "stack": 30,
+    "ante": 1,
+    "iterations": 600,
+    "seconds": 314,
+    "decisions": 3835,
+    "kept": 1547,
+    "size": 135834,
+    "opens": {
+      "UTG": {
+        "fold": 80.4,
+        "raise": 19.5,
+        "allin": 0.1
+      },
+      "UTG+1": {
+        "fold": 78.3,
+        "raise": 21.6,
+        "allin": 0.1
+      },
+      "LJ": {
+        "fold": 75.4,
+        "raise": 24.5,
+        "allin": 0.1
+      },
+      "HJ": {
+        "fold": 71.5,
+        "raise": 28.4,
+        "allin": 0.1
+      },
+      "CO": {
+        "fold": 64.6,
+        "raise": 35.2,
+        "allin": 0.1
+      },
+      "BTN": {
+        "fold": 54.7,
+        "raise": 45.1,
+        "allin": 0.2
+      },
+      "SB": {
+        "fold": 12.1,
+        "call": 61.6,
+        "raise": 13.6,
+        "allin": 12.7
+      }
+    },
+    "premiums": [
+      "AA 100%",
+      "KK 100%",
+      "QQ 100%",
+      "AKs 100%",
+      "AKo 100%"
+    ]
+  },
+  {
+    "name": "ante-40",
+    "stack": 40,
+    "ante": 1,
+    "iterations": 600,
+    "seconds": 339,
+    "decisions": 4571,
+    "kept": 1803,
+    "size": 183212,
+    "opens": {
+      "UTG": {
+        "fold": 80.5,
+        "raise": 19.4,
+        "allin": 0.1
+      },
+      "UTG+1": {
+        "fold": 77.6,
+        "raise": 22.3,
+        "allin": 0.1
+      },
+      "LJ": {
+        "fold": 74.3,
+        "raise": 25.6,
+        "allin": 0.1
+      },
+      "HJ": {
+        "fold": 69.4,
+        "raise": 30.5,
+        "allin": 0.1
+      },
+      "CO": {
+        "fold": 63.3,
+        "raise": 36.6,
+        "allin": 0.1
+      },
+      "BTN": {
+        "fold": 52.3,
+        "raise": 47.7,
+        "allin": 0.1
+      },
+      "SB": {
+        "fold": 12.4,
+        "call": 59.6,
+        "raise": 26.9,
+        "allin": 1.2
+      }
+    },
+    "premiums": [
+      "AA 100%",
+      "KK 100%",
+      "QQ 100%",
+      "AKs 100%",
+      "AKo 100%"
+    ]
+  },
+  {
+    "name": "ante-60",
+    "stack": 60,
+    "ante": 1,
+    "iterations": 600,
+    "seconds": 377,
+    "decisions": 4260,
+    "kept": 1673,
+    "size": 203478,
+    "opens": {
+      "UTG": {
+        "fold": 84.8,
+        "raise": 15.2
+      },
+      "UTG+1": {
+        "fold": 83.1,
+        "raise": 16.9
+      },
+      "LJ": {
+        "fold": 79.4,
+        "raise": 20.6
+      },
+      "HJ": {
+        "fold": 74.9,
+        "raise": 25.1
+      },
+      "CO": {
+        "fold": 66.2,
+        "raise": 33.8
+      },
+      "BTN": {
+        "fold": 48.8,
+        "raise": 51.2
+      },
+      "SB": {
+        "fold": 16,
+        "call": 62.2,
+        "raise": 21.8
+      }
+    },
+    "premiums": [
+      "AA 100%",
+      "KK 100%",
+      "QQ 99%",
+      "AKs 100%",
+      "AKo 100%"
+    ]
+  }
+]

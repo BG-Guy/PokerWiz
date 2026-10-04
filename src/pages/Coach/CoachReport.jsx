@@ -1,5 +1,5 @@
-// The coach's report for one hand: accuracy gauge and summary, the players and reads, every decision,
-// and a short explanation of how the numbers are made.
+// The coach's report for one hand: accuracy gauge and summary, the players, every decision graded against
+// GTO, and a short explanation of how the numbers are made.
 import { Link } from 'react-router-dom';
 import Money from '../../components/Money/Money.jsx';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
@@ -19,7 +19,6 @@ const GRADE_ORDER = [
 // saveState: null | 'saving' | { id } (saved) | { error }
 // backTo: link to the saved hand being reviewed (reviews started from Hands), or null.
 export default function CoachReport({ report, onNewHand, onSave, saveState, canSave, backTo = null }) {
-  const pct = (x) => `${Math.round(x * 100)}%`;
 
   return (
     <div className="coach-report">
@@ -30,7 +29,7 @@ export default function CoachReport({ report, onNewHand, onSave, saveState, canS
           <span className="coach-report-kicker">Hand accuracy</span>
           <p className="coach-report-headline">
             {report.decisions.length} {report.decisions.length === 1 ? 'decision' : 'decisions'} reviewed ·{' '}
-            {report.evLostBB > 0 ? `${report.evLostBB} bb given up to the best lines` : 'no EV given up'}
+            {report.evLostBB > 0 ? `${report.evLostBB} bb given up to GTO` : 'no EV given up to GTO'}
           </p>
           <div className="coach-report-grades">
             {GRADE_ORDER.filter((g) => report.counts[g.id] > 0).map((g) => (
@@ -77,9 +76,7 @@ export default function CoachReport({ report, onNewHand, onSave, saveState, canS
             </span>
             <span className="coach-report-player-text">
               <strong>{villain.position}</strong>
-              <span>
-                {villain.label} · ends on ~{pct(villain.finalWidth)} of hands
-              </span>
+              <span>Plays GTO</span>
             </span>
             <span className="coach-report-player-cards">
               {villain.cards.length === 2
@@ -101,11 +98,14 @@ export default function CoachReport({ report, onNewHand, onSave, saveState, canS
       <details className="coach-report-method">
         <summary>How the coach grades a hand</summary>
         <ul>
-          <li>Every villain starts with all possible hands. Each action they take reweights their range by how likely a player with their traits is to take it with each hand.</li>
-          <li>Preflop spots are checked against position-based ranges (solver-style charts), widened or tightened by the opener's traits.</li>
-          <li>Postflop, every option is valued in chips: your equity against their ranges, the price, how often they fold (pot odds vs. the range they put you on), and what you realize in or out of position.</li>
-          <li>Accuracy compares your play with the best option. Losing a bigger share of the pot costs more; your level sets how strict the grading is.</li>
-          <li>These are model estimates, not solver output. The better your reads, the better the advice.</li>
+          <li>
+            Preflop: solved 8-handed GTO charts for your stack depth{report.chart ? ` (this hand used the ${report.chart.stack} bb${report.chart.ante ? ' ante' : ''} chart)` : ''}. Every
+            player's range narrows with each action by how often GTO takes it with each hand.
+          </li>
+          <li>Postflop: each street is solved (Discounted CFR) from the ranges everyone arrived with, heads-up or multiway, with the real bet sizes from the hand in the game tree.</li>
+          <li>For your hand the coach shows how often GTO takes each option and what each one is worth. An option GTO plays often enough is as good as the best one; anything else is graded by how much it gives up.</li>
+          <li>Accuracy weighs bigger pots more. Your level sets how strict the grading is.</li>
+          <li>Everyone is assumed to play GTO; player reads aren't used yet. Solves use a few bet sizes and sampled runouts, so values are close estimates, not exact to the cent.</li>
         </ul>
       </details>
 

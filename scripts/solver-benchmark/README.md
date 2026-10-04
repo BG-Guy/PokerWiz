@@ -1,13 +1,15 @@
 # Coach vs solver benchmark
 
-Measures how close the coach's best play is to a game-theory-optimal solver, using
+Measures how close the coach's best play is to a full game-theory-optimal solve, using
 [postflop-solver](https://github.com/b-inary/postflop-solver) (open-source CFR solver, AGPL-3.0, fetched at
-build time).
+build time). Since version 0.3.0 the coach is itself a GTO engine (src/gto: solved preflop charts, and each
+postflop street re-solved with a few bet sizes and sampled runouts), so this checks how much its
+simplifications cost against a solve of the full game.
 
 ## What it tests
 
-- **Spot:** single-raised pot, 9-handed, 100 bb. Button opens to 2.5 bb, big blind calls. Both sides use the
-  coach's own preflop ranges (about 46% and 48% of hands), so only the postflop logic is tested.
+- **Spot:** single-raised pot, 8-handed, 100 bb. Button opens to 2.5 bb, big blind calls. Both sides use the
+  coach's own preflop ranges (the GTO engine's 100 bb charts), so only the postflop logic is tested.
 - **Boards:** five textures. K♠7♦2♣ (dry, high), T♦9♦6♥ (wet), A♥8♣3♦ (ace high), 7♣6♣5♦ (low, connected),
   Q♠9♥4♠ (two-tone). Line: flop checked to the button, 33% c-bet called, turn checked through.
 - **Solves:** the full game from the flop, trimmed to fit in ~5 GB (flop 33%/75% with raises; turn and
@@ -24,10 +26,10 @@ build time).
 - Spots the solver's strategy barely reaches (for example the big blind leading 75% on the turn) are
   skipped: their values aren't converged.
 
-The coach isn't meant to play like a solver. It exploits the reads you give it. With default reads
-(Unknown, Regular) it should come close, and this benchmark checks that.
-
 ## Results
+
+These numbers are from the coach before version 0.3.0 (a model of player tendencies, not a solver), kept for
+reference. The GTO engine hasn't been scored yet: run the benchmark to fill this in.
 
 1,560 decisions over the five boards. "Original" is the coach before calibration; "calibrated" is the
 current one. Tuning started on K♠7♦2♣ and T♦9♦6♥; A♥8♣3♦ and 7♣6♣5♦ were added later (and helped with

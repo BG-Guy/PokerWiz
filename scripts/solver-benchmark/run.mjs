@@ -47,9 +47,9 @@ const XX = [...X, 'check', 'check', 'deal']; // turn checks through, river comes
 
 // Full game from the flop. Sizes are trimmed to fit in memory (~5 GB): flop 33%/75% with raises, turn and
 // river 75% with all-in raises. Only the flop spots are scored from this tree.
+const ranges = await coachRanges();
 function flopSolve(id) {
   const [flop, turn, river] = BOARDS[id];
-  const ranges = coachRanges();
   return solve(id, {
     flop, turn, river, oop_range: ranges.oop, ip_range: ranges.ip, pot: 110, stack: 1950,
     flop_sizes: '33%, 75%', flop_raise: '3x', turn_sizes: '75%', turn_raise: 'a', river_sizes: '75%', river_raise: 'a', raise: 'a',
@@ -96,13 +96,13 @@ function matchAction(best, actions) {
   let gap = Infinity;
   actions.forEach((a, i) => {
     if (category(a.kind) !== 'aggressive') return;
-    const d = best.allIn ? (a.kind === 'allin' ? 0 : 1e9) : Math.abs(a.amount - best.to * UNIT);
+    const d = best.type === 'allin' ? (a.kind === 'allin' ? 0 : 1e9) : Math.abs(a.amount - best.to * UNIT);
     if (d < gap) [gap, pick] = [d, i];
   });
   return pick;
 }
 
-function score(out, flop, prefix = []) {
+async function score(out, flop, prefix = []) {
   const rows = [];
   for (const node of out.nodes) {
     if (node.error || node.name.endsWith('_start')) continue;
@@ -120,7 +120,7 @@ function score(out, flop, prefix = []) {
     const step = Math.max(1, sorted.length / SAMPLE);
     for (let k = 0; k < Math.min(SAMPLE, sorted.length); k++) {
       const hand = sorted[Math.floor(k * step)];
-      const d = coachDecision({ flop, line: [...prefix, ...node.line], heroPlayer: node.player, heroCards: hand.cards.match(/../g) });
+      const d = await coachDecision({ flop, line: [...prefix, ...node.line], heroPlayer: node.player, heroCards: hand.cards.match(/../g) });
       const coachKind = category(d.best.kind === 'raise' ? 'bet' : d.best.kind);
       const bestEV = Math.max(...hand.ev);
       const kindEV = Math.max(...node.actions.map((a, i) => (category(a.kind) === coachKind ? hand.ev[i] : -Infinity)));
@@ -169,7 +169,7 @@ for (const id of boards) {
   const riverPrefix = startOf('river');
   // Only the flop is scored from the full tree (its turn and river sizes are trimmed).
   const flopOnly = { ...full, nodes: full.nodes.filter((n) => n.name.startsWith('flop_')) };
-  all.push(...score(flopOnly, flop), ...score(turn, flop, turnPrefix), ...score(river, flop, riverPrefix));
+  all.push(...(await score(flopOnly, flop)), ...(await score(turn, flop, turnPrefix)), ...(await score(river, flop, riverPrefix)));
   console.error(`${id}: scored`);
 }
 fs.writeFileSync(file(`results_${LABEL}.json`), JSON.stringify(all, null, 1));

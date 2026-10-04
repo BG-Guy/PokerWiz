@@ -1,5 +1,6 @@
-// One graded decision in the coach report: what you did vs. the best play, the numbers behind it
-// (price, equity, fold equity, EV of every option), the coach's notes, and each villain's range read.
+// One graded decision in the coach report: what you did vs. the GTO play, how often GTO takes each option
+// with your hand and what each is worth, the numbers behind the spot (price, equity), the coach's notes, and
+// each villain's range at that point.
 import { formatMoney } from '../../utils/format.js';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
@@ -11,74 +12,45 @@ const pct = (x) => `${Math.round(x * 100)}%`;
 const plain = (n, bb) => formatMoney(Math.round(n * 100) / 100, { sign: false, bb });
 const signed = (n, bb) => formatMoney(Math.round(n * 100) / 100, { bb });
 
-const CHART_WORDS = { raise: 'Raise', call: 'Call', fold: 'Fold', check: 'Check' };
-
-// Preflop chart: where the hand sits among all starting hands, next to the raise / play zones.
-// A square-root scale gives the small premium ranges (top 3-10%) enough room to read.
-function ChartScale({ thresholds, handTop }) {
-  const at = (x) => `${Math.sqrt(Math.min(1, Math.max(0, x))) * 100}%`;
-  const raiseEnd = thresholds.raise;
-  const playEnd = Math.max(thresholds.play, thresholds.raise);
+// Every option: how often GTO takes it with this hand (bar) and its value (relative to folding).
+function GtoOptions({ options, bb }) {
+  const hasValues = options.some((o) => o.ev !== null && o.ev !== undefined);
   return (
-    <div className="decision-chart">
-      <div className="decision-chart-bar" aria-hidden="true">
-        <span className="decision-chart-zone is-raise" style={{ left: 0, width: at(raiseEnd) }} />
-        <span className="decision-chart-zone is-play" style={{ left: at(raiseEnd), width: `calc(${at(playEnd)} - ${at(raiseEnd)})` }} />
-        <span className="decision-chart-marker" style={{ left: at(handTop) }} />
+    <div className="decision-gto">
+      <div className={`decision-gto-head ${hasValues ? '' : 'no-values'}`} aria-hidden="true">
+        <span>Option</span>
+        <span>GTO plays it</span>
+        {hasValues && <span>Value</span>}
       </div>
-      <div className="decision-chart-legend">
-        <span>
-          <i className="is-raise" /> {thresholds.kind === 'unopened' ? 'Open' : 'Raise'} (top {pct(raiseEnd)})
-        </span>
-        {playEnd > raiseEnd + 0.001 && (
-          <span>
-            <i className="is-play" /> {thresholds.kind === 'unopened' ? 'Play' : 'Call'} (to {pct(playEnd)})
-          </span>
-        )}
-        <span>
-          <i className="is-hand" /> Your hand (top {pct(handTop)})
-        </span>
-      </div>
-    </div>
-  );
-}
-
-// EV of every option as diverging bars from zero; the best option and yours are marked.
-function EvList({ options, bb }) {
-  const maxAbs = Math.max(1e-9, ...options.map((o) => Math.abs(o.ev)));
-  return (
-    <ul className="decision-ev">
-      {options.map((option) => {
-        const width = (Math.abs(option.ev) / maxAbs) * 50;
-        return (
-          <li key={option.label} className={`decision-ev-row ${option.isBest ? 'is-best' : ''} ${option.isActual ? 'is-actual' : ''}`}>
+      <ul className="decision-gto-list">
+        {options.map((option) => (
+          <li key={option.label} className={`decision-gto-row ${option.isBest ? 'is-best' : ''} ${option.isActual ? 'is-actual' : ''} ${hasValues ? '' : 'no-values'}`}>
             <span className="decision-ev-label">
               {option.label}
-              {option.isBest && <span className="decision-tag is-best">Best</span>}
+              {option.isBest && <span className="decision-tag is-best">GTO</span>}
               {option.isActual && <span className="decision-tag is-actual">You</span>}
             </span>
-            <span className="decision-ev-track">
-              <span
-                className={`decision-ev-bar ${option.ev < 0 ? 'is-negative' : ''}`}
-                style={option.ev < 0 ? { right: '50%', width: `${width}%` } : { left: '50%', width: `${width}%` }}
-              />
+            <span className="decision-gto-frequency">
+              <span className="decision-gto-track">
+                <span className="decision-gto-bar" style={{ width: pct(option.frequency) }} />
+              </span>
+              <span className="num">{pct(option.frequency)}</span>
             </span>
-            <span className={`decision-ev-value num ${option.ev < 0 ? 'is-negative' : ''}`}>{signed(option.ev, bb)}</span>
+            {hasValues && <span className={`decision-ev-value num ${option.ev < 0 ? 'is-negative' : ''}`}>{option.ev === null ? '–' : signed(option.ev, bb)}</span>}
           </li>
-        );
-      })}
-    </ul>
+        ))}
+      </ul>
+    </div>
   );
 }
 
 export default function DecisionCard({ decision, number, bb = null }) {
   const d = decision;
-  const yourPlay = d.kind === 'chart' ? d.actualLabel : d.actual.label;
-  const bestPlay = d.kind === 'chart' ? CHART_WORDS[d.advice.best] : d.best.label;
-  const needed = d.toCall > 0 ? d.toCall / (d.pot + d.toCall) : null;
+  const needed = d.facingBet ? d.toCall / (d.pot + d.toCall) : null;
+  const gradeId = d.graded ? d.grade.id : 'ungraded';
 
   return (
-    <article className={`decision-card is-${d.grade.id}`}>
+    <article className={`decision-card is-${gradeId}`}>
       <header className="decision-card-header">
         <span className="decision-card-number">{number}</span>
         <span className="decision-card-street">{d.street}</span>
@@ -89,65 +61,75 @@ export default function DecisionCard({ decision, number, bb = null }) {
             ))}
           </span>
         )}
-        <span className={`decision-grade is-${d.grade.id}`}>
-          {d.grade.label} <span className="num">{d.score}</span>
+        <span className={`decision-grade is-${gradeId}`}>
+          {d.graded ? (
+            <>
+              {d.grade.label} <span className="num">{d.score}</span>
+            </>
+          ) : (
+            'Not graded'
+          )}
         </span>
       </header>
 
       <p className="decision-card-hand">{d.heroHand.text}</p>
 
-      {/* You vs. the coach */}
-      <div className="decision-compare">
-        <div className="decision-compare-item">
-          <span className="decision-compare-label">You</span>
-          <span className="decision-compare-value">{yourPlay}</span>
-        </div>
-        <Icon name="chevronRight" size={18} className="decision-compare-arrow" />
-        <div className="decision-compare-item is-coach">
-          <span className="decision-compare-label">Coach</span>
-          <span className="decision-compare-value">{bestPlay}</span>
-        </div>
-      </div>
+      {d.graded && (
+        <>
+          {/* You vs. GTO */}
+          <div className="decision-compare">
+            <div className="decision-compare-item">
+              <span className="decision-compare-label">You</span>
+              <span className="decision-compare-value">{d.actual.label}</span>
+            </div>
+            <Icon name="chevronRight" size={18} className="decision-compare-arrow" />
+            <div className="decision-compare-item is-coach">
+              <span className="decision-compare-label">GTO</span>
+              <span className="decision-compare-value">{d.best.label}</span>
+            </div>
+          </div>
 
-      {/* Key numbers */}
-      <dl className="decision-numbers">
-        <div>
-          <dt>Pot</dt>
-          <dd className="num">{plain(d.pot, bb)}</dd>
-        </div>
-        {d.toCall > 0 && (
-          <div>
-            <dt>To call</dt>
-            <dd className="num">{plain(d.toCall, bb)}</dd>
-          </div>
-        )}
-        {needed !== null && (
-          <div>
-            <dt>Equity needed</dt>
-            <dd className="num">{pct(needed)}</dd>
-          </div>
-        )}
-        {d.equity != null && (
-          <div>
-            <dt>Your equity</dt>
-            <dd className="num">{pct(d.equity)}</dd>
-          </div>
-        )}
-        {d.equityVsActual != null && (
-          <div>
-            <dt>Vs their cards</dt>
-            <dd className="num">{pct(d.equityVsActual)}</dd>
-          </div>
-        )}
-        {d.kind === 'ev' && d.best.kind === 'raise' && (
-          <div>
-            <dt>Fold equity</dt>
-            <dd className="num">{pct(d.best.foldEquity)}</dd>
-          </div>
-        )}
-      </dl>
+          {/* Key numbers */}
+          <dl className="decision-numbers">
+            <div>
+              <dt>Pot</dt>
+              <dd className="num">{plain(d.pot, bb)}</dd>
+            </div>
+            {d.toCall > 0 && (
+              <div>
+                <dt>To call</dt>
+                <dd className="num">{plain(d.toCall, bb)}</dd>
+              </div>
+            )}
+            {needed !== null && (
+              <div>
+                <dt>Equity needed</dt>
+                <dd className="num">{pct(needed)}</dd>
+              </div>
+            )}
+            {d.equity != null && (
+              <div>
+                <dt>Your equity</dt>
+                <dd className="num">{pct(d.equity)}</dd>
+              </div>
+            )}
+            {d.equityVsActual != null && (
+              <div>
+                <dt>Vs their cards</dt>
+                <dd className="num">{pct(d.equityVsActual)}</dd>
+              </div>
+            )}
+            {d.evLoss > 0 && (
+              <div>
+                <dt>Given up</dt>
+                <dd className="num">{plain(d.evLoss, bb)}</dd>
+              </div>
+            )}
+          </dl>
 
-      {d.kind === 'chart' ? <ChartScale thresholds={d.thresholds} handTop={d.handTop} /> : <EvList options={d.options} bb={bb} />}
+          <GtoOptions options={d.options} bb={bb} />
+        </>
+      )}
 
       <ul className="decision-notes">
         {d.notes.map((note) => (
@@ -158,16 +140,16 @@ export default function DecisionCard({ decision, number, bb = null }) {
         ))}
       </ul>
 
-      {/* What the coach thinks each villain holds at this point */}
+      {/* Each villain's GTO range at this point */}
       {d.reads.map((read) => (
         <details key={read.seat} className="decision-read">
           <summary>
             <Icon name="villain" size={16} />
             <span>
-              {read.position} · {read.label} · about {pct(read.width)} of hands
+              {read.position} · GTO range · about {pct(read.width)} of hands
             </span>
           </summary>
-          <p className="decision-read-top">Most likely: {read.top.join(', ')}</p>
+          {read.top.length > 0 && <p className="decision-read-top">Most likely: {read.top.join(', ')}</p>}
           <RangeGrid grid={read.grid} label={`${read.position} range`} />
         </details>
       ))}

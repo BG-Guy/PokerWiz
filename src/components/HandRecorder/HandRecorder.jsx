@@ -8,6 +8,7 @@ import { STAKES, TABLE_POSITIONS } from '../../constants/poker.js';
 import { RANKS } from '../../utils/cards.js';
 import { formatMoney, todayIso } from '../../utils/format.js';
 import { defaultProfile, describeProfile } from '../../coach/profiles.js';
+import { PLAYER_READS } from '../../gto/config.js';
 import PokerTable from './PokerTable.jsx';
 import PromptCarousel from './PromptCarousel.jsx';
 import LogEntry from './LogEntry.jsx';
@@ -178,7 +179,7 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
   const finishStacks = () => {
     const depths = [...new Set(inHand.map((p) => Math.round(Number(stacks[p.seat]) / stakes.bb)))];
     const entry = { text: depths.length === 1 ? `Everyone ${depths[0]} bb deep` : 'Stacks set' };
-    if (isCoach) {
+    if (isCoach && PLAYER_READS) {
       // Every player starts with a neutral profile unless one was already set.
       const withDefaults = Object.fromEntries(inHand.map((p) => [p.seat, profiles[p.seat] ?? defaultProfile()]));
       advance({ step: 'traits', profiles: withDefaults }, entry);
@@ -386,7 +387,7 @@ export default function HandRecorder({ mode = 'record', initialStakesLabel, onSa
       cards: cards[seat] ?? [],
       // Coach mode shows each player's read (e.g. "LAG", "Tilted") on their seat.
       badge:
-        isCoach && role && profiles[seat] && (role === 'villain' || describeProfile(profiles[seat]).label !== 'Unknown')
+        PLAYER_READS && isCoach && role && profiles[seat] && (role === 'villain' || describeProfile(profiles[seat]).label !== 'Unknown')
           ? describeProfile(profiles[seat]).label
           : null,
       // Before the action starts show the starting stack; during it, what's left behind.

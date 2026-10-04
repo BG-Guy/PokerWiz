@@ -7,6 +7,7 @@ import Icon from '../../Icon/Icon.jsx';
 const STAKE_OPTIONS = STAKES.map((s) => ({ value: s.label, label: s.label }));
 const SIZE_OPTIONS = [
   { value: 9, label: '9-max' },
+  { value: 8, label: '8-max' },
   { value: 6, label: '6-max' },
 ];
 

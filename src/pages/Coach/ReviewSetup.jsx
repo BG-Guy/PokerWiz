@@ -1,7 +1,9 @@
-// Header for a coach review of a saved hand: which hand it is, what the coach had to assume, and quick
-// reads (tendency and skill level per villain, your level) that re-run the analysis when changed.
+// Header for a coach review of a saved hand: which hand it is, what the coach had to assume, and your level
+// (how strictly you're graded), which re-runs the review when changed. Villain reads come back here once the
+// GTO engine uses them (gto/config.js).
 import { Link } from 'react-router-dom';
 import { LEVELS, applyLevel, defaultProfile, levelOf } from '../../coach/profiles.js';
+import { PLAYER_READS } from '../../gto/config.js';
 import ReadPicker from '../../components/ReadPicker/ReadPicker.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import './ReviewSetup.css';
@@ -12,7 +14,7 @@ export default function ReviewSetup({ hand, record, assumptions, busy, status, o
   const heroProfile = record.players.find((p) => p.role === 'hero').profile ?? defaultProfile();
   const level = levelOf(heroProfile);
   // The "no reads" note goes away once any villain has a read.
-  const shown = villains.some((v) => v.profile) ? assumptions.filter((a) => a.id !== 'reads') : assumptions;
+  const shown = !PLAYER_READS || villains.some((v) => v.profile) ? assumptions.filter((a) => a.id !== 'reads') : assumptions;
 
   return (
     <section className={`review-setup ${busy ? 'is-busy' : ''}`}>
@@ -39,7 +41,7 @@ export default function ReviewSetup({ hand, record, assumptions, busy, status, o
 
       {/* Reads: change a tendency or level and the coach re-runs */}
       <div className="review-setup-reads">
-        {villains.map((villain) => (
+        {PLAYER_READS && villains.map((villain) => (
           <div key={villain.seat} className="review-setup-read">
             <span className="review-setup-read-name">
               <Icon name="villain" size={14} /> {villain.position}
@@ -68,7 +70,7 @@ export default function ReviewSetup({ hand, record, assumptions, busy, status, o
       </div>
 
       <p className="review-setup-status" aria-live="polite">
-        {busy ? 'Re-analyzing with the new reads...' : status}
+        {busy ? 'Re-analyzing...' : status}
       </p>
     </section>
   );

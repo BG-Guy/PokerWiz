@@ -1,8 +1,8 @@
-// Coach mode (/coach): record a hand with reads on every player, then get a math-based review of each
-// decision (accuracy, best play, EV of every option, villain ranges). The analysis runs in a web worker.
+// Coach mode (/coach): record a hand, then get a GTO review of each decision (accuracy, the GTO play and how
+// often GTO makes it, the value of every option, villain ranges). The GTO engine runs in a web worker.
 // Opened as /coach?hand=<id> (the Coach button on any hand in Hands), it reviews that saved hand instead:
-// missing details are rebuilt from the log, reads can be changed on the spot (the review re-runs), and the
-// score and reads are saved onto the hand.
+// missing details are rebuilt from the log, your level can be changed on the spot (the review re-runs), and
+// the score is saved onto the hand.
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { createHand, getHand, updateHand } from '../../api/hands.js';
@@ -18,8 +18,8 @@ import './Coach.css';
 
 const STEPS = [
   { icon: 'cards', title: 'Replay the hand', text: 'Seats, stacks, cards and every action, on the table.' },
-  { icon: 'villain', title: 'Add your reads', text: 'Nit, LAG, calling station, tilted... each changes the math.' },
-  { icon: 'bulb', title: 'Get graded', text: 'Accuracy, the best play and why, decision by decision.' },
+  { icon: 'target', title: 'Solved with GTO', text: 'Preflop charts for your stack depth; every postflop street solved from both ranges.' },
+  { icon: 'bulb', title: 'Get graded', text: 'Accuracy, the GTO play and how often it makes it, decision by decision.' },
 ];
 
 export default function Coach() {
@@ -38,6 +38,7 @@ export default function Coach() {
   const [assumptions, setAssumptions] = useState([]);
   const [busy, setBusy] = useState(false); // re-running with new reads (the old report stays visible)
   const [status, setStatus] = useState(null);
+  const [progress, setProgress] = useState(null); // what the GTO engine is solving right now
   const workerRef = useRef(null);
   const requestRef = useRef(0);
 
@@ -46,6 +47,10 @@ export default function Coach() {
     const worker = new Worker(new URL('../../coach/coach.worker.js', import.meta.url), { type: 'module' });
     worker.onmessage = (event) => {
       if (event.data.id !== requestRef.current) return;
+      if (event.data.progress) {
+        setProgress(event.data.progress);
+        return;
+      }
       setBusy(false);
       if (event.data.error) {
         setError(event.data.error);
@@ -63,8 +68,9 @@ export default function Coach() {
     if (keepReport) setBusy(true);
     else setPhase('analyzing');
     setError(null);
+    setProgress(null);
     requestRef.current += 1;
-    workerRef.current.postMessage({ id: requestRef.current, record: nextRecord, unit: getMoneyUnit() });
+    workerRef.current.postMessage({ id: requestRef.current, record: nextRecord, unit: getMoneyUnit(), detail: 'full' });
   };
 
   // Saved-hand review: load the hand, fill in what's missing, analyze. Without ?hand, record a new one.
@@ -148,7 +154,7 @@ export default function Coach() {
     <div className="coach">
       <PageHeader
         title="Coach"
-        subtitle={savedHandId ? 'A math-based review of a hand from your Hands.' : 'Replay a hand and get a math-based review of every decision.'}
+        subtitle={savedHandId ? 'A GTO review of a hand from your Hands.' : 'Replay a hand and get every decision graded against GTO.'}
       >
         {savedHandId ? (
           <Link to="/coach" className="btn btn-ghost">
@@ -189,7 +195,7 @@ export default function Coach() {
         </>
       )}
 
-      {/* Saved hand: what's being reviewed, what was assumed, and quick reads */}
+      {/* Saved hand: what's being reviewed, what was assumed, and your level */}
       {savedHand && record && phase !== 'error' && phase !== 'loading' && (
         <ReviewSetup
           hand={savedHand}
@@ -205,8 +211,8 @@ export default function Coach() {
       {(phase === 'loading' || phase === 'analyzing') && (
         <div className="coach-thinking" aria-live="polite">
           <span className="coach-thinking-spinner" />
-          <p className="coach-thinking-title">{phase === 'loading' ? 'Loading the hand' : 'Crunching ranges and equity'}</p>
-          <p className="coach-thinking-text">Replaying every action, narrowing ranges and valuing every option.</p>
+          <p className="coach-thinking-title">{phase === 'loading' ? 'Loading the hand' : progress ? `${progress}...` : 'Solving the hand'}</p>
+          <p className="coach-thinking-text">Following the hand through the GTO charts and solving each postflop street from both ranges. A few seconds per street.</p>
         </div>
       )}
 

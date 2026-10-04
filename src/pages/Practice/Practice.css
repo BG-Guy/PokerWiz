@@ -134,9 +134,18 @@
 }
 
 .practice-dealing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 14px 16px;
   font-weight: 700;
   color: var(--text-muted);
+}
+/* The small spinner while the GTO opponents decide */
+.practice-dealing .coach-thinking-spinner.is-small {
+  width: 18px;
+  height: 18px;
+  border-width: 3px;
 }
 
 /* End of hand: accuracy gauge and the outcome */

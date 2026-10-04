@@ -1,6 +1,7 @@
-// The coach side of the benchmark: exports the coach's preflop ranges in solver format, and replays a solver
-// line through the coach to get its decision for one hand. COACH_DIR picks which copy of the app to test
-// (default: this repository), so an older version can be scored on the same spots.
+// The coach side of the benchmark: the coach's preflop ranges (the GTO engine's charts) in solver format, and
+// the coach's graded decision for one hand at a point of a solver line. COACH_DIR picks which copy of the app
+// to test (default: this repository), so another version can be scored on the same spots.
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -8,42 +9,40 @@ const COACH = process.env.COACH_DIR ?? path.resolve(path.dirname(fileURLToPath(i
 const load = (file) => import(path.join(COACH, 'src', file));
 const { createHand, applyAction, dealBoard, getOptions } = await load('utils/handEngine.js');
 const { analyzeHand } = await load('coach/analyzeHand.js');
-const { defaultProfile, modelParams } = await load('coach/profiles.js');
 const { TABLE_POSITIONS } = await load('constants/poker.js');
-const { CLASS_NAMES } = await load('coach/combos.js');
-const { preflopActionLikelihood } = await load('coach/preflopModel.js');
+const { CLASS_NAMES } = await load('gto/cards.js');
+const { setChartLoader } = await load('gto/preflop/charts.js');
+const { createGtoHand } = await load('gto/hand.js');
+setChartLoader(async (name) => new Uint8Array(fs.readFileSync(path.join(COACH, 'src', 'gto', 'preflop', 'charts', `${name}.pfc`))));
 
-const POSITIONS = TABLE_POSITIONS[9];
+const POSITIONS = TABLE_POSITIONS[8];
 export const UNIT = 10; // solver chips per dollar ($1/$2 blinds: a 110 pot is $11)
 export const category = (kind) => (kind === 'bet' || kind === 'raise' || kind === 'allin' ? 'aggressive' : kind);
 
-// The coach's button open and big blind flat-call ranges (100 bb, 9-handed), as weighted solver ranges.
-export function coachRanges() {
-  const params = modelParams(defaultProfile());
-  const base = { limpers: 0, facingAllIn: false, callPutsAllIn: false, stackBB: 100 };
-  const open = preflopActionLikelihood({ action: 'raise', position: 'BTN', tableSize: 9, situation: { ...base, raises: 1 }, params, openerWidth: 1 }).likelihood;
-  const call = preflopActionLikelihood({
-    action: 'call',
-    position: 'BB',
-    tableSize: 9,
-    situation: { ...base, raises: 2, openerPosition: 'BTN' },
-    params,
-    openerWidth: params.widthMult,
-  }).likelihood;
-  const format = (lk) =>
-    CLASS_NAMES.map((name, i) => [name, lk[i]])
+// The button's open and the big blind's flat-call ranges (100 bb, 8-handed GTO charts), as weighted solver ranges.
+export async function coachRanges() {
+  const players = POSITIONS.map((position, seat) => ({ seat, position, role: position === 'BTN' ? 'hero' : 'villain', name: position, stack: 200 }));
+  let state = createHand({ players, positions: POSITIONS, sb: 1, bb: 2 });
+  const gto = await createGtoHand({ state, stackBB: 100 });
+  // Folded to the button, who opens to 2.5 bb; the small blind folds and the big blind calls.
+  for (const action of [{ type: 'fold' }, { type: 'fold' }, { type: 'fold' }, { type: 'fold' }, { type: 'fold' }, { type: 'raise', amount: 5 }, { type: 'fold' }, { type: 'call' }]) {
+    gto.apply(state, action);
+    state = applyAction(state, action);
+  }
+  const format = (grid) =>
+    CLASS_NAMES.map((name, i) => [name, grid[i]])
       .filter(([, w]) => w >= 0.02)
       .map(([name, w]) => (w > 0.98 ? name : `${name}:${w.toFixed(2)}`))
       .join(',');
-  return { ip: format(open), oop: format(call) };
+  return { ip: format(gto.rangeOf(state, 0)), oop: format(gto.rangeOf(state, 2)) };
 }
 
 // Button opens to $5, big blind calls, then the solver line (bets in solver chips) up to the hero's turn.
-// Returns the coach's graded decision for the hero's hand there.
-export function coachDecision({ flop, line, heroPlayer, heroCards }) {
+// Resolves to the coach's graded decision for the hero's hand there.
+export async function coachDecision({ flop, line, heroPlayer, heroCards }) {
   const players = [
-    { seat: 0, position: 'BTN', role: heroPlayer === 1 ? 'hero' : 'villain', name: 'BTN', stack: 200, profile: defaultProfile() },
-    { seat: 2, position: 'BB', role: heroPlayer === 0 ? 'hero' : 'villain', name: 'BB', stack: 200, profile: defaultProfile() },
+    { seat: 0, position: 'BTN', role: heroPlayer === 1 ? 'hero' : 'villain', name: 'BTN', stack: 200 },
+    { seat: 2, position: 'BB', role: heroPlayer === 0 ? 'hero' : 'villain', name: 'BB', stack: 200 },
   ];
   for (const p of players) p.cards = p.role === 'hero' ? heroCards : [];
   let state = createHand({ players, positions: POSITIONS, sb: 1, bb: 2 });
@@ -58,9 +57,9 @@ export function coachDecision({ flop, line, heroPlayer, heroCards }) {
   }
   // Any action will do: the coach values every option at the hero's decision.
   state = applyAction(state, { type: getOptions(state).canCheck ? 'check' : 'call' });
-  const report = analyzeHand({
+  const report = await analyzeHand({
     stakes: { label: '$1/$2', sb: 1, bb: 2 },
-    tableSize: 9,
+    tableSize: 8,
     positions: POSITIONS,
     heroSeat: heroPlayer === 1 ? 0 : 2,
     players,

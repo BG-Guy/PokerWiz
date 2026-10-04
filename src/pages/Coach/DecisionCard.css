@@ -24,6 +24,9 @@
 .decision-card.is-blunder {
   --grade: var(--negative);
 }
+.decision-card.is-ungraded {
+  --grade: var(--border);
+}
 @keyframes decision-card-in {
   from {
     opacity: 0;
@@ -136,27 +139,79 @@
   font-weight: 600;
 }
 
-/* EV bars */
-.decision-ev {
+/* GTO options: how often GTO takes each option (bar) and what it's worth */
+.decision-gto {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.decision-gto-head,
+.decision-gto-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+.decision-gto-head.no-values,
+.decision-gto-row.no-values {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+}
+.decision-gto-head {
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.decision-gto-head span:last-child {
+  text-align: right;
+}
+.decision-gto-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
-.decision-ev-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
+.decision-gto-row {
   padding: 6px 8px;
   border-radius: 10px;
   font-size: 13px;
 }
-.decision-ev-row.is-best {
+.decision-gto-row.is-best {
   background: var(--accent-soft);
 }
-.decision-ev-row.is-actual:not(.is-best) {
+.decision-gto-row.is-actual:not(.is-best) {
   box-shadow: inset 0 0 0 2px var(--grade);
 }
+.decision-gto-frequency {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+.decision-gto-frequency .num {
+  min-width: 3ch;
+  text-align: right;
+}
+.decision-gto-track {
+  position: relative;
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.decision-gto-bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+/* Tags and values (shared) */
 .decision-ev-label {
   display: flex;
   flex-wrap: wrap;
@@ -178,31 +233,6 @@
   background: var(--text);
   color: var(--bg);
 }
-.decision-ev-track {
-  position: relative;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--surface-2);
-}
-.decision-ev-track::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: -3px;
-  bottom: -3px;
-  width: 2px;
-  background: var(--border);
-}
-.decision-ev-bar {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  border-radius: 999px;
-  background: var(--accent);
-}
-.decision-ev-bar.is-negative {
-  background: var(--negative);
-}
 .decision-ev-value {
   font-weight: 600;
   color: var(--positive);
@@ -212,66 +242,6 @@
   color: var(--negative);
 }
 
-/* Preflop chart scale */
-.decision-chart {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.decision-chart-bar {
-  position: relative;
-  height: 14px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--negative) 18%, var(--surface-2));
-}
-.decision-chart-zone {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-}
-.decision-chart-zone.is-raise {
-  border-radius: 999px 0 0 999px;
-  background: var(--accent);
-}
-.decision-chart-zone.is-play {
-  background: color-mix(in srgb, var(--accent) 45%, var(--surface-2));
-}
-.decision-chart-marker {
-  position: absolute;
-  top: 50%;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--surface);
-  border: 4px solid var(--text);
-  transform: translate(-50%, -50%);
-}
-.decision-chart-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 14px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-.decision-chart-legend i {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  margin-right: 4px;
-  border-radius: 3px;
-  vertical-align: -1px;
-}
-.decision-chart-legend i.is-raise {
-  background: var(--accent);
-}
-.decision-chart-legend i.is-play {
-  background: color-mix(in srgb, var(--accent) 45%, var(--surface-2));
-}
-.decision-chart-legend i.is-hand {
-  border-radius: 50%;
-  border: 3px solid var(--text);
-}
 
 /* Coach notes */
 .decision-notes {

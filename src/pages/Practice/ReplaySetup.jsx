@@ -1,9 +1,11 @@
 // Setup for replaying a saved hand in Practice: from which street, whose cards the villains play (the real
-// ones when the hand shows them, or cards from their range), how the next cards come, and the reads.
+// ones when the hand shows them, or cards from their GTO range), and how the next cards come. Villains play
+// GTO from there (their reads come back once the engine uses them: gto/config.js).
 import { Link } from 'react-router-dom';
 import { replayStreets } from '../../practice/replaySpot.js';
 import { prepareSavedHand } from '../../coach/savedHand.js';
 import { defaultProfile, describeProfile } from '../../coach/profiles.js';
+import { PLAYER_READS } from '../../gto/config.js';
 import FilterChips from '../../components/FilterChips/FilterChips.jsx';
 import ReadPicker from '../../components/ReadPicker/ReadPicker.jsx';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
@@ -28,8 +30,8 @@ export default function ReplaySetup({ hand, options, onChange, onStart }) {
           <Icon name="undo" size={18} /> Replay: {hand.title}
         </h2>
         <p className="practice-card-text">
-          Everything up to the {options.street.toLowerCase()} stays as it was. From there it's your call: play it differently and see how
-          they react.
+          Everything up to the {options.street.toLowerCase()} stays as it was. From there it's your call: play it differently and see how GTO
+          opponents react.
         </p>
         <div className="replay-setup-cards">
           <span className="replay-setup-hand">
@@ -60,7 +62,7 @@ export default function ReplaySetup({ hand, options, onChange, onStart }) {
           <p className="read-picker-description">
             {anyKnown && options.villainCards === 'real'
               ? 'Villains play the cards they really had (shown in this hand). Where a hand is unknown, they get cards that fit how they played.'
-              : 'Their cards weren’t shown, so each villain is dealt a hand that fits everything they did up to here. Replay again for a different one.'}
+              : 'Their cards weren’t shown, so each villain is dealt a hand from the range GTO plays the way they did. Replay again for a different one.'}
           </p>
         </div>
 
@@ -87,7 +89,7 @@ export default function ReplaySetup({ hand, options, onChange, onStart }) {
         </div>
       </section>
 
-      {villains.map((villain) => (
+      {PLAYER_READS && villains.map((villain) => (
         <section key={villain.seat} className="practice-card">
           <h2 className="practice-card-title">
             <Icon name="villain" size={18} /> {villain.position}

@@ -1,8 +1,9 @@
-// Practice setup: the game (cash or tournament), the spot (preflop, heads-up, 3-way), how the next cards
-// come (random or picked by you), and who you're up against: each opponent's tendency, skill level and
-// stack. Preflop uses one read for the whole table.
+// Practice setup: the game (cash or tournament), the spot (preflop, heads-up, 3-way), how the next cards come
+// (random or picked by you), the stacks, and how strictly you're graded. Opponents all play GTO; player reads
+// (tendencies per opponent) come back here once the engine uses them (gto/config.js).
 import { GAMES, FORMATS } from '../../practice/generateSpot.js';
-import { LEVELS, applyLevel, describeProfile, levelOf } from '../../coach/profiles.js';
+import { LEVELS, applyLevel, defaultProfile, describeProfile, levelOf } from '../../coach/profiles.js';
+import { PLAYER_READS } from '../../gto/config.js';
 import ReadPicker from '../../components/ReadPicker/ReadPicker.jsx';
 import FilterChips from '../../components/FilterChips/FilterChips.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
@@ -43,8 +44,7 @@ function StackPicker({ game, value, onChange, label }) {
 export default function PracticeSetup({ setup, onChange, onStart }) {
   const format = FORMATS.find((f) => f.id === setup.format);
   const game = GAMES.find((g) => g.id === setup.game);
-  const shown = setup.villains.slice(0, format.villains);
-  const isTable = setup.format === 'preflop';
+  const opponents = setup.villains[0];
 
   const changeGame = (id) => {
     const next = GAMES.find((g) => g.id === id);
@@ -55,8 +55,7 @@ export default function PracticeSetup({ setup, onChange, onStart }) {
       villains: setup.villains.map((v) => ({ ...v, stackBB: next.defaultStackBB })),
     });
   };
-  const changeVillain = (index, patch) =>
-    onChange({ ...setup, villains: setup.villains.map((v, i) => (i === index ? { ...v, ...patch } : v)) });
+  const changeOpponents = (patch) => onChange({ ...setup, villains: setup.villains.map((v, i) => (i === 0 ? { ...v, ...patch } : v)) });
 
   return (
     <div className="practice-setup">
@@ -70,7 +69,7 @@ export default function PracticeSetup({ setup, onChange, onStart }) {
           options={FORMATS.map((f) => ({ value: f.id, label: f.label }))}
         />
         <p className="practice-card-text">
-          {format.description} {game.id === 'mtt' ? 'Blinds 1/2 with a big-blind ante, 9-handed.' : 'Blinds $1/$2, 9-handed.'}
+          {format.description} {game.id === 'mtt' ? 'Blinds 1/2 with a big-blind ante, 8-handed.' : 'Blinds $1/$2, 8-handed.'}
         </p>
         <div className="read-picker-group">
           <span className="read-picker-label">Next cards</span>
@@ -85,24 +84,24 @@ export default function PracticeSetup({ setup, onChange, onStart }) {
           />
           <p className="read-picker-description">
             {setup.boardMode === 'pick'
-              ? 'You choose each street\'s cards, to practice the runouts you want.'
+              ? "You choose each street's cards, to practice the runouts you want."
               : 'The flop, turn and river are dealt at random as the hand plays out.'}
           </p>
         </div>
       </section>
 
-      {shown.map((villain, index) => (
-        <section key={index} className="practice-card">
-          <h2 className="practice-card-title">
-            <Icon name={isTable ? 'users' : 'villain'} size={18} />
-            {isTable ? 'The table' : shown.length > 1 ? `Opponent ${index + 1}` : 'Your opponent'}
-            <span className="practice-card-badge">{describeProfile(villain.profile).label}</span>
-          </h2>
-          {isTable && <p className="practice-card-text">Everyone at the table plays this read.</p>}
-          <ReadPicker profile={villain.profile} onChange={(profile) => changeVillain(index, { profile })} />
-          <StackPicker game={setup.game} label="Stack" value={villain.stackBB} onChange={(stackBB) => changeVillain(index, { stackBB })} />
-        </section>
-      ))}
+      <section className="practice-card">
+        <h2 className="practice-card-title">
+          <Icon name="users" size={18} /> Your opponents
+          <span className="practice-card-badge">{PLAYER_READS ? describeProfile(opponents.profile ?? defaultProfile()).label : 'GTO'}</span>
+        </h2>
+        <p className="practice-card-text">
+          Every opponent plays game-theory-optimal poker with their real cards: solved preflop charts for this stack depth, and each postflop street
+          solved as the hand goes.
+        </p>
+        {PLAYER_READS && <ReadPicker profile={opponents.profile ?? defaultProfile()} onChange={(profile) => changeOpponents({ profile })} />}
+        <StackPicker game={setup.game} label="Their stacks" value={opponents.stackBB} onChange={(stackBB) => changeOpponents({ stackBB })} />
+      </section>
 
       <section className="practice-card">
         <h2 className="practice-card-title">

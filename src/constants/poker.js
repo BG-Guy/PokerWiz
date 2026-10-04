@@ -24,8 +24,10 @@ export const STAKES = [
   { label: '$5/$10', sb: 5, bb: 10 },
 ];
 
-// Seat positions clockwise, starting from the button.
+// Seat positions clockwise, starting from the button. 8-handed is the table the GTO engine is solved for
+// (src/gto); 6- and 9-handed hands are mapped onto it.
 export const TABLE_POSITIONS = {
   6: ['BTN', 'SB', 'BB', 'UTG', 'HJ', 'CO'],
+  8: ['BTN', 'SB', 'BB', 'UTG', 'UTG+1', 'LJ', 'HJ', 'CO'],
   9: ['BTN', 'SB', 'BB', 'UTG', 'UTG+1', 'MP', 'LJ', 'HJ', 'CO'],
 };

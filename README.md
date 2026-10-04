@@ -5,11 +5,11 @@ A poker tracker for mobile and desktop: a React frontend and a small Express + S
 **Features**
 - **Play (live session):** start a session (game, stakes, venue, buy-in), then log hands, notes and rebuys on a timeline while you play. Finish with cash-out, a draggable 0 to 5 star rating (one decimal) and a 1 to 5 tilt scale with faces.
 - **Add hand:** rebuild a hand on a poker table. You seat the hero and villains, set each stack (exact amount, or Short / Average / Big / Huge), pick known cards, then answer each player's action turn by turn in an animated carousel below the table. All-ins and side pots are handled.
-- **Coach:** record a hand with reads on every player: a tendency (Nit, LAG, calling station, drunk...) and a skill level (Beginner to Pro), plus tilt and form, then get an accuracy score and a review of every decision: the best play, the value of every option in dollars, pot odds, equity against their ranges, and a range grid. Saved hands can be opened in the coach too. See [docs/coach-algorithm.md](docs/coach-algorithm.md).
-- **Practice:** pick cash or tournament and a spot (preflop, heads-up, 3-way), describe each opponent's tendency, skill level and stack, then play random hands against them to the end, with the turn and river dealt at random or picked by you. Villains act on their real cards using the coach's models, and every decision is graded.
-- **Replay a hand:** in any Hold'em hand, pick Flop, Turn or River (or "Replay from here" on the timeline) and play it again from that point. Seats, stacks, reads, the action and the board so far carry over; the next cards come as they did, at random, or picked by you. Villains play their real cards when the hand shows them, otherwise a hand that fits how they played. Compare how it goes with the real result.
+- **Coach:** record a hand and get every decision graded against GTO: solved 8-max preflop charts for the hand's stack depth (cash or tournament with antes), and each postflop street solved from the ranges the players arrived with, heads-up or 3-way, with the hand's real bet sizes. For your hand you see how often GTO takes each option and what each is worth, plus pot odds, equity against their ranges and their range grids. Saved hands can be opened in the coach too. See [docs/coach-algorithm.md](docs/coach-algorithm.md).
+- **Practice:** pick cash or tournament, a spot (preflop, heads-up, 3-way) and the stacks, then play random hands to the end against an 8-handed table of GTO opponents (they play the solved strategy with their real cards), with the turn and river dealt at random or picked by you. Every decision is graded.
+- **Replay a hand:** in any Hold'em hand, pick Flop, Turn or River (or "Replay from here" on the timeline) and play it again from that point against GTO opponents. Seats, stacks, the action and the board so far carry over; the next cards come as they did, at random, or picked by you. Villains play their real cards when the hand shows them, otherwise a hand from the range GTO plays the way they did. Compare how it goes with the real result.
 - **Highlights:** Hall of Fame, Wall of Shame, Tilt Tower, Monster Pots and more, from your ratings and results. The top three are on Home.
-- **Hand review:** replay hands street by street with your hand and the villains' (face down unless shown), all-ins highlighted, plus verdict, star rating, tilt and notes. Every Hold'em hand has a **Coach** button (in the list and on the hand). Older hands without stacks are rebuilt from the action log, and the review shows what was assumed. Change the reads and it re-runs; the score is saved onto the hand.
+- **Hand review:** replay hands street by street with your hand and the villains' (face down unless shown), all-ins highlighted, plus verdict, star rating, tilt and notes. Every Hold'em hand has a **Coach** button (in the list and on the hand). Older hands without stacks are rebuilt from the action log, and the review shows what was assumed. The score is saved onto the hand.
 - **Game history:** past sessions by month, with filters, rating and tilt.
 - **Insights:** leaks and strengths plus hourly by venue, stakes, game and day, all from your sessions. Hand insights live in the Hands tab.
 - **Goals:** measured from your real data (hands played, profit, hours, hands reviewed), with pace projections and a "focus next" pick.
@@ -24,7 +24,10 @@ npm install
 npm run dev      # web (Vite) + API (Express on :3001); Vite proxies /api to the API
 npm run build    # production build into dist/
 npm start        # API that also serves dist/ on :3001
-node scripts/test-coach.mjs              # coach sanity checks (scripted hands with known answers)
+npm test         # tests (server, CSV import, GTO engine)
+node scripts/test-coach.mjs              # coach sanity checks (scripted hands, printed for a read-through)
+node scripts/gto/buildEquityTables.mjs   # preflop equity tables (input of the preflop solver)
+node scripts/gto/solvePreflop.mjs        # re-solve the preflop charts in src/gto/preflop/charts/
 node scripts/generate-preflop-table.mjs  # rebuild the preflop hand ranking
 # coach vs solver benchmark: see scripts/solver-benchmark/README.md
 ```
@@ -52,6 +55,7 @@ it with `npm version minor --no-git-tag-version` (or `patch` for small fixes) an
 ## Project structure
 
 ```
+scripts/gto/             Offline GTO tools: equity tables and the preflop solver that writes the charts
 server/                  Express API
   index.js               App setup, routes, static hosting of dist/
   db/                    SQLite connection, schema.sql, first-run seeding
@@ -68,8 +72,10 @@ src/
   constants/poker.js     Verdicts, stakes, venues, table positions
   utils/                 Formatting, session stats, goal analysis, cards, hand evaluator, betting engine,
                          highlights, hand and session insights
-  coach/                 The coach: ranges, player profiles, equity, EV of every option, grading
-  practice/              Practice spots: deals hands and plays villains from their reads
+  gto/                   The GTO engine: preflop charts (8-max, every stack depth) and the postflop solver
+                         (heads-up and multiway), plus hand.js, which follows a real hand through both
+  coach/                 The coach: grades your decisions against the GTO engine, equity, notes
+  practice/              Practice spots: an 8-handed table of GTO opponents (runs in a web worker)
   components/            Reusable UI, one folder each with its CSS
                          (PlayingCard, CardPicker, StarRating, TiltMeter, Modal, NavBar, ...)
   pages/
