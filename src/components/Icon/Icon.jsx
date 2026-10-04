@@ -40,6 +40,9 @@ const ICONS = {
     </>
   ),
   close: <path d="M18 6 6 18M6 6l12 12" />,
+  // Full screen on (corners pointing out) and off (corners pointing in)
+  expand: <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />,
+  shrink: <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" />,
   trendUp: <path d="m3 17 6-6 4 4 8-8M15 7h6v6" />,
   alert: (
     <>

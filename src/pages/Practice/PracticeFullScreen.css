@@ -1,0 +1,218 @@
+/* Practice full screen: a layer over the whole app (above the tab bar, below dialogs). Phones: a slim top bar,
+   the table as big as the space left allows, and the action panel docked at the bottom. Wide screens: the
+   table on the left, the log and the panel on the right. */
+
+.practice-fs {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas: 'bar' 'table' 'side';
+  height: 100dvh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background: var(--bg);
+  animation: practice-fs-in 0.2s ease-out;
+}
+@keyframes practice-fs-in {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+}
+
+/* Top bar */
+.practice-fs-bar {
+  grid-area: bar;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 56px;
+  padding: 6px 10px;
+}
+.practice-fs-title {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  line-height: 1.25;
+}
+.practice-fs-title strong {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+}
+.practice-fs-title span {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.practice-fs-log-btn,
+.practice-fs-next {
+  flex: none;
+}
+@media (max-width: 420px) {
+  .practice-fs-log-label {
+    display: none;
+  }
+}
+
+/* The table: as wide as the area, unless the height runs out first (38px are the table's own margins) */
+.practice-fs-table {
+  grid-area: table;
+  container-type: size;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  padding: 0 10px;
+  overflow: hidden;
+}
+.practice-fs-table .poker-table {
+  width: min(100cqw, calc((100cqh - 38px) / 0.84));
+}
+@media (min-width: 640px) {
+  .practice-fs-table .poker-table {
+    width: min(100cqw, calc((100cqh - 38px) * 1.6));
+  }
+}
+
+/* Under the table on phones: the dock, never taller than about half the screen */
+.practice-fs-side {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  padding: 0 12px 12px;
+}
+.practice-fs-log {
+  display: none;
+}
+.practice-fs-dock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 58dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* The current street in one line; tap for the whole log */
+.practice-fs-peek {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  min-height: 38px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  text-align: left;
+}
+.practice-fs-peek-street {
+  flex: none;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-text);
+}
+.practice-fs-peek-cards {
+  display: inline-flex;
+  flex: none;
+  gap: 2px;
+}
+.practice-fs-peek-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* After the hand: review the decisions, go back to the hand, or the next hand */
+.practice-fs-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.practice-fs-result-actions > * {
+  flex: 1 1 auto;
+}
+
+/* Table above the dock (phones, tablets upright): the dock keeps to a readable width, and the action card is
+   compact so the table gets the room. Its street and pot line goes: the line above it and the table show both. */
+@media not all and (min-width: 640px) and (min-aspect-ratio: 5/4) {
+  .practice-fs-side {
+    justify-self: center;
+    width: 100%;
+    max-width: 640px;
+  }
+  .practice-fs-dock .prompt-carousel-card {
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  .practice-fs-dock .prompt-kicker:has(.action-prompt-pot) {
+    display: none;
+  }
+  .practice-fs-dock .prompt-title {
+    font-size: 19px;
+  }
+  .practice-fs-dock .action-prompt-buttons {
+    grid-template-columns: repeat(auto-fit, minmax(62px, 1fr));
+    gap: 6px;
+  }
+  .practice-fs-dock .action-prompt-btn {
+    min-height: 54px;
+    font-size: 17px;
+  }
+}
+
+/* Wide screens (laptops, tablets and phones held sideways): table left, log and dock right */
+@media (min-width: 640px) and (min-aspect-ratio: 5/4) {
+  .practice-fs {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 400px);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: 'bar bar' 'table side';
+  }
+  .practice-fs-bar {
+    padding: 8px 16px;
+  }
+  .practice-fs-side {
+    padding: 0 16px 16px 0;
+  }
+  .practice-fs-log {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .practice-fs-dock {
+    flex: 0 1 auto;
+    max-height: none;
+    min-height: 0;
+  }
+  .practice-fs-peek,
+  .practice-fs-log-btn {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .practice-fs {
+    animation: none;
+  }
+}

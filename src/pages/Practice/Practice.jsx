@@ -2,7 +2,8 @@
 // all play GTO with their real cards (src/gto). From the spot on you play the hand to the end (the next cards
 // are random, or picked by you), then the coach grades every decision you made against GTO.
 // /practice?hand=<id>&street=Turn replays a saved hand from that street instead (see ReplaySetup).
-// Two web workers do the heavy lifting: practice.worker.js plays the opponents (they solve their spots), and
+// Hands are played full screen by default (PracticeFullScreen: the action buttons are always in view); the
+// choice is remembered. Two web workers do the heavy lifting: practice.worker.js plays the opponents (they solve their spots), and
 // the coach worker grades the hand when it's over.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -20,15 +21,27 @@ import BoardPrompt from '../../components/HandRecorder/prompts/BoardPrompt.jsx';
 import AccuracyGauge from '../Coach/AccuracyGauge.jsx';
 import DecisionCard from '../Coach/DecisionCard.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
+import Modal from '../../components/Modal/Modal.jsx';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
 import PracticeSetup from './PracticeSetup.jsx';
 import ReplaySetup from './ReplaySetup.jsx';
+import PracticeFullScreen from './PracticeFullScreen.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import '../../components/HandRecorder/HandRecorder.css';
 import '../Coach/Coach.css';
 import './Practice.css';
 
 const STORAGE_KEY = 'pokerwiz-practice-setup';
+const FULL_SCREEN_KEY = 'pokerwiz-practice-full-screen';
+
+// Full screen unless it was turned off last time.
+function loadFullScreen() {
+  try {
+    return localStorage.getItem(FULL_SCREEN_KEY) !== 'off';
+  } catch {
+    return true;
+  }
+}
 
 function defaultSetup() {
   const stackBB = GAMES[0].defaultStackBB;
@@ -94,6 +107,8 @@ export default function Practice() {
   const [error, setError] = useState(null);
   const [tally, setTally] = useState({ hands: 0, total: 0, netBB: 0 });
   const [handNumber, setHandNumber] = useState(0);
+  const [fullScreen, setFullScreen] = useState(loadFullScreen);
+  const [decisionsOpen, setDecisionsOpen] = useState(false); // full screen: the graded decisions sheet
   const coachRef = useRef(null);
   const coachRequest = useRef(0);
   const practiceRef = useRef(null);
@@ -107,6 +122,14 @@ export default function Practice() {
       // storage blocked: the setup just isn't remembered
     }
   }, [setup]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(FULL_SCREEN_KEY, fullScreen ? 'on' : 'off');
+    } catch {
+      // storage blocked: the choice just isn't remembered
+    }
+  }, [fullScreen]);
 
   // ----- The opponents' worker: only the latest request's answer counts -----
   const onPracticeMessage = useCallback((event) => {
@@ -225,6 +248,7 @@ export default function Practice() {
     coachRequest.current += 1; // a grade still on its way belongs to the old hand: ignore it
     setReview(null);
     setError(null);
+    setDecisionsOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (replayHand) {
       startReplay();
@@ -273,19 +297,39 @@ export default function Practice() {
     );
   }
 
+  const title = replayHand ? 'Replay' : 'Practice';
+  const nextLabel = replayHand ? 'Replay again' : 'Next hand';
+  const backToSetup = () => setPhase(replayHand ? 'replay' : 'setup');
+  const errorNote = error && (
+    <p className="practice-error" role="alert">
+      <Icon name="alert" size={16} /> {error}
+    </p>
+  );
+  // Full screen: the same shell for dealing and playing, so it stays up from one hand to the next.
+  const fullScreenView = (props) => (
+    <div className="practice">
+      <PracticeFullScreen title={title} nextLabel={nextLabel} onExit={() => setFullScreen(false)} {...props} />
+    </div>
+  );
+
+  // Dealing the first hand (or the next one): nothing on the table yet.
   if (phase === 'dealing' || !spot) {
+    const dealing = (
+      <div className="coach-thinking" aria-live="polite">
+        <span className="coach-thinking-spinner" />
+        <p className="coach-thinking-title">Dealing</p>
+        <p className="coach-thinking-text">The GTO players are playing the hand up to your spot. Postflop spots are solved on the way, so this can take a few seconds.</p>
+      </div>
+    );
+    if (fullScreen) return fullScreenView({ subtitle: replayHand ? replayHand.title : 'Dealing a hand', table: dealing, dock: errorNote });
     return (
       <div className="practice">
-        <PageHeader title={replayHand ? 'Replay' : 'Practice'} subtitle={replayHand ? replayHand.title : 'Dealing a hand'}>
-          <button type="button" className="btn btn-ghost" onClick={() => setPhase(replayHand ? 'replay' : 'setup')}>
+        <PageHeader title={title} subtitle={replayHand ? replayHand.title : 'Dealing a hand'}>
+          <button type="button" className="btn btn-ghost" onClick={backToSetup}>
             <Icon name="chevronLeft" size={16} /> Setup
           </button>
         </PageHeader>
-        <div className="coach-thinking" aria-live="polite">
-          <span className="coach-thinking-spinner" />
-          <p className="coach-thinking-title">Dealing</p>
-          <p className="coach-thinking-text">The GTO players are playing the hand up to your spot. Postflop spots are solved on the way, so this can take a few seconds.</p>
-        </div>
+        {dealing}
       </div>
     );
   }
@@ -319,20 +363,163 @@ export default function Practice() {
   const bb = state.bb;
   const replay = spot.replay ?? null;
   const heroStackBB = Math.round((state.players.find((p) => p.seat === heroSeat).stack / bb) * 10) / 10;
+  const lines = actionLines(state);
+  const subtitle = replay ? `${replay.title} · from the ${replay.street.toLowerCase()}` : `Hand ${handNumber} · ${spot.game.label}`;
+  // The running score, short enough for the full-screen top bar.
+  const tallyText =
+    tally.hands > 0 &&
+    `${Math.round(tally.total / tally.hands)}% avg · ${tally.netBB >= 0 ? '+' : ''}${Math.round(tally.netBB * 10) / 10} bb over ${tally.hands} ${tally.hands === 1 ? 'hand' : 'hands'}`;
 
+  // ----- The pieces both views share: the table, the action so far, and what's needed now -----
+  const table = <PokerTable seats={seats} board={state.board} pot={state.pot} bb={state.bb} rotation={heroSeat} />;
+
+  const log = (
+    <>
+      <ol className="practice-log">
+        {lines.map((line) => (
+          <li key={line.name}>
+            <span className="practice-log-street">
+              {line.name}
+              {line.cards.length > 0 && (
+                <span className="practice-log-cards">
+                  {line.cards.map((code) => (
+                    <PlayingCard key={code} code={code} size="xs" />
+                  ))}
+                </span>
+              )}
+            </span>
+            <span className="practice-log-text">{line.text || 'Nobody has acted yet'}</span>
+          </li>
+        ))}
+      </ol>
+      <p className="practice-stacks">
+        Opponents play GTO · You started with <span className="num">{heroStackBB} bb</span>
+        {state.ante > 0 && <> · Big-blind ante {formatMoney(state.ante, { sign: false, bb: state.bb })}</>}
+      </p>
+    </>
+  );
+
+  // Your turn, the next card, the opponents thinking, or the grade being worked out.
+  const turn = (
+    <>
+      {phase === 'play' && thinking && (
+        <p className="practice-dealing" aria-live="polite">
+          <span className="coach-thinking-spinner is-small" /> Opponents are thinking...
+        </p>
+      )}
+
+      {phase === 'play' && !thinking && spot.status === 'hero' && (
+        <PromptCarousel stepKey={`hand-${handNumber}-${state.streets.length}-${state.streets.at(-1).actions.length}`} direction="forward">
+          <ActionPrompt hand={state} playerName="You" onAction={(action) => send({ type: 'act', action })} />
+        </PromptCarousel>
+      )}
+
+      {phase === 'play' && !thinking && spot.status === 'board' && boardMode === 'pick' && (
+        <PromptCarousel stepKey={`board-${handNumber}-${spot.street}`} direction="forward">
+          <BoardPrompt street={spot.street} count={spot.count} used={seenCards(spot)} onDeal={(codes) => send({ type: 'deal', codes })} />
+          <button type="button" className="btn btn-ghost practice-random-card" onClick={() => send({ type: 'deal', codes: null })}>
+            <Icon name="cards" size={16} /> Deal {spot.count === 1 ? 'a random card' : 'random cards'}
+          </button>
+        </PromptCarousel>
+      )}
+
+      {phase === 'play' && !thinking && spot.status === 'board' && boardMode !== 'pick' && (
+        <p className="practice-dealing" aria-live="polite">
+          Dealing the {spot.street.toLowerCase()}...
+        </p>
+      )}
+
+      {phase === 'grading' && (
+        <div className="coach-thinking" aria-live="polite">
+          <span className="coach-thinking-spinner" />
+          <p className="coach-thinking-title">Grading your decisions</p>
+          <p className="coach-thinking-text">{progress ? `${progress}...` : 'Comparing every decision with GTO.'}</p>
+        </div>
+      )}
+    </>
+  );
+
+  // Hand over: the grade and how it went.
+  const summary = phase === 'result' && (
+    <section className="practice-summary">
+      {review && <AccuracyGauge value={review.accuracy ?? 0} label={review.label} />}
+      <div className="practice-summary-text">
+        <span className="practice-summary-kicker">Hand over</span>
+        <p className={`practice-summary-outcome ${spot.result > 0 ? 'is-win' : spot.result < 0 ? 'is-loss' : ''}`}>{outcomeText(spot)}</p>
+        {replay && replay.realResult != null && (
+          <p className="practice-summary-detail">
+            In the real hand: {replay.realResult > 0 ? 'you won' : replay.realResult < 0 ? 'you lost' : 'you broke even'}
+            {replay.realResult !== 0 && ` ${formatMoney(Math.abs(replay.realResult), { sign: false, bb })}`}.
+            {Object.values(replay.dealtFrom).includes('range') && ' Villains dealt from their range get new cards on every replay.'}
+          </p>
+        )}
+        {review && (
+          <p className="practice-summary-detail">
+            {review.decisions.length} {review.decisions.length === 1 ? 'decision' : 'decisions'} graded against GTO. Results vary with the cards; the grade is about the
+            decisions.
+          </p>
+        )}
+      </div>
+    </section>
+  );
+  const decisionCards = review?.decisions.map((decision, index) => <DecisionCard key={index} decision={decision} number={index + 1} bb={state.bb} />);
+  const backToHand = replay && (
+    <Link to={`/hands/${replay.handId}`} className="btn btn-ghost">
+      <Icon name="chevronLeft" size={16} /> Back to the hand
+    </Link>
+  );
+
+  // ----- Full screen: table on top, everything else docked under it (or beside it on wide screens) -----
+  if (fullScreen) {
+    const current = lines.at(-1);
+    return fullScreenView({
+      subtitle: tallyText ? `${replay ? replay.title : `Hand ${handNumber}`} · ${tallyText}` : subtitle,
+      table,
+      log,
+      peek: phase === 'play' ? { name: current.name, cards: current.cards, text: current.text || 'Nobody has acted yet' } : null,
+      onNext: phase !== 'result' ? deal : null,
+      dock: (
+        <>
+          {turn}
+          {summary}
+          {errorNote}
+          {phase === 'result' && (
+            <div className="practice-fs-result-actions">
+              {review?.decisions.length > 0 && (
+                <button type="button" className="btn btn-ghost" onClick={() => setDecisionsOpen(true)}>
+                  <Icon name="coach" size={16} /> Review {review.decisions.length === 1 ? 'the decision' : `${review.decisions.length} decisions`}
+                </button>
+              )}
+              {backToHand}
+              <button type="button" className="btn practice-next-btn" onClick={deal}>
+                {nextLabel} <Icon name="chevronRight" size={16} />
+              </button>
+            </div>
+          )}
+          {decisionCards && (
+            <Modal open={decisionsOpen} onClose={() => setDecisionsOpen(false)} title="Your decisions" className="practice-decisions-sheet">
+              <div className="practice-decisions">{decisionCards}</div>
+            </Modal>
+          )}
+        </>
+      ),
+    });
+  }
+
+  // ----- Page view: header, tally, then the table and the panel -----
   return (
     <div className={`practice ${phase === 'result' ? 'has-next-bar' : ''}`}>
-      <PageHeader
-        title={replay ? 'Replay' : 'Practice'}
-        subtitle={replay ? `${replay.title} · from the ${replay.street.toLowerCase()}` : `Hand ${handNumber} · ${spot.game.label}`}
-      >
-        <button type="button" className="btn btn-ghost" onClick={() => setPhase(replay ? 'replay' : 'setup')}>
+      <PageHeader title={title} subtitle={subtitle}>
+        <button type="button" className="btn btn-ghost" onClick={backToSetup}>
           <Icon name="chevronLeft" size={16} /> Setup
+        </button>
+        <button type="button" className="btn btn-ghost" onClick={() => setFullScreen(true)}>
+          <Icon name="expand" size={16} /> Full screen
         </button>
         {/* Every hand can be left for the next one; once it's over, the pinned bar below takes over */}
         {phase !== 'result' && (
           <button type="button" className="btn btn-ghost practice-skip" onClick={deal}>
-            {replay ? 'Replay again' : 'Next hand'} <Icon name="chevronRight" size={16} />
+            {nextLabel} <Icon name="chevronRight" size={16} />
           </button>
         )}
       </PageHeader>
@@ -356,110 +543,22 @@ export default function Practice() {
       )}
 
       <div className="hand-recorder">
-        <div className="hand-recorder-table">
-          <PokerTable seats={seats} board={state.board} pot={state.pot} bb={state.bb} rotation={heroSeat} />
-        </div>
+        <div className="hand-recorder-table">{table}</div>
 
         <div className="hand-recorder-panel">
-          <ol className="practice-log">
-            {actionLines(state).map((line) => (
-              <li key={line.name}>
-                <span className="practice-log-street">
-                  {line.name}
-                  {line.cards.length > 0 && (
-                    <span className="practice-log-cards">
-                      {line.cards.map((code) => (
-                        <PlayingCard key={code} code={code} size="xs" />
-                      ))}
-                    </span>
-                  )}
-                </span>
-                <span className="practice-log-text">{line.text || 'Nobody has acted yet'}</span>
-              </li>
-            ))}
-          </ol>
-          <p className="practice-stacks">
-            Opponents play GTO · You started with <span className="num">{heroStackBB} bb</span>
-            {state.ante > 0 && <> · Big-blind ante {formatMoney(state.ante, { sign: false, bb: state.bb })}</>}
-          </p>
-
-          {phase === 'play' && thinking && (
-            <p className="practice-dealing" aria-live="polite">
-              <span className="coach-thinking-spinner is-small" /> Opponents are thinking...
-            </p>
-          )}
-
-          {phase === 'play' && !thinking && spot.status === 'hero' && (
-            <PromptCarousel stepKey={`hand-${handNumber}-${state.streets.length}-${state.streets.at(-1).actions.length}`} direction="forward">
-              <ActionPrompt hand={state} playerName="You" onAction={(action) => send({ type: 'act', action })} />
-            </PromptCarousel>
-          )}
-
-          {phase === 'play' && !thinking && spot.status === 'board' && boardMode === 'pick' && (
-            <PromptCarousel stepKey={`board-${handNumber}-${spot.street}`} direction="forward">
-              <BoardPrompt street={spot.street} count={spot.count} used={seenCards(spot)} onDeal={(codes) => send({ type: 'deal', codes })} />
-              <button type="button" className="btn btn-ghost practice-random-card" onClick={() => send({ type: 'deal', codes: null })}>
-                <Icon name="cards" size={16} /> Deal {spot.count === 1 ? 'a random card' : 'random cards'}
-              </button>
-            </PromptCarousel>
-          )}
-
-          {phase === 'play' && !thinking && spot.status === 'board' && boardMode !== 'pick' && (
-            <p className="practice-dealing" aria-live="polite">
-              Dealing the {spot.street.toLowerCase()}...
-            </p>
-          )}
-
-          {phase === 'grading' && (
-            <div className="coach-thinking" aria-live="polite">
-              <span className="coach-thinking-spinner" />
-              <p className="coach-thinking-title">Grading your decisions</p>
-              <p className="coach-thinking-text">{progress ? `${progress}...` : 'Comparing every decision with GTO.'}</p>
-            </div>
-          )}
-
+          {log}
+          {turn}
+          {summary}
+          {errorNote}
+          {phase === 'result' && decisionCards}
+          {/* Pinned to the bottom of the screen (above the phone tab bar), so it never needs a scroll */}
           {phase === 'result' && (
-            <>
-              <section className="practice-summary">
-                {review && <AccuracyGauge value={review.accuracy ?? 0} label={review.label} />}
-                <div className="practice-summary-text">
-                  <span className="practice-summary-kicker">Hand over</span>
-                  <p className={`practice-summary-outcome ${spot.result > 0 ? 'is-win' : spot.result < 0 ? 'is-loss' : ''}`}>{outcomeText(spot)}</p>
-                  {replay && replay.realResult != null && (
-                    <p className="practice-summary-detail">
-                      In the real hand: {replay.realResult > 0 ? 'you won' : replay.realResult < 0 ? 'you lost' : 'you broke even'}
-                      {replay.realResult !== 0 && ` ${formatMoney(Math.abs(replay.realResult), { sign: false, bb })}`}.
-                      {Object.values(replay.dealtFrom).includes('range') && ' Villains dealt from their range get new cards on every replay.'}
-                    </p>
-                  )}
-                  {review && (
-                    <p className="practice-summary-detail">
-                      {review.decisions.length} {review.decisions.length === 1 ? 'decision' : 'decisions'} graded against GTO. Results vary with the cards; the grade is about the
-                      decisions.
-                    </p>
-                  )}
-                </div>
-              </section>
-              {error && (
-                <p className="practice-error" role="alert">
-                  <Icon name="alert" size={16} /> {error}
-                </p>
-              )}
-              {review?.decisions.map((decision, index) => (
-                <DecisionCard key={index} decision={decision} number={index + 1} bb={state.bb} />
-              ))}
-              {/* Pinned to the bottom of the screen (above the phone tab bar), so it never needs a scroll */}
-              <div className="practice-next">
-                {replay && (
-                  <Link to={`/hands/${replay.handId}`} className="btn btn-ghost">
-                    <Icon name="chevronLeft" size={16} /> Back to the hand
-                  </Link>
-                )}
-                <button type="button" className="btn practice-next-btn" onClick={deal}>
-                  {replay ? 'Replay again' : 'Next hand'} <Icon name="chevronRight" size={16} />
-                </button>
-              </div>
-            </>
+            <div className="practice-next">
+              {backToHand}
+              <button type="button" className="btn practice-next-btn" onClick={deal}>
+                {nextLabel} <Icon name="chevronRight" size={16} />
+              </button>
+            </div>
           )}
         </div>
       </div>
