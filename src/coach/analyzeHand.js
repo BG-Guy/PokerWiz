@@ -94,7 +94,6 @@ export async function analyzeHand(record, { rangesOnly = false, detail = 'full',
   if (!heroRecord || heroRecord.cards?.length !== 2) throw new Error('The coach needs your two hole cards.');
   const heroCards = heroRecord.cards.map(codeToIndex);
   const heroProfile = heroRecord.profile ?? defaultProfile();
-  const heroSkill = heroProfile.skill / 100;
   const bb = record.stakes.bb;
 
   // Every action with the state it was taken in.
@@ -104,7 +103,7 @@ export async function analyzeHand(record, { rangesOnly = false, detail = 'full',
   const villains = record.players
     .filter((p) => p.role === 'villain')
     .map((p) => ({ seat: p.seat, position: p.position, name: p.name ?? p.position, cards: (p.cards ?? []).map(codeToIndex) }));
-  if (!entries.length) return rangesOnly ? { ranges: [] } : summarize([], { record, heroRecord, heroProfile, heroSkill, villains, chart: null, bb });
+  if (!entries.length) return rangesOnly ? { ranges: [] } : summarize([], { record, heroRecord, heroProfile, villains, chart: null, bb });
 
   // The depth that matters: your stack against the deepest opponent's.
   const stackOf = (p) => p.stack ?? 100 * bb;
@@ -140,7 +139,7 @@ export async function analyzeHand(record, { rangesOnly = false, detail = 'full',
         boardKey = board.join();
         strengths = board.length >= 3 ? computeStrengths(board, heroCards) : null;
       }
-      decisions.push(gradeHeroDecision({ gto, state, action, street, heroCards, heroRecord, villains, heroSkill, board, strengths, random, index: decisions.length }));
+      decisions.push(gradeHeroDecision({ gto, state, action, street, heroCards, heroRecord, villains, board, strengths, random, index: decisions.length }));
     }
     gto.apply(state, action);
   }
@@ -154,11 +153,11 @@ export async function analyzeHand(record, { rangesOnly = false, detail = 'full',
       }),
     };
   }
-  return summarize(decisions, { record, heroRecord, heroProfile, heroSkill, villains, chart: gto.chart, bb });
+  return summarize(decisions, { record, heroRecord, heroProfile, villains, chart: gto.chart, bb });
 }
 
 // One hero decision: what GTO does with the hand here and how the real play compares.
-function gradeHeroDecision({ gto, state, action, street, heroCards, heroRecord, villains, heroSkill, board, strengths, random, index }) {
+function gradeHeroDecision({ gto, state, action, street, heroCards, heroRecord, villains, board, strengths, random, index }) {
   const opts = getOptions(state);
   const potRef = state.pot + opts.toCall;
   const playerOf = (seat) => state.players.find((p) => p.seat === seat);
@@ -205,7 +204,7 @@ function gradeHeroDecision({ gto, state, action, street, heroCards, heroRecord, 
     actual = options.length - 1;
     offMenu = "Limping isn't part of GTO from this seat (it opens or folds), so the limp is valued halfway between the two.";
   }
-  const graded = gradeAgainstGto({ advice, actual, potRef, heroSkill, bb: state.bb });
+  const graded = gradeAgainstGto({ advice, actual, potRef, bb: state.bb });
   const labeled = options.map((o, k) => ({ ...o, ev: o.ev === null ? null : round2(o.ev), isActual: k === actual, isBest: k === graded.best }));
 
   // A raise size the charts don't have was graded as the closest one they do.
@@ -237,7 +236,7 @@ function gradeHeroDecision({ gto, state, action, street, heroCards, heroRecord, 
 }
 
 // The report: accuracy over the graded decisions, grade counts, EV given up, the biggest leak, players.
-function summarize(decisions, { record, heroRecord, heroProfile, heroSkill, villains, chart, bb }) {
+function summarize(decisions, { record, heroRecord, heroProfile, villains, chart, bb }) {
   const ctx = { bb };
   for (const d of decisions) d.notes = explainDecision(d, ctx);
   const graded = decisions.filter((d) => d.graded);
@@ -257,7 +256,6 @@ function summarize(decisions, { record, heroRecord, heroProfile, heroSkill, vill
     evLost,
     evLostBB: round2(evLost / bb),
     keyLesson,
-    heroSkill,
     chart,
     hero: {
       position: heroRecord.position,

@@ -149,15 +149,21 @@ worth:
 - **Preflop:** the stored loss against the best option.
 - **Postflop:** the solve's value for your exact hand, relative to folding.
 
-- An option GTO takes at least 20% of the time is as good as the best one: at equilibrium every mixed option
-  is worth the same. Score 100.
-- 5-20% of the time: at least "Good" (85-96).
-- Rarer than that, the score comes from the value given up: the share of the pot (3% tolerance for beginners,
-  1% for pros) and the size in big blinds. On top of that:
-  - **Preflop**, an option GTO almost never takes stays below "Good", because the stored losses are coarse.
-  - **Postflop**, a play GTO doesn't make is never "Best move". But the right kind of play in a rarely used
-    size, at little cost, is still "Good".
-- Grades: Best move 97+, Good 80+, Inaccuracy 55+, Mistake 30+, Blunder. Hand accuracy weighs bigger pots more.
+Everyone is graded the same way, against GTO, whatever level they're set to:
+- The score comes from the value given up, as a share of the pot and in big blinds. Only half a percent of
+  the pot is forgiven as solver noise. In a 20 bb pot, giving up 3% of it scores about 87 (Good), 5% about 77
+  and 10% about 58 (Inaccuracy), 20% about 32 (Mistake), and 30% or more is a Blunder. Each big blind given
+  up takes about 3% more off, so the same share of a bigger pot scores lower.
+- GTO mixes its plays. An option it takes at least 20% of the time scores 100, and one it takes 5-20% of the
+  time is at least "Good" (85-96), but only while the solve agrees it costs next to nothing (1.5% and 3% of
+  the pot): a quick solve isn't fully converged, and a rare mix can hide a real loss.
+- **Preflop**, an option GTO almost never takes stays below "Good", because the stored losses are coarse.
+- **Postflop**, a play GTO doesn't make is never "Best move", and once it gives up more than 2% of the pot
+  it's at most an "Inaccuracy". But the right kind of play in a rarely used size, at a cost under 2% of the
+  pot, is still "Good".
+- Grades: Best move 97+, Good 80+, Inaccuracy 55+, Mistake 30+, Blunder.
+- Hand accuracy weighs bigger pots more (square root of the pot in big blinds), and bad decisions more (up to
+  3x as the score falls), so a blunder isn't averaged away by the easy decisions around it.
 
 The notes explain:
 - where the answer comes from
