@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { useDiskCharts, playHand } from './helpers.mjs';
 import { solvePostflop } from '../../src/gto/postflop/solver.js';
-import { cardId, handIndex } from '../../src/gto/cards.js';
+import { cardId, handIndex, expandClasses } from '../../src/gto/cards.js';
 import { analyzeHand } from '../../src/coach/analyzeHand.js';
 import { generateSpot, heroAct, dealStreet } from '../../src/practice/generateSpot.js';
 import { botAction } from '../../src/practice/gtoBot.js';
@@ -78,6 +78,30 @@ test('river, 3-way: strategies are proper mixes and the nuts never folds', () =>
     const k = sol.handPosition(node.player, hand('Ac', 'Ah'));
     if (fold >= 0 && k >= 0) assert.ok(s[fold * n + k] < 0.02, 'aces never fold');
   }
+});
+
+test('solves converge: heads-up exploitability and 3-way best-response gains shrink toward zero', () => {
+  // A third of all hands on a turn (sampled rivers), at the Practice budget.
+  const range = expandClasses(Float32Array.from({ length: 169 }, (_, c) => (c % 3 === 0 ? 1 : 0)));
+  const board = ['Qs', '9h', '4s', '8d'].map(cardId);
+  const solve = (players, iterations) => solvePostflop({ board, ranges: Array(players).fill(range), pot: 9, stacks: Array(players).fill(90), path: [], detail: 'fast', iterations, ms: 1e9 });
+  const early = solve(2, 15).exploitability();
+  const late = solve(2, 150).exploitability();
+  assert.ok(late >= 0 && late < early && late < 0.01, `heads-up: ${early} after 15 iterations, ${late} after 150`);
+  const threeWay = solve(3, 150).nashConv();
+  assert.ok(threeWay.gains.every((g) => g >= -1e-6), `no player can lose by best-responding (${threeWay.gains})`);
+  assert.ok(threeWay.total < 0.01, `3-way gains add up to ${threeWay.total} of the pot`);
+});
+
+test('visiting 2 rivers per pass converges about as fast per pass as visiting them all', () => {
+  // Within the app's time limit a solve gets a few dozen passes; there, 2 rotating rivers per pass (cheaper
+  // passes) are about as close to equilibrium as every river. Judged by an exact best response.
+  const range = expandClasses(Float32Array.from({ length: 169 }, (_, c) => (c % 4 === 0 ? 1 : 0)));
+  const board = ['Js', '8h', '3s'].map(cardId);
+  const solve = (riverDraw) => solvePostflop({ board, ranges: [range, range], pot: 10, stacks: [90, 90], path: [], detail: 'fast', iterations: 40, ms: 1e9, sampling: { turns: 4, rivers: 4, riverDraw } });
+  const all = solve(0).exploitability();
+  const drawn = solve(2).exploitability();
+  assert.ok(drawn >= 0 && drawn < 0.02 && drawn < 1.25 * all + 0.001, `after 40 passes, 2 rivers per pass: ${drawn} of the pot from equilibrium, every river: ${all}`);
 });
 
 test('the coach grades a flatted premium below the GTO 3-bet', async () => {

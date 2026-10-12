@@ -35,8 +35,8 @@ export function playability(cls) {
 }
 
 // The realization model's settings: position effect by postflop order among the players who saw the flop
-// (heads-up: out of position, in position; 3-way: first, middle, last), and how much stronger hands
-// out-earn their equity (gamma: 1 = not at all).
+// (heads-up: out of position, in position; 3-way: first, middle, last), how much stronger hands out-earn
+// their equity (gamma: 1 = not at all), and how much playability counts (playScale, 1 = as written above).
 export const DEFAULT_MODEL = { edge2: [-0.14, 0.1], edge3: [-0.12, -0.03, 0.09], gamma: 0.5, sprScale: 4 };
 
 // How much of the postflop edge (position, playability, strength) applies at this stack-to-pot ratio: all of
@@ -61,16 +61,35 @@ export function createPayoffs(table, model = DEFAULT_MODEL) {
 
   // Flop, heads-up: realized pot share of i (at postflop seat `seat`: 0 = out of position) against j,
   // cached by seat and stack-to-pot bucket.
-  const play = Float64Array.from({ length: N }, (_, cls) => playability(cls));
+  // Playability per class: the formula above, or for heads-up pots the values fitted to TexasSolver
+  // (model.play; 3-way pots weren't measured, so they keep the formula).
+  const formulaPlay = Float64Array.from({ length: N }, (_, cls) => (model.playScale ?? 1) * playability(cls));
+  const play = model.play ? Float64Array.from(model.play) : formulaPlay;
   const flopCache = new Map();
   function flop2(seat, spr) {
     const bucket = sprBucket(spr);
     const key = `${seat}:${bucket}`;
     if (flopCache.has(key)) return flopCache.get(key);
     const w = sprWeight(bucket, model.sprScale);
+    const matrix = new Float64Array(N * N);
+    if (model.form === 'transfer') {
+      // Equity plus a transfer between the two players (what one wins beyond their equity the other loses):
+      // stronger hands win more than their equity (strength), the player in position wins `edge` of the pot
+      // from the one out of position, and better-playing hands win from worse ones. Shares can go above 1
+      // (a set gets paid off) or below 0 (a weak hand pays off), as measured with TexasSolver
+      // (scripts/gto-reference/realization.mjs).
+      const side = seat === 0 ? -model.edge : model.edge;
+      for (let i = 0; i < N; i++) {
+        for (let j = 0; j < N; j++) {
+          const e = equity[i][j];
+          matrix[i * N + j] = K[i * N + j] * (e + w * (model.strength * (e - 0.5) + side + play[i] - play[j]));
+        }
+      }
+      flopCache.set(key, matrix);
+      return matrix;
+    }
     const gamma = 1 + model.gamma * w; // stronger hands win more than their share when stacks are deep
     const [mine, theirs] = seat === 0 ? POSITION_EDGE[2] : [POSITION_EDGE[2][1], POSITION_EDGE[2][0]];
-    const matrix = new Float64Array(N * N);
     for (let i = 0; i < N; i++) {
       const ri = 1 + w * (mine + play[i]);
       for (let j = 0; j < N; j++) {
@@ -95,7 +114,7 @@ export function createPayoffs(table, model = DEFAULT_MODEL) {
     if (!share3Cache.has(key)) {
       const flat = new Float64Array(N * B * B);
       for (let i = 0; i < N; i++) {
-        const factor = isFlop ? 1 + sprWeight(bucket, model.sprScale) * (POSITION_EDGE[3][seat] + play[i] - 0.02) : 1;
+        const factor = isFlop ? 1 + sprWeight(bucket, model.sprScale) * (POSITION_EDGE[3][seat] + formulaPlay[i] - 0.02) : 1;
         for (let k = 0; k < B * B; k++) flat[i * B * B + k] = threeWay[i][k] * factor;
       }
       share3Cache.set(key, flat);

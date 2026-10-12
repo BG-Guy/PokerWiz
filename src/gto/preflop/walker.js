@@ -65,8 +65,19 @@ export function matchAction(node, real, stack) {
 }
 
 // chart: from loadChart(); seatOf: Map(table position -> tree seat, -1 = left out).
-export function createPreflopWalker(chart, seatOf) {
+// models: Map(tree seat -> player model, see gto/players/models.js): those seats play the chart bent toward
+// their tendency (it shapes their range and the advice for them).
+export function createPreflopWalker(chart, seatOf, models = new Map()) {
   let node = chart.tree.root;
+  // The strategy the player at a node follows: the chart's, or their model's version of it. Cached per hand
+  // (chart trees are shared between hands, so nothing is stored on the nodes).
+  const bent = new Map();
+  function strategyAt(at, data) {
+    const model = models.get(at.player);
+    if (!model) return data.strategy;
+    if (!bent.has(at)) bent.set(at, model.preflop(at, data.strategy));
+    return bent.get(at);
+  }
   const reach = Array.from({ length: 8 }, () => new Float32Array(N).fill(1));
   const history = [];
   let lost = null; // why the hand can't be followed any more (e.g. four players in the pot)
@@ -76,14 +87,15 @@ export function createPreflopWalker(chart, seatOf) {
     const data = chart.dataAt(node);
     const row = reach[node.player];
     if (data) {
+      const strategy = strategyAt(node, data);
       let before = 0;
       let after = 0;
       for (let c = 0; c < N; c++) {
         before += CLASS_COMBOS[c] * row[c];
-        after += CLASS_COMBOS[c] * row[c] * data.strategy[index * N + c];
+        after += CLASS_COMBOS[c] * row[c] * strategy[index * N + c];
       }
       const floor = after < OFF_STRATEGY * before ? FLOOR : 0;
-      for (let c = 0; c < N; c++) row[c] *= data.strategy[index * N + c] + floor;
+      for (let c = 0; c < N; c++) row[c] *= strategy[index * N + c] + floor;
     }
     history.push({ node, index, ...info });
     node = node.children[index];
@@ -158,10 +170,11 @@ export function createPreflopWalker(chart, seatOf) {
         const best = Math.min(...loss);
         loss = loss.map((l) => l - best);
       }
+      const strategy = strategyAt(node, data);
       return {
         node,
         actions: node.actions,
-        strategy: Array.from({ length: A }, (_, a) => data.strategy[a * N + cls]),
+        strategy: Array.from({ length: A }, (_, a) => strategy[a * N + cls]),
         loss,
         exact: data.exact,
       };

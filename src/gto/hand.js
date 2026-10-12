@@ -5,9 +5,10 @@
 //   preflop   the solved 8-max charts (preflop/), at the stack depth closest to the hand's
 //   postflop  a fresh solve of each street (postflop/) from the ranges the players brought to it
 //
-// Player reads (profiles) aren't used yet. When they are, they plug in here: a read would lock a player's
-// strategy at the spots it describes (advise) and narrow their range by that strategy (apply), and the solver
-// would answer everyone else against it.
+// Player reads plug in as models (gto/players/models.js, from a profile): a modelled seat plays the preflop
+// charts bent toward their tendency (which shapes the range they bring to the flop), and in every postflop
+// solve they play their tendency mixed with GTO by their skill, while everyone else's strategy becomes the
+// best answer to them. Seats without a model play GTO.
 import { loadChart } from './preflop/charts.js';
 import { mapSeats, createPreflopWalker, matchAction } from './preflop/walker.js';
 import { createStreet } from './postflop/street.js';
@@ -33,11 +34,17 @@ export function solverAction(state, action) {
 // state: the hand as dealt (createHand). stackBB: the depth to play (the effective stack that matters).
 // known: { seat: ['As', 'Kd'] } cards we'll ask about (the solve makes sure it can value them).
 // folders: positions that fold first or aren't in the hand (lets a 9-handed hand fit the 8-handed charts).
-export async function createGtoHand({ state, stackBB, known = {}, detail = 'full', seed = 1, folders = new Set() }) {
+// models: { seat: model } for players with a read (modelFor(profile)); everyone else plays GTO.
+export async function createGtoHand({ state, stackBB, known = {}, detail = 'full', seed = 1, folders = new Set(), models = {} }) {
   const bb = state.bb;
   const chart = await loadChart(stackBB, (state.ante ?? 0) / bb);
   const seatOf = mapSeats(state.preflopOrder, folders);
-  const walker = createPreflopWalker(chart, seatOf);
+  const treeModels = new Map();
+  for (const p of state.players) {
+    const treeSeat = seatOf.get(p.position);
+    if (models[p.seat] && treeSeat >= 0) treeModels.set(treeSeat, models[p.seat]);
+  }
+  const walker = createPreflopWalker(chart, seatOf, treeModels);
   const knownHand = {};
   for (const [seat, cards] of Object.entries(known)) {
     if (cards?.length === 2) knownHand[seat] = handIndex(cardId(cards[0]), cardId(cards[1]));
@@ -73,6 +80,7 @@ export async function createGtoHand({ state, stackBB, known = {}, detail = 'full
       pot: s.pot / bb,
       stacks: alive.map((p) => (p.stack - p.invested) / bb),
       include: alive.map((p) => (knownHand[p.seat] !== undefined ? [knownHand[p.seat]] : [])),
+      models: alive.map((p) => models[p.seat] ?? null),
       detail,
       seed: seed * 31 + STREET_INDEX[s.street],
     });

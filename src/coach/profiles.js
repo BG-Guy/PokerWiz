@@ -125,10 +125,11 @@ export function modelParams(profile, imageOf = null) {
   const pfrRatio = 0.2 + 0.7 * A;
   let aggression = 0.5 + 4.5 * A ** 1.3;
   let bluffMult = 0.3 + 1.7 * A;
-  // Loose players call more; skill pulls folding back toward the mathematically correct amount;
-  // recreational players call noticeably more on top of that ("I have to see it").
-  let foldMult = clamp(1.3 - 0.8 * L, 0.45, 1.35);
-  foldMult = lerp(foldMult, 1, 0.6 * S) * (0.75 + 0.25 * S);
+  // Folding against what minimum defence asks for: tight players fold more (a nit about 20% more), loose ones
+  // less (a calling station about half as often); skill pulls it back toward the right amount, and
+  // recreational players call a little more on top of that ("I have to see it").
+  let foldMult = clamp(1.5 - 1.2 * L, 0.3, 1.5);
+  foldMult = lerp(foldMult, 1, 0.5 * S) * (0.9 + 0.1 * S);
   let noise = 0.05 + 0.13 * (1 - S);
   let bigBluffShy = clamp((0.45 - S) / 0.35, 0, 1); // beginners 1, recreational ~0.65, regulars and up 0
   const drawSkill = clamp((S - 0.05) / 0.65, 0, 1);

@@ -15,6 +15,7 @@ import { FULL_DECK, codeToIndex } from '../utils/cards.js';
 import { classOf } from '../coach/combos.js';
 import { PREFLOP_BY_CLASS } from '../coach/preflopTable.js';
 import { createGtoHand } from '../gto/hand.js';
+import { readModels } from '../gto/players/models.js';
 import { botAction } from './gtoBot.js';
 
 // Blinds are $1/$2 in both games; tournaments add a big-blind ante and play shallower.
@@ -135,7 +136,9 @@ async function tryDeal(setup, random) {
 
   let state = createHand({ players, positions, sb: game.sb, bb: game.bb, ante: game.ante });
   const stackBB = Math.min(setup.hero.stackBB, villainStackBB);
-  const gto = await createGtoHand({ state, stackBB, known: cards, detail: DETAIL, seed: Math.floor(random() * 2 ** 31) });
+  // Opponents with a read (setup.villains[0].profile, when reads are on) play their tendency; the rest GTO.
+  const models = readModels(players.map((p) => ({ ...p, profile: p.role === 'villain' ? setup.villains?.[0]?.profile : null })));
+  const gto = await createGtoHand({ state, stackBB, known: cards, detail: DETAIL, seed: Math.floor(random() * 2 ** 31), models });
   const spot = { cards, heroSeat, villainSeats: players.filter((p) => p.role === 'villain').map((p) => p.seat), players, game, positions, setup, gto };
   const finishSpot = (s) => ({ ...spot, state: s, deck: deck.cards, firstDecision: heroDecisions(s), status: 'hero' });
 

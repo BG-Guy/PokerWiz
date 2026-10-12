@@ -5,6 +5,8 @@
 //   ante-<stack>   1 big-blind ante (tournaments)
 //
 // Run: node scripts/gto/solvePreflop.mjs [--iterations 600] [--only cash-100,ante-20]
+//      [--model model.json] (the flop model's settings, default payoffs.mjs DEFAULT_MODEL)
+//      [--out dir] (write the charts somewhere else, e.g. to compare before replacing the app's)
 // Needs scripts/gto/data/equity.json (node scripts/gto/buildEquityTables.mjs). Each depth runs in its own
 // worker thread; a full run takes a few minutes per depth.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -21,7 +23,7 @@ import { CHART_CONFIGS as CONFIGS } from '../../src/gto/preflop/configs.js';
 // the app falls back to the closest node it has.
 const KEEP_THRESHOLD = 1e-4;
 
-const CHART_DIR = new URL('../../src/gto/preflop/charts/', import.meta.url);
+const DEFAULT_CHART_DIR = new URL('../../src/gto/preflop/charts/', import.meta.url);
 
 // Share of all hands taking each action at a node (for the summary).
 function frequencies(node, strategy) {
@@ -33,9 +35,9 @@ function frequencies(node, strategy) {
 
 // ----- Worker: solve one config -----
 if (!isMainThread) {
-  const { config, iterations, table } = workerData;
+  const { config, iterations, table, model } = workerData;
   const started = Date.now();
-  const solver = createPreflopSolver({ stack: config.stack, ante: config.ante, table });
+  const solver = createPreflopSolver({ stack: config.stack, ante: config.ante, table, model });
   for (let done = 0; done < iterations; done += 50) {
     solver.run(Math.min(50, iterations - done));
     parentPort.postMessage({ progress: Math.min(iterations, done + 50) });
@@ -88,6 +90,10 @@ async function main() {
     .filter(Boolean);
   const configs = only.length ? CONFIGS.filter((c) => only.includes(c.name)) : CONFIGS;
   const table = JSON.parse(readFileSync(new URL('./data/equity.json', import.meta.url), 'utf8'));
+  const modelFile = option('model', '');
+  const model = modelFile ? JSON.parse(readFileSync(modelFile, 'utf8')) : undefined;
+  const out = option('out', '');
+  const CHART_DIR = out ? new URL(`file://${out.endsWith('/') ? out : `${out}/`}`) : DEFAULT_CHART_DIR;
   mkdirSync(CHART_DIR, { recursive: true });
 
   const manifestUrl = new URL('manifest.json', CHART_DIR);
@@ -110,7 +116,7 @@ async function main() {
       }
       const config = queue.shift();
       running++;
-      const worker = new Worker(new URL(import.meta.url), { workerData: { config, iterations, table } });
+      const worker = new Worker(new URL(import.meta.url), { workerData: { config, iterations, table, model } });
       worker.on('message', (message) => {
         if (message.progress) return;
         writeFileSync(new URL(`${config.name}.pfc`, CHART_DIR), message.bytes);

@@ -90,6 +90,43 @@ export function sweep(pList, pStrength, pOrder, oList, oStrength, oOrder, oReach
   }
 }
 
+// Heads-up showdown values for every hand of p in one pass (the sweep above, fused with the payoff): what p
+// wins (half the pot on a tie) minus what p put in, weighted by o's compatible reach.
+function headsUpShowdown(pList, pStrength, pOrder, oList, oStrength, oOrder, oReach, same, mass, pot, invested, out) {
+  sumsLt.fill(0);
+  sumsLe.fill(0);
+  let totalLt = 0;
+  let totalLe = 0;
+  let iLt = 0;
+  let iLe = 0;
+  const oCount = oList.count;
+  const half = 0.5 * pot;
+  for (let n = 0; n < pList.count; n++) {
+    const k = pOrder[n];
+    const s = pStrength[k];
+    while (iLt < oCount && oStrength[oOrder[iLt]] < s) {
+      const j = oOrder[iLt++];
+      const r = oReach[j];
+      totalLt += r;
+      sumsLt[oList.c1[j]] += r;
+      sumsLt[oList.c2[j]] += r;
+    }
+    while (iLe < oCount && oStrength[oOrder[iLe]] <= s) {
+      const j = oOrder[iLe++];
+      const r = oReach[j];
+      totalLe += r;
+      sumsLe[oList.c1[j]] += r;
+      sumsLe[oList.c2[j]] += r;
+    }
+    const a = pList.c1[k];
+    const b = pList.c2[k];
+    const sameJ = same[k];
+    const lt = totalLt - sumsLt[a] - sumsLt[b];
+    const le = totalLe - sumsLe[a] - sumsLe[b] + (sameJ >= 0 ? oReach[sameJ] : 0);
+    out[k] = half * (lt + le) - invested * mass[k];
+  }
+}
+
 // Leaf evaluator for one solve: holds scratch buffers sized for its players.
 // game: { lists, same[p][o] } (see solver.js).
 export function createLeafEvaluator(game) {
@@ -102,10 +139,11 @@ export function createLeafEvaluator(game) {
   const les = Array.from({ length: P }, () => new Float64Array(maxHands));
   const coeffs = new Float64Array(P + 1);
 
-  // masses[p][o][k]: o's reach compatible with p's hand k (for every pair).
-  function fillMasses(reach) {
-    for (let o = 0; o < P; o++) totals[o] = cardSums(game.lists[o], reach[o], sums[o]);
+  // masses[p][o][k]: o's reach compatible with p's hand k (for every pair, or only those p = only needs).
+  function fillMasses(reach, only) {
+    for (let o = 0; o < P; o++) if (o !== only) totals[o] = cardSums(game.lists[o], reach[o], sums[o]);
     for (let p = 0; p < P; p++) {
+      if (only >= 0 && p !== only) continue;
       for (let o = 0; o < P; o++) {
         if (o !== p) massAgainst(game.lists[p], game.same[p][o], reach[o], totals[o], sums[o], masses[p][o]);
       }
@@ -124,11 +162,17 @@ export function createLeafEvaluator(game) {
     return out;
   }
   const othersOf = Array.from({ length: P }, (_, p) => [...Array(P).keys()].filter((o) => o !== p));
+  // Players who are still in at a leaf, and who folded, from each player's point of view (cached per leaf).
+  function split(leaf, p) {
+    if (!leaf.split) leaf.split = othersOf.map((others) => ({ live: others.filter((o) => leaf.alive[o]), folded: others.filter((o) => !leaf.alive[o]) }));
+    return leaf.split[p];
+  }
 
-  // Everyone else folded: `winner` takes the pot.
-  function fold(leaf, reach, cfv) {
-    fillMasses(reach);
+  // Everyone else folded: `winner` takes the pot. only: compute just that player's values (-1 = everyone's).
+  function fold(leaf, reach, cfv, only = -1) {
+    fillMasses(reach, only);
     for (let p = 0; p < P; p++) {
+      if (only >= 0 && p !== only) continue;
       const payoff = p === leaf.winner ? leaf.pot - leaf.invested[p] : -leaf.invested[p];
       const out = cfv[p];
       const n = game.lists[p].count;
@@ -139,11 +183,12 @@ export function createLeafEvaluator(game) {
 
   // Showdown on a 5-card board among the players still in (leaf.alive); board = { strength[p], order[p] }.
   // Pot share against independent opponents: win outright against all, or split with those who tie.
-  function showdown(leaf, reach, cfv, board) {
-    fillMasses(reach);
+  function showdown(leaf, reach, cfv, board, only = -1) {
+    fillMasses(reach, only);
     const alive = leaf.alive;
     const pot = leaf.pot;
     for (let p = 0; p < P; p++) {
+      if (only >= 0 && p !== only) continue;
       const list = game.lists[p];
       const n = list.count;
       const out = cfv[p];
@@ -155,8 +200,14 @@ export function createLeafEvaluator(game) {
         for (let k = 0; k < n; k++) out[k] = loss * product[k];
         continue;
       }
-      const live = others.filter((o) => alive[o]);
-      productOf(p, others.filter((o) => !alive[o]), product); // players who folded earlier: their reach only
+      const { live, folded } = split(leaf, p);
+      if (P === 2 && live.length === 1) {
+        // Heads-up, both still in: one fused pass.
+        const o = live[0];
+        headsUpShowdown(list, board.strength[p], board.order[p], game.lists[o], board.strength[o], board.order[o], reach[o], game.same[p][o], masses[p][o], pot, leaf.invested[p], out);
+        continue;
+      }
+      productOf(p, folded, product); // players who folded earlier: their reach only
       for (const o of live) {
         sweep(list, board.strength[p], board.order[p], game.lists[o], board.strength[o], board.order[o], reach[o], game.same[p][o], lts[o], les[o]);
       }

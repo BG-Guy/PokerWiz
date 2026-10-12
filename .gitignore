@@ -2,3 +2,6 @@ node_modules/
 dist/
 server/data/
 .DS_Store
+# TexasSolver reference runs and the local build (scripts/gto-reference/README.md)
+scripts/gto-reference/work/
+scripts/gto-reference/texassolver

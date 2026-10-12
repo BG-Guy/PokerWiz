@@ -21,6 +21,7 @@ import { explainDecision } from './explain.js';
 import { replayHand } from './replay.js';
 import { createRandom, seedFromString } from './random.js';
 import { createGtoHand } from '../gto/hand.js';
+import { readModels } from '../gto/players/models.js';
 import { toAppRange } from '../gto/cards.js';
 
 const round2 = (n) => Math.round(n * 100) / 100;
@@ -118,6 +119,7 @@ export async function analyzeHand(record, { rangesOnly = false, detail = 'full',
     detail,
     seed,
     folders: firstFolders(record, entries),
+    models: readModels(record.players), // villains with a read (when reads are on): graded against their tendency
   });
 
   const decisions = [];

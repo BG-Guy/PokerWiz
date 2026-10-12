@@ -1,0 +1,215 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3b95318..3689bec 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,6 +1,6 @@
+ cmake_minimum_required(VERSION 3.15)
+ project(bindSolver)
+-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
++set(CMAKE_OSX_DEPLOYMENT_TARGET 11.0)
+ 
+ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+ set(CMAKE_CXX_STANDARD 17)
+@@ -79,8 +79,8 @@ include_directories(ext/fmt/include ext/fmt)
+ add_subdirectory(ext/fmt/)
+ 
+ # ppybind11
+-include_directories(ext/pybind11/include)
+-add_subdirectory(ext/pybind11)
++# (local build: python bindings off) include_directories(ext/pybind11/include)
++# add_subdirectory(ext/pybind11)
+ 
+ include_directories(include)
+ 
+diff --git a/include/solver/PCfrSolver.h b/include/solver/PCfrSolver.h
+index 3bcfcf2..e95ec83 100644
+--- a/include/solver/PCfrSolver.h
++++ b/include/solver/PCfrSolver.h
+@@ -119,6 +119,8 @@ private:
+     bool distributing_task;
+     float accuracy;
+     bool use_isomorphism;
++    bool collecting_evs = false; // (local patch) the final pass that measures action values
++    vector<vector<float>> root_evs; // (local patch) each hand's value at the root, per player
+ 
+     const vector<PrivateCards>& playerHands(int player);
+     vector<vector<float>> getReachProbs();
+diff --git a/include/trainable/DiscountedCfrTrainable.h b/include/trainable/DiscountedCfrTrainable.h
+index 2c0fd34..639fa71 100644
+--- a/include/trainable/DiscountedCfrTrainable.h
++++ b/include/trainable/DiscountedCfrTrainable.h
+@@ -23,6 +23,7 @@ private:
+     // TODO 這裏能不能减肥
+     vector<float> r_plus_sum;
+     vector<float> cum_r_plus;
++    vector<float> evs; // (local patch)
+     //vector<float> cum_r_plus_sum;
+     //vector<float> current_strategy;
+     //vector<float> average_strategy;
+@@ -40,6 +41,7 @@ public:
+     void copyStrategy(shared_ptr<Trainable> other_trainable);
+ 
+     json dump_strategy(bool with_state) override;
++    void setEv(const vector<float>& evs) override; // (local patch)
+ 
+ private:
+ 
+diff --git a/include/trainable/Trainable.h b/include/trainable/Trainable.h
+index b30f880..01f2b0f 100644
+--- a/include/trainable/Trainable.h
++++ b/include/trainable/Trainable.h
+@@ -20,6 +20,8 @@ public:
+     virtual void updateRegrets(const vector<float>& regrets,int iteration_number,const vector<float>& reach_probs) = 0;
+     virtual void copyStrategy(shared_ptr<Trainable> other_trainable) = 0;
+     virtual json dump_strategy(bool with_state) = 0;
++    // (local patch) each action's value per hand, measured with the final strategies
++    virtual void setEv(const vector<float>& evs) {}
+     virtual TrainableType get_type() = 0;
+ };
+ 
+diff --git a/src/solver/PCfrSolver.cpp b/src/solver/PCfrSolver.cpp
+index f0e022b..a07c38f 100644
+--- a/src/solver/PCfrSolver.cpp
++++ b/src/solver/PCfrSolver.cpp
+@@ -425,7 +425,8 @@ PCfrSolver::actionUtility(int player, shared_ptr<ActionNode> node, const vector<
+     }
+ #endif
+ 
+-    const vector<float> current_strategy = trainable->getcurrentStrategy();
++    // (local patch) the measuring pass plays the final (average) strategies
++    const vector<float> current_strategy = this->collecting_evs ? trainable->getAverageStrategy() : trainable->getcurrentStrategy();
+ #ifdef DEBUG
+     if (current_strategy.size() != actions.size() * node_player_private_cards.size()) {
+         node->printHistory();
+@@ -511,7 +512,32 @@ PCfrSolver::actionUtility(int player, shared_ptr<ActionNode> node, const vector<
+             }
+         }
+ 
+-        if(!this->distributing_task) {
++        // (local patch) measuring pass: each action's value per hand, normalised by the opponent's reach that
++        // doesn't clash with the hand (as the GUI version does); nothing is trained
++        if(this->collecting_evs) {
++            int oppo_player = 1 - player;
++            const vector<PrivateCards>& oppo_hand = playerHands(oppo_player);
++            float oppo_sum = 0;
++            vector<float> oppo_card_sum(52, 0.0);
++            for(std::size_t i = 0;i < oppo_hand.size();i ++){
++                oppo_card_sum[oppo_hand[i].card1] += reach_probs[i];
++                oppo_card_sum[oppo_hand[i].card2] += reach_probs[i];
++                oppo_sum += reach_probs[i];
++            }
++            const vector<PrivateCards>& player_hand = playerHands(player);
++            vector<float> evs(actions.size() * node_player_private_cards.size(), 0.0);
++            for(std::size_t action_id = 0;action_id < actions.size();action_id ++){
++                if(all_action_utility[action_id].empty()) continue;
++                for(std::size_t hand_id = 0;hand_id < node_player_private_cards.size();hand_id ++){
++                    int same = this->pcm.indPlayer2Player(player, oppo_player, hand_id);
++                    float plus = same == -1 ? 0 : reach_probs[same];
++                    const PrivateCards& one = player_hand[hand_id];
++                    float mass = oppo_sum - oppo_card_sum[one.card1] - oppo_card_sum[one.card2] + plus;
++                    evs[hand_id + action_id * node_player_private_cards.size()] = mass > 1e-12 ? all_action_utility[action_id][hand_id] / mass : 0;
++                }
++            }
++            trainable->setEv(evs);
++        } else if(!this->distributing_task) {
+             if (iter > this->warmup) {
+                 trainable->updateRegrets(regrets, iter + 1, reach_probs);
+             }/*else if(iter < this->warmup){
+@@ -770,6 +796,33 @@ void PCfrSolver::train() {
+         fileWriter.close();
+     }
+ 
++    // (local patch) one more pass with both players' final strategies, recording each action's value per hand
++    this->collecting_evs = true;
++    this->root_evs = vector<vector<float>>(this->player_number);
++    for(int player_id = 0;player_id < this->player_number;player_id ++) {
++        this->round_deal = vector<int>{-1,-1,-1,-1};
++        vector<float> values = cfr(player_id, this->tree->getRoot(), reach_probs[1 - player_id], this->iteration_number, this->initial_board_long, 0);
++        // Normalised like the action values: by the opponent's starting reach that doesn't clash with the hand.
++        int oppo = 1 - player_id;
++        const vector<PrivateCards>& oppo_hand = playerHands(oppo);
++        const vector<float>& oppo_reach = reach_probs[oppo];
++        float oppo_sum = 0;
++        vector<float> oppo_card_sum(52, 0.0);
++        for(std::size_t i = 0;i < oppo_hand.size();i ++){
++            oppo_card_sum[oppo_hand[i].card1] += oppo_reach[i];
++            oppo_card_sum[oppo_hand[i].card2] += oppo_reach[i];
++            oppo_sum += oppo_reach[i];
++        }
++        const vector<PrivateCards>& mine = playerHands(player_id);
++        this->root_evs[player_id] = vector<float>(mine.size(), 0.0);
++        for(std::size_t h = 0;h < mine.size();h ++){
++            int same = this->pcm.indPlayer2Player(player_id, oppo, h);
++            float plus = same == -1 ? 0 : oppo_reach[same];
++            float mass = oppo_sum - oppo_card_sum[mine[h].card1] - oppo_card_sum[mine[h].card2] + plus;
++            this->root_evs[player_id][h] = mass > 1e-12 ? values[h] / mass : 0;
++        }
++    }
++    this->collecting_evs = false;
+ }
+ 
+ void PCfrSolver::exchangeRange(json& strategy,int rank1,int rank2,shared_ptr<ActionNode> one_node){
+@@ -815,6 +868,8 @@ void PCfrSolver::filterColliding(json& strategy_block,uint64_t current_board_lon
+         }
+     }
+     for(const string& combo : to_drop) combo_map.erase(combo);
++    // (local patch) the values are keyed the same way
++    if(strategy_block.contains("evs")) for(const string& combo : to_drop) strategy_block["evs"].erase(combo);
+ }
+ 
+ void PCfrSolver::reConvertJson(const shared_ptr<GameTreeNode>& node,json& strategy,string key,int depth,int max_depth,vector<string> prefix,int deal,vector<vector<int>> exchange_color_list,uint64_t current_board_long) {
+@@ -856,6 +911,7 @@ void PCfrSolver::reConvertJson(const shared_ptr<GameTreeNode>& node,json& strate
+                 int rank1 = one_exchange[0];
+                 int rank2 = one_exchange[1];
+                 this->exchangeRange((*retval)["strategy"]["strategy"],rank1,rank2,one_node);
++                if((*retval)["strategy"].contains("evs")) this->exchangeRange((*retval)["strategy"]["evs"],rank1,rank2,one_node); // (local patch)
+ 
+             }
+             PCfrSolver::filterColliding((*retval)["strategy"],current_board_long);
+@@ -963,6 +1019,13 @@ json PCfrSolver::dumps(bool with_status,int depth) {
+     }
+     json retjson;
+     this->reConvertJson(this->tree->getRoot(),retjson,"",0,depth,vector<string>({"begin"}),0,vector<vector<int>>(),this->initial_board_long);
++    // (local patch) each hand's value at the root, per player
++    for(std::size_t p = 0;p < this->root_evs.size();p ++){
++        json values;
++        vector<PrivateCards>& mine = this->ranges[p];
++        for(std::size_t h = 0;h < mine.size() && h < this->root_evs[p].size();h ++) values[mine[h].toString()] = this->root_evs[p][h];
++        retjson["root_evs"][fmt::format("{}",p)] = std::move(values);
++    }
+     return std::move(retjson);
+ }
+ 
+diff --git a/src/trainable/DiscountedCfrTrainable.cpp b/src/trainable/DiscountedCfrTrainable.cpp
+index 64399bb..808cca6 100644
+--- a/src/trainable/DiscountedCfrTrainable.cpp
++++ b/src/trainable/DiscountedCfrTrainable.cpp
+@@ -124,6 +124,11 @@ void DiscountedCfrTrainable::updateRegrets(const vector<float>& regrets, int ite
+     }
+ }
+ 
++// (local patch) remember each action's value per hand (action-major, like the strategy)
++void DiscountedCfrTrainable::setEv(const vector<float>& values) {
++    this->evs = values;
++}
++
+ json DiscountedCfrTrainable::dump_strategy(bool with_state) {
+     if(with_state) throw runtime_error("state storage not implemented");
+ 
+@@ -151,6 +156,16 @@ json DiscountedCfrTrainable::dump_strategy(bool with_state) {
+     json retjson;
+     retjson["actions"] = std::move(actions_str);
+     retjson["strategy"] = std::move(strategy);
++    // (local patch) the values next to the strategy, per hand
++    if(this->evs.size() == this->action_number * this->card_number){
++        json evmap;
++        for(int i = 0;i < this->privateCards->size();i ++){
++            vector<float> one_ev(this->action_number);
++            for(int j = 0;j < this->action_number;j ++) one_ev[j] = this->evs[j * this->privateCards->size() + i];
++            evmap[fmt::format("{}",(*this->privateCards)[i].toString())] = one_ev;
++        }
++        retjson["evs"] = std::move(evmap);
++    }
+     return std::move(retjson);
+ }
+ 

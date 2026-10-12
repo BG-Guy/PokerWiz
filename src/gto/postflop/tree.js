@@ -1,7 +1,7 @@
 // The game tree of a postflop solve: from the start of one street to the end of the hand, for 2 or more
 // players (seat 0 acts first, the last seat is the button side).
 //
-//   decision  { type: DECISION, player, actions: [{ type, to }], children }   to = the player's street total
+//   decision  { type: DECISION, player, actions: [{ type, to }], children, board }   to = the player's street total
 //   chance    { type: CHANCE, street, cards: [card ids], children }           the next card (sampled, see solver.js)
 //   fold      { type: FOLD, winner, pot, invested }                           everyone else folded
 //   showdown  { type: SHOWDOWN, pot, invested, alive, board }                 5 cards out, best hand wins
@@ -218,6 +218,7 @@ export function buildPostflopTree(spec) {
       pot: s.pot,
       toCall: round(s.currentBet - s.streetBet[next]),
       invested: Float64Array.from(s.invested),
+      board: s.board, // the cards out at this decision (player models judge hand strength on them)
     };
     // On the real line: onPath = how many real actions came before this spot (the last one is where the
     // hand is now); realIndex = the action the hand really took here.

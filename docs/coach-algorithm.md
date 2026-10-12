@@ -1,8 +1,9 @@
 # How the coach works: the GTO engine
 
 Since version 0.3.0 the coach and the Practice opponents run on a game-theory-optimal (GTO) engine
-(`src/gto/`). Everyone is assumed to play GTO, and only position and stack depth matter. Player reads
-(tendencies, skill levels) are still recorded with hands but aren't used yet (see "Player reads" below).
+(`src/gto/`). Everyone is assumed to play GTO, and only position and stack depth matter. The engine can also
+play the best answer to a player's tendencies (see "Player models" below), but that's switched off in the app
+for now.
 
 The engine follows the approach published poker AIs use (Libratus, Pluribus, and solvers like PioSolver and
 postflop-solver), scaled to run in a phone's browser:
@@ -123,12 +124,22 @@ What keeps it fast enough for a phone:
   Later streets get one size each. All in is added whenever it isn't a giant overbet, and on the river always.
 - **The real sizes:** every bet in the hand that isn't in the menu is added at its spot, so the coach values
   exactly what was done.
-- **Sampled runouts:** a handful of turn cards and a few rivers per turn, the same sample everywhere in the
-  tree.
+- **Sampled runouts:** a set of turn cards and a few rivers per turn (heads-up flops: 16 turns x 8 rivers for
+  reviews, 12 x 6 for Practice), the same sample everywhere in the tree. They're chosen, not drawn at random:
+  spread evenly over the four suits and over the ranks, so every flush and straight draw sees its share of
+  the cards that complete it. A random handful of turns can miss them, and backdoor draws then look worthless
+  (measured against TexasSolver, see "Checked against TexasSolver" below).
   - Heads-up flop solves bet on the flop and the turn and check the river down.
   - Turn solves bet on the turn and the river.
   - Multiway solves bet on the street being solved and check the rest down.
   - River solves are exact.
+  - Each training pass of a heads-up flop solve visits only 2 of a turn's rivers, a different spread-out pair
+    each pass, so over a few passes every river counts the same. River showdowns are most of a pass's cost,
+    so passes get cheaper, and that pays for a bigger sample. In the app the time limit, not a pass count, is
+    what ends a solve: measured against TexasSolver at equal time, 16 x 8 with 2 rivers per pass loses 0.28%
+    of the pot per decision with 0.1% big mistakes, against 0.38% and 0.7% for 12 x 4 with every river.
+    (Run for hundreds of passes, sampling would leave a little noise that visiting every river doesn't; a
+    solve in the app never gets that far.)
 - **Budgets:** about 7 s per street for reviews ("full"), 2.5 s for Practice opponents ("fast"). Less with
   fewer iterations on slow devices.
 
@@ -189,28 +200,60 @@ solve doesn't have, the street is re-solved with it.
 Everything runs in a web worker (`practice.worker.js`). "Next hand" while the opponents are thinking restarts
 it at once. When the hand is over, the coach grades it (with the "fast" budget).
 
-## Player reads (later)
+## Player models (`src/gto/players/`)
 
-Reads are kept everywhere they were (hands store them, `coach/profiles.js` maps them to model parameters), but
-the engine ignores them and their pickers are hidden behind `PLAYER_READS` in `src/gto/config.js`. They would
-plug into `src/gto/hand.js`:
-- lock a read player's strategy at the spots the read describes (node-locking)
-- narrow their range by that strategy
-- let the solver answer everyone else against it
+The engine can play against players who don't play GTO. A read (a tendency like Nit, Calling station, Maniac or
+Drunk, plus a skill level; `coach/profiles.js`) becomes a **model** (`modelFor(profile)`), passed per seat to
+`createGtoHand({ models })`. Seats without a read are GTO. The pickers are still hidden behind `PLAYER_READS`
+in `src/gto/config.js`; the engine side is ready.
+
+- **Preflop:** the seat plays the charts bent toward its tendency (`players/models.js`): it plays more or fewer
+  hands by its width (strongest first), and more calls or more raises by its raise ratio, mixed with the chart
+  by its skill. That shapes the range it brings to the flop.
+- **Postflop:** at each of its decisions the seat plays its tendency's policy (`players/policy.js`) mixed with
+  its own CFR strategy: `(1 - weight) x CFR + weight x policy`, with weight = 1 - skill. The policy works from
+  each hand's effective strength on the board (made hand plus draws):
+  - facing a bet it continues with the share of its range minimum defence asks for, divided by its fold
+    multiplier (a nit folds about 20% more than correct, a calling station about half as often), raises the
+    top of its range by aggression, and bluff-raises now and then;
+  - checked to, it bets the top of its range (wider when aggressive) and bluffs weak hands (less with big
+    sizes for recreational players); aggressive players pick bigger sizes;
+  - noise blurs every threshold and adds random play (a drunk is mostly noise).
+- **Everyone else** keeps solving with CFR, so their strategy becomes the best answer to that mix: against a
+  calling station the bluffs disappear and thin value bets appear; against a nit the bluffs go up
+  (`tests/gto/models.test.mjs`). This is node-locking with a soft lock (a restricted Nash response), so a
+  wrong read costs less than a full exploit would.
+
+## Checked against TexasSolver (`scripts/gto-reference/`)
+
+TexasSolver (open source, AGPL; built locally, not part of the app) solves the same heads-up flop spots in full
+(every runout; its solutions are about 0.3% of the pot from equilibrium), starting from the engine's own
+preflop ranges. Each of the engine's decisions is then scored with TexasSolver's values: how much of the pot
+following the engine gives up against TexasSolver's best play.
+
+- Button opens, big blind calls; flops K72, T96 and A83; the button after a check and the big blind facing a
+  75% bet. Run the way the app runs them (stopped at the time limit), reviews give up 0.28% of the pot per
+  decision on average, with big mistakes (over 5% of the pot) on 0.1% of hands, and pick TexasSolver's main
+  action 98% of the time. Practice solves: 0.29%.
+- The biggest gap left is calling big bets on wet boards (about 0.5% of the pot on T96), from checking the
+  river down in flop solves. Betting the river there fixes most of it but takes about five times as long.
+- Not checked yet: turn and river decisions, 3-bet pots, and 3-way pots (TexasSolver is heads-up only).
 
 ## Known limits
 
-- The preflop solution rests on the realization model above, not on postflop solves. It's close to published
-  solver charts, with some differences:
+- The preflop solution rests on the realization model above, not on postflop solves, and the model underrates
+  calling. Measured against TexasSolver (below), the 100 bb chart has the big blind fold about half the time
+  to a button open (no-rake solves fold well under 40%) and 3-bet every pair from 44 up instead of calling
+  with some, and the button almost never flats a cutoff open. `scripts/gto-reference/realization.mjs`
+  measures the model against TexasSolver to recalibrate it. Other differences from published charts:
   - Early-position opens are a little tighter (UTG ~12% against ~15% in no-rake solves).
-  - The big blind defends a little less than no-rake solves, close to raked games.
   - With antes, the small blind completes very wide at short stacks.
   - At 30-40 bb, QQ often flats an early-position open instead of 3-betting it.
 - No rake and no ICM: chips are chips.
 - Multiway postflop solves bet on one street and check the rest down, and side pots in multiway all-ins aren't
   modeled.
-- Values postflop are estimates within the simplified game (a few sizes, sampled runouts), typically within
-  1-2% of the pot.
+- Values postflop are estimates within the simplified game (a few sizes, sampled runouts): about 0.3% of the
+  pot per flop decision against TexasSolver (below). Turn and river decisions haven't been checked yet.
 
 ## Regenerating
 
@@ -221,4 +264,5 @@ node scripts/gto/solvePreflop.mjs --only cash-100 --iterations 800   # one chart
 npm test                                         # includes chart and solver checks
 ```
 
-The comparison against a full solve with postflop-solver is in `scripts/solver-benchmark/` (needs Rust).
+The comparison against a full solve with postflop-solver is in `scripts/solver-benchmark/` (needs Rust); the
+comparison against TexasSolver is in `scripts/gto-reference/` (see its README to build TexasSolver).

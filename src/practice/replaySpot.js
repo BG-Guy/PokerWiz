@@ -7,6 +7,7 @@ import { FULL_DECK } from '../utils/cards.js';
 import { prepareSavedHand } from '../coach/savedHand.js';
 import { actionType } from '../coach/replay.js';
 import { createGtoHand } from '../gto/hand.js';
+import { readModels } from '../gto/players/models.js';
 import { HAND_CARDS, cardCode } from '../gto/cards.js';
 import { advance, createDeck, dealNext, heroDecisions } from './generateSpot.js';
 
@@ -37,7 +38,7 @@ function drawFromRange(weights, dead, random) {
 
 // options: { street: 'Flop' | 'Turn' | 'River', villainCards: 'real' | 'range', boardMode: 'real' | 'random' | 'pick' }
 // Resolves to a Practice spot (see generateSpot.js), or { error }.
-export async function spotFromSavedHand(hand, { street, villainCards = 'real', boardMode = 'real' }, random = Math.random) {
+export async function spotFromSavedHand(hand, { street, villainCards = 'real', boardMode = 'real', profiles = {} }, random = Math.random) {
   const prepared = prepareSavedHand(hand);
   if (prepared.error) return { error: prepared.error };
   const { record } = prepared;
@@ -48,7 +49,9 @@ export async function spotFromSavedHand(hand, { street, villainCards = 'real', b
   const hero = players.find((p) => p.role === 'hero');
   const opening = createHand({ players, positions: record.positions, sb: record.stakes.sb, bb: record.stakes.bb, ante: record.stakes.ante ?? 0 });
   const deepest = Math.max(0, ...players.filter((p) => p.role === 'villain').map((p) => p.stack));
-  const gto = await createGtoHand({ state: opening, stackBB: Math.min(hero.stack, deepest || hero.stack) / record.stakes.bb, known: { [hero.seat]: hero.cards }, detail: 'fast' });
+  // Reads picked for the replay (or recorded with the hand) make those villains play their tendency.
+  const models = readModels(players.map((p) => ({ ...p, profile: profiles[p.seat] ?? p.profile })));
+  const gto = await createGtoHand({ state: opening, stackBB: Math.min(hero.stack, deepest || hero.stack) / record.stakes.bb, known: { [hero.seat]: hero.cards }, detail: 'fast', models });
   const engine = { gto };
 
   // Everything before the chosen street, replayed through the hand engine and the GTO engine together.
