@@ -12,10 +12,12 @@ import { CLASS_COUNT, CLASS_COMBOS, CLASS_NAMES } from '../../../src/gto/cards.j
 import { createPayoffs, classRanks } from './payoffs.mjs';
 
 const N = CLASS_COUNT;
-// Node-lock: AA and KK facing a single raise always re-raise, as in every published chart. Without it the
-// realization model makes flatting them nearly as good as re-raising (the flop model can't see how much more a
-// bigger pot is worth to them), and the solution drifted into flatting them a third of the time in some spots.
-const PREMIUM_LOCK = ['AA', 'KK'].map((name) => CLASS_NAMES.indexOf(name));
+// Node-lock: the premiums (AA, KK, QQ, AKs, AKo) facing a single raise always re-raise, as published charts
+// almost always do. Without it the realization model makes flatting them nearly as good as re-raising (the
+// flop model can't see how much more a bigger pot is worth to them): the solution drifted into flatting KK a
+// third of the time in some spots, and a recalibrated model flatted AK against an early-position open. To a
+// player, a flatted premium reads as a bug.
+const PREMIUM_LOCK = ['AA', 'KK', 'QQ', 'AKs', 'AKo'].map((name) => CLASS_NAMES.indexOf(name));
 const ALPHA = 1.5;
 const GAMMA = 2;
 const TREMBLE = 0.001;

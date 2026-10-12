@@ -25,6 +25,13 @@ export const PREFLOP = {
     oop: 'BB',
     ip: 'BTN',
   },
+  // UTG opens 2.5 bb, big blind calls (calling against a strong range).
+  srp_utg_bb: {
+    stackBB: 100,
+    actions: [['UTG', 'raise', 2.5], ['UTG+1', 'fold'], ['LJ', 'fold'], ['HJ', 'fold'], ['CO', 'fold'], ['BTN', 'fold'], ['SB', 'fold'], ['BB', 'call']],
+    oop: 'BB',
+    ip: 'UTG',
+  },
   // Cutoff opens 2.5 bb, button 3-bets to 8 bb, cutoff calls.
   '3bp_co_btn': {
     stackBB: 100,

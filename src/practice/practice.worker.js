@@ -1,10 +1,11 @@
 // Web worker that runs Practice hands: the GTO opponents solve their spots here, off the main thread.
 // It keeps the hand being played (with its engine); the page sends what you do and gets the hand back.
 // Messages in:  { id, type: 'new', setup } | { id, type: 'replay', hand, options } | { id, type: 'act', action }
-//               | { id, type: 'deal', codes (null = random) }
+//               | { id, type: 'deal', codes (null = random) } | { id, type: 'again', sameRunout } (the last
+//               hand again from your spot)
 // Messages out: { id, spot } (the hand without the engine, or null if no spot came up) or { id, error }.
 import '../gto/chartUrls.js';
-import { generateSpot, heroAct, dealStreet, snapshot } from './generateSpot.js';
+import { generateSpot, heroAct, dealStreet, playAgain, snapshot } from './generateSpot.js';
 import { spotFromSavedHand } from './replaySpot.js';
 
 let current = null;
@@ -18,6 +19,7 @@ self.onmessage = async (event) => {
       if (result.error) throw new Error(result.error);
       current = result;
     } else if (!current) throw new Error('No hand in progress.');
+    else if (type === 'again') current = await playAgain(current, { sameRunout: event.data.sameRunout });
     else if (type === 'act') current = heroAct(current, event.data.action);
     else if (type === 'deal') current = dealStreet(current, event.data.codes ?? null);
     self.postMessage({ id, spot: snapshot(current) });

@@ -229,6 +229,30 @@
 }
 
 /* After the hand: review the decisions, go back to the hand, or the next hand */
+/* The hand's result in the dock: a smaller gauge beside the text, so the whole card (with "Play again")
+   fits without scrolling */
+.practice-fs-dock .practice-summary {
+  gap: 12px 14px;
+  padding: 14px;
+}
+.practice-fs-dock .practice-summary-text {
+  flex-basis: 160px;
+}
+.practice-fs-dock .accuracy-gauge {
+  width: 92px;
+  height: 92px;
+}
+.practice-fs-dock .accuracy-gauge-number {
+  font-size: 28px;
+}
+.practice-fs-dock .accuracy-gauge-number small {
+  font-size: 14px;
+}
+.practice-fs-dock .accuracy-gauge-label {
+  margin-top: 2px;
+  font-size: 12px;
+}
+
 .practice-fs-result-actions {
   display: flex;
   flex-wrap: wrap;

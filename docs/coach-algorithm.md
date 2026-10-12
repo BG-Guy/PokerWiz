@@ -40,10 +40,11 @@ face aces).
 Every action keeps a 0.1% probability during training. That way lines the solution avoids are still reached
 and get sensible answers: after an unusual limp, or a 3-bet with a hand GTO doesn't 3-bet.
 
-One node-lock: AA and KK facing a single raise always re-raise; the solver still picks between a 3-bet and a
-shove. Every published chart plays them that way. The flop model below can't see how much more a big pot is
-worth to them, so without the lock the solution drifted into flatting KK against early opens a third of the
-time. Everyone else's strategy is solved against the lock.
+One node-lock: the premiums (AA, KK, QQ, AKs, AKo) facing a single raise always re-raise; the solver still
+picks between a 3-bet and a shove. Published charts play them that way almost always. The flop model below
+can't see how much more a big pot is worth to them, so without the lock the solution drifted into flatting KK
+against early opens a third of the time, and QQ flatted early opens at 20-40 bb. Everyone else's strategy is
+solved against the lock.
 
 When the betting ends, a hand is worth (`scripts/gto/preflop/payoffs.mjs`):
 
@@ -55,6 +56,10 @@ When the betting ends, a hand is worth (`scripts/gto/preflop/payoffs.mjs`):
   - `r` grows in position and with playability: suited, connected, pairs, broadway.
   - `r` shrinks for disconnected offsuit hands.
   - The exponent `g` makes stronger hands win more than their raw equity.
+  - In 3-way pots playability counts three times as much, and pairs below TT get a set-mining bonus: with two
+    opponents, the hands that make the nuts (sets, straights, flushes) win the big pots and dominated offsuit
+    hands make second-best ones. Without it the small blind flatted A9o and folded T9s into 3-way pots, and
+    the big blind squeezed 44 instead of calling to hit a set.
   - All of these fade as the stack-to-pot ratio drops, because with little behind a flop is close to all in.
 
   This is the one model in the engine (a full postflop solve at every preflop leaf is far too big). Its
@@ -197,6 +202,14 @@ Your decisions before the spot are made the same way, so 3-bet and 4-bet pots co
 at a table of solvers. From the spot on, the opponents answer with the GTO strategy. When you use a size the
 solve doesn't have, the street is re-solved with it.
 
+- **3-bet pots only** (the "Pots" choice): deals that don't become one are dropped before any postflop solve.
+  Heads-up and 3-way, the pot was 3-bet before the flop and called. Preflop, the spot is the decision the
+  3-bet is about: the 3-bet you make facing one raise (the hand is played GTO to find it, then rebuilt up to
+  your decision) or the 3-bet you face after opening or calling (facing one cold is nearly always a fold, so
+  those aren't dealt).
+- **Play again:** every spot keeps how it came about (the table, everyone's cards, and each action and card
+  before your decision). Playing it again rebuilds it exactly, with the same cards still to come or new ones.
+
 Everything runs in a web worker (`practice.worker.js`). "Next hand" while the opponents are thinking restarts
 it at once. When the hand is over, the coach grades it (with the "fast" budget).
 
@@ -242,13 +255,20 @@ following the engine gives up against TexasSolver's best play.
 ## Known limits
 
 - The preflop solution rests on the realization model above, not on postflop solves, and the model underrates
-  calling. Measured against TexasSolver (below), the 100 bb chart has the big blind fold about half the time
-  to a button open (no-rake solves fold well under 40%) and 3-bet every pair from 44 up instead of calling
-  with some, and the button almost never flats a cutoff open. `scripts/gto-reference/realization.mjs`
-  measures the model against TexasSolver to recalibrate it. Other differences from published charts:
+  calling. Measured against TexasSolver (below), the 100 bb chart is tight where it calls: the big blind folds
+  about half the time to a button open (no-rake solves fold well under 40%) and 84% to an UTG open (solves:
+  roughly 70%), 3-bets small pairs more than it calls them, and the button flats a cutoff open only about 5% of
+  the time.
+  `scripts/gto-reference/realization.mjs` measures, with TexasSolver, what every hand earns after the flop.
+  Fitting the flop model to that (per hand, or from hand features) fixed the button spots but brought worse
+  oddities (opening 75o under the gun, folding A2s on the button, defending three quarters of hands against
+  the button). A hand-against-hand model can't express what drives it: implied odds (small pairs and suited
+  connectors win stacks from overpairs) and a capped range (a hand the big blind rarely flats does unusually
+  well when it does). So the charts keep the hand-written model until the flop model can. `scripts/gto/
+  leakScan.mjs` checks every chart for the plays that would look wrong to a player. Other differences from
+  published charts:
   - Early-position opens are a little tighter (UTG ~12% against ~15% in no-rake solves).
   - With antes, the small blind completes very wide at short stacks.
-  - At 30-40 bb, QQ often flats an early-position open instead of 3-betting it.
 - No rake and no ICM: chips are chips.
 - Multiway postflop solves bet on one street and check the rest down, and side pots in multiway all-ins aren't
   modeled.
@@ -261,6 +281,8 @@ following the engine gives up against TexasSolver's best play.
 node scripts/gto/buildEquityTables.mjs           # equity tables (30-60 s), scripts/gto/data/equity.json
 node scripts/gto/solvePreflop.mjs                # all 14 charts, a few minutes each, in parallel
 node scripts/gto/solvePreflop.mjs --only cash-100 --iterations 800   # one chart
+node scripts/gto/leakScan.mjs                    # rules any sound strategy keeps (premiums re-raise, strong
+                                                 # hands bet when checked to, ...): run it before shipping charts
 npm test                                         # includes chart and solver checks
 ```
 

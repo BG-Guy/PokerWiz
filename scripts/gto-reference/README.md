@@ -70,7 +70,7 @@ position, playability and hand strength win or lose on later streets, `scripts/g
 
 ```bash
 node scripts/gto-reference/realization.mjs --tag r0                         # measure the app's charts
-node scripts/gto-reference/realization.mjs --fit r0 --out model.json        # fit the flop model
+node scripts/gto-reference/realization.mjs --fit r0 --out model.json        # fit the flop model (--play features|free)
 node scripts/gto/solvePreflop.mjs --only cash-100 --model model.json --out charts-r1
 node scripts/gto-reference/realization.mjs --charts charts-r1 --tag r1 --seed 12
 node scripts/gto-reference/realization.mjs --fit r0,r1 --out model.json     # and so on, until the charts settle
@@ -79,6 +79,12 @@ node scripts/gto-reference/realization.mjs --fit r0,r1 --out model.json     # an
 Each round solves a sample of flops (single-raised and 3-bet pots) from a set of charts, with every starting
 hand added to both ranges at a small weight, so every hand is measured, including the ones the charts never
 play that way. Measuring only the charts' own ranges keeps a wrong chart wrong: a chart that never flats 77
-from the big blind has nothing telling it that flatting 77 is good. A round takes about an hour.
+from the big blind has nothing telling it that flatting 77 is good. The flops are stratified and balanced
+across ranks (a random sample once put a 4 on half of them, and every hand holding a 4 looked great). A round
+takes one to two hours per line.
+
+So far no fitted model has been good enough to ship: each fixed some spots and broke others (see "Known
+limits" in docs/coach-algorithm.md). Check any candidate charts with `node scripts/gto/leakScan.mjs --charts
+<dir>` before they replace the app's.
 
 TexasSolver is AGPL-3.0; `texassolver-ev.patch` modifies it and is under the same license.

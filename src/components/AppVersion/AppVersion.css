@@ -4,6 +4,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  text-align: center;
   gap: 2px 6px;
   font-size: 12px;
   font-weight: 700;
@@ -20,4 +21,11 @@
   content: '·';
   margin-right: 6px;
   font-family: var(--font-body);
+}
+
+/* When it was updated: its own line under the version */
+.app-version-date {
+  flex-basis: 100%;
+  text-align: inherit; /* lines up with the version above (centered, or left in the wide sidebar) */
+  font-weight: 600;
 }

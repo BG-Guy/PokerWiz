@@ -1,7 +1,8 @@
 // Practice mode (/practice): pick a game, a spot and the stacks, then play random spots against opponents who
 // all play GTO with their real cards (src/gto). From the spot on you play the hand to the end (the next cards
 // are random, or picked by you), then the coach grades every decision you made against GTO.
-// /practice?hand=<id>&street=Turn replays a saved hand from that street instead (see ReplaySetup).
+// /practice?hand=<id>&street=Turn replays a saved hand from that street instead (see ReplaySetup). A hand
+// can be played again from your spot, with the same cards to come or new ones.
 // Hands are played full screen by default (PracticeFullScreen: the action buttons are always in view); the
 // choice is remembered. Two web workers do the heavy lifting: practice.worker.js plays the opponents (they solve their spots), and
 // the coach worker grades the hand when it's over.
@@ -51,6 +52,7 @@ function defaultSetup() {
     villains: [{ stackBB }],
     hero: { profile: defaultProfile(), stackBB },
     boardMode: 'random', // next cards: 'random' or 'pick'
+    pot: 'any', // which pots: 'any' or '3bet'
   };
 }
 
@@ -139,14 +141,15 @@ export default function Practice() {
     setThinking(false);
     if (failure || !next) {
       setError(failure ?? 'Could not find a spot with these settings. Try again or change the stacks.');
-      setPhase(type === 'replay' ? 'replay' : type === 'new' ? 'setup' : 'play');
+      setPhase({ replay: 'replay', new: 'setup', again: 'result' }[type] ?? 'play');
       return;
     }
     setError(null);
     setSpot(next);
-    if (type === 'new' || type === 'replay') {
+    if (type === 'new' || type === 'replay' || type === 'again') {
       firstDecisionRef.current = next.firstDecision ?? 0;
-      setHandNumber((n) => n + 1);
+      if (type === 'again') setReview(null); // the same hand number, played again
+      else setHandNumber((n) => n + 1);
       setPhase('play');
     }
   }, []);
@@ -267,6 +270,16 @@ export default function Practice() {
     send({ type: 'replay', hand: replayHand, options: replayOptions }, { restart: true });
   }
 
+  // The hand again from your spot (same cards for everyone, same action up to your decision): with the same
+  // cards still to come, or new ones. The last grade stays up until the hand is dealt again.
+  const playAgain = (sameRunout) => {
+    coachRequest.current += 1;
+    setError(null);
+    setDecisionsOpen(false);
+    setPhase('dealing');
+    send({ type: 'again', sameRunout });
+  };
+
   if (phase === 'loading') return <LoadState />;
 
   if (phase === 'replay') {
@@ -364,7 +377,8 @@ export default function Practice() {
   const replay = spot.replay ?? null;
   const heroStackBB = Math.round((state.players.find((p) => p.seat === heroSeat).stack / bb) * 10) / 10;
   const lines = actionLines(state);
-  const subtitle = replay ? `${replay.title} · from the ${replay.street.toLowerCase()}` : `Hand ${handNumber} · ${spot.game.label}`;
+  const handLabel = `Hand ${handNumber}${spot.again ? ' · played again' : ''}`;
+  const subtitle = replay ? `${replay.title} · from the ${replay.street.toLowerCase()}` : `${handLabel} · ${spot.game.label}`;
   // The running score, short enough for the full-screen top bar.
   const tallyText =
     tally.hands > 0 &&
@@ -460,6 +474,28 @@ export default function Practice() {
           </p>
         )}
       </div>
+      {/* Play it again from your spot: with the same runout or a new one (when any cards came after it) */}
+      {spot.origin && (
+        <div className="practice-again" role="group" aria-label="Play this hand again">
+          <span className="practice-again-label">
+            <Icon name="repeat" size={16} /> Play again
+          </span>
+          {spot.state.board.length > spot.startBoard ? (
+            <>
+              <button type="button" className="btn btn-ghost" onClick={() => playAgain(true)}>
+                Same runout
+              </button>
+              <button type="button" className="btn btn-ghost" onClick={() => playAgain(false)}>
+                New runout
+              </button>
+            </>
+          ) : (
+            <button type="button" className="btn btn-ghost" onClick={() => playAgain(false)}>
+              From my spot
+            </button>
+          )}
+        </div>
+      )}
     </section>
   );
   const decisionCards = review?.decisions.map((decision, index) => <DecisionCard key={index} decision={decision} number={index + 1} bb={state.bb} />);
@@ -473,7 +509,7 @@ export default function Practice() {
   if (fullScreen) {
     const current = lines.at(-1);
     return fullScreenView({
-      subtitle: tallyText ? `${replay ? replay.title : `Hand ${handNumber}`} · ${tallyText}` : subtitle,
+      subtitle: tallyText ? `${replay ? replay.title : handLabel} · ${tallyText}` : subtitle,
       table,
       log,
       peek: phase === 'play' ? { name: current.name, cards: current.cards, text: current.text || 'Nobody has acted yet' } : null,

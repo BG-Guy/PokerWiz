@@ -291,12 +291,17 @@ export function heroResult(state, winnerSeats) {
   return round2(won - hero.invested);
 }
 
+// Raises before the flop so far (1 = a single-raised pot, 2 = 3-bet, ...). An all in that only calls isn't one.
+export function preflopRaises(state) {
+  return state.streets[0].actions.filter((a) => a.verb.includes('raise') || a.verb.includes('-bets') || a.verb === 'all in').length;
+}
+
 // Tags worth filtering by later: pot type, all-in, multiway, showdown.
 export function autoTags(state) {
-  const preflopRaises = state.streets[0].actions.filter((a) => a.verb.includes('raise') || a.verb.includes('-bets') || a.verb === 'all in').length;
+  const raises = preflopRaises(state);
   const tags = [];
-  if (preflopRaises >= 2) tags.push(`${preflopRaises + 1}-bet pot`);
-  else if (preflopRaises === 1) tags.push('Single-raised pot');
+  if (raises >= 2) tags.push(`${raises + 1}-bet pot`);
+  else if (raises === 1) tags.push('Single-raised pot');
   if (state.streets.some((street) => street.actions.some((a) => a.allIn))) tags.push('All in');
   // Multiway: more than two players acted on the flop.
   if (state.streets[1] && new Set(state.streets[1].actions.map((a) => a.actor)).size > 2) tags.push('Multiway');

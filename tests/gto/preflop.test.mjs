@@ -72,8 +72,8 @@ test('premium hands are raised and re-raised at every depth', async () => {
       const node = nodeAt(tree, foldsBefore(seat).join('|'));
       for (const hand of ['AA', 'KK', 'QQ', 'AKs', 'AKo']) assert.ok(raiseShare(chart, node, hand) > 0.97, `${config.name}: ${POSITIONS[seat]} opens ${hand}`);
     }
-    // Facing a single open (everyone in between folded): AA and KK always re-raise (they're node-locked to, see
-    // scripts/gto/preflop/cfr.mjs), and QQ and AK never fold.
+    // Facing a single open (everyone in between folded): the premiums always re-raise (they're node-locked to,
+    // see scripts/gto/preflop/cfr.mjs) and never fold.
     for (const opener of [0, 3, 4, 5]) {
       const open = nodeAt(tree, foldsBefore(opener).join('|'));
       const raise = open.actions.find((a) => a.type === 'raise');
@@ -83,8 +83,7 @@ test('premium hands are raised and re-raised at every depth', async () => {
         const node = nodeAt(tree, key);
         if (node && chart.dataAt(node)?.exact) {
           const where = `${config.name}: ${POSITIONS[seat]} vs a ${POSITIONS[opener]} open`;
-          assert.ok(raiseShare(chart, node, 'AA') > 0.98, `${where} re-raises AA`);
-          assert.ok(raiseShare(chart, node, 'KK') > 0.98, `${where} re-raises KK`);
+          for (const hand of ['AA', 'KK', 'QQ', 'AKs', 'AKo']) assert.ok(raiseShare(chart, node, hand) > 0.98, `${where} re-raises ${hand}`);
           const fold = node.actions.findIndex((a) => a.type === 'fold');
           for (const hand of ['AA', 'KK', 'QQ', 'AKs']) assert.ok(chart.dataAt(node).strategy[fold * 169 + cls(hand)] < 0.02, `${where} never folds ${hand}`);
         }

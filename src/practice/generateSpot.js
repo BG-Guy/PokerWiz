@@ -8,8 +8,10 @@
 //   hu       a heads-up pot: you take over on the flop, turn or river
 //   3way     the same with three players
 // Spots only come from hands the GTO players would really play that way (so 3-bet and 4-bet pots show up as
-// often as they would at a table of solvers). Runs in a web worker (practice.worker.js): solves take a moment.
-import { createHand, applyAction, dealBoard, currentPlayer, showdownWinners, heroResult } from '../utils/handEngine.js';
+// often as they would at a table of solvers), unless you ask for 3-bet pots only (setup.pot). Any spot can be
+// played again from where you took over, with the same cards still to come or new ones (playAgain).
+// Runs in a web worker (practice.worker.js): solves take a moment.
+import { createHand, applyAction, dealBoard, currentPlayer, showdownWinners, heroResult, preflopRaises } from '../utils/handEngine.js';
 import { TABLE_POSITIONS } from '../constants/poker.js';
 import { FULL_DECK, codeToIndex } from '../utils/cards.js';
 import { classOf } from '../coach/combos.js';
@@ -28,6 +30,13 @@ export const FORMATS = [
   { id: 'preflop', label: 'Preflop', description: 'A full table acts before you. Open, call, 3-bet or fold, then play the hand out.', players: null },
   { id: 'hu', label: 'Heads-up', description: 'Two players see a flop. You take over on the flop, turn or river and play to the end.', players: 2 },
   { id: '3way', label: '3-way', description: 'Three players see a flop. You take over on the flop, turn or river and play to the end.', players: 3 },
+];
+
+// Which pots: any (as they come at a GTO table), or only 3-bet pots (heads-up or 3-way: the pot was 3-bet
+// before the flop and called; preflop: you make the 3-bet or face it after opening or calling).
+export const POTS = [
+  { id: 'any', label: 'Any pot' },
+  { id: '3bet', label: '3-bet pots' },
 ];
 
 // Which street you take over on. Later streets need the earlier ones solved first (and a hand that ends early
@@ -100,15 +109,19 @@ export function dealNext(spot, state, codes) {
 
 // ----- Spot builder -----
 
-// setup: { game, format, villains: [{ stackBB }], hero: { stackBB }, boardMode }
+// setup: { game, format, pot ('any' | '3bet'), villains: [{ stackBB }], hero: { stackBB }, boardMode, street? }
 // Resolves to a spot with you on the clock, or null if none came up (call again). A spot holds everything
 // needed to keep playing: { state, cards: { seat: [codes] }, deck (cards left), heroSeat, villainSeats, players,
-// game, positions, setup, firstDecision, status, gto (the engine; it stays in the worker) }.
+// game, positions, setup, firstDecision, status, origin, gto (the engine; it stays in the worker) }.
 // firstDecision = how many of your decisions came before the spot (made for you), so grading can skip them.
+// origin = how the spot came about (the table and every action and card before it), to play it again.
 const ATTEMPTS = { preflop: 40, hu: 300, '3way': 800 };
+// 3-bet pots are rarer (most hands see one raise or none), so more deals are tried. A deal that doesn't
+// become one is dropped before any postflop solve, so these are cheap.
+const ATTEMPTS_3BET = { preflop: 400, hu: 2000, '3way': 6000 };
 
 export async function generateSpot(setup, random = Math.random) {
-  const attempts = ATTEMPTS[setup.format] ?? 40;
+  const attempts = (setup.pot === '3bet' ? ATTEMPTS_3BET : ATTEMPTS)[setup.format] ?? 40;
   for (let attempt = 0; attempt < attempts; attempt++) {
     const spot = await tryDeal(setup, random);
     if (spot) return spot;
@@ -116,9 +129,46 @@ export async function generateSpot(setup, random = Math.random) {
   return null;
 }
 
+// A new hand at the table: the hand engine and the GTO engine (which knows everyone's cards), with nothing
+// played yet. table: { game, positions, players, cards, stackBB, seed, setup }.
+async function openTable(table) {
+  const { game, positions, players, cards, stackBB, seed, setup } = table;
+  const state = createHand({ players, positions, sb: game.sb, bb: game.bb, ante: game.ante });
+  // Opponents with a read (setup.villains[0].profile, when reads are on) play their tendency; the rest GTO.
+  const models = readModels(players.map((p) => ({ ...p, profile: p.role === 'villain' ? setup.villains?.[0]?.profile : null })));
+  const gto = await createGtoHand({ state, stackBB, known: cards, detail: DETAIL, seed, models });
+  const heroSeat = players.find((p) => p.role === 'hero').seat;
+  return { cards, heroSeat, villainSeats: players.filter((p) => p.role === 'villain').map((p) => p.seat), players, game, positions, setup, gto, state };
+}
+
+// The table again, with the steps of a script (actions and dealt cards, in order) played on it: the spot as
+// it was. runout = cards to deal next instead of random ones (they leave the deck).
+async function rebuild(origin, { cards = origin.table.cards, runout = [] } = {}) {
+  const spot = await openTable({ ...origin.table, cards });
+  let state = spot.state;
+  for (const step of origin.script) state = step.codes ? dealNext(spot, state, step.codes) : act(spot, state, step.action);
+  const held = new Set(Object.values(cards).flat());
+  const deck = origin.deck.filter((code) => !held.has(code) && !runout.includes(code));
+  return { ...spot, state, deck, plannedBoard: runout, firstDecision: heroDecisions(state), status: 'hero', origin, startBoard: state.board.length };
+}
+
+// Play the spot again from where you took over: the same cards for everyone and the same action up to your
+// decision. sameRunout: the board cards that came after it come again (if the hand ended early, the cards
+// after those are new); otherwise new cards come (or you pick them, if that's the setup).
+export async function playAgain(spot, { sameRunout = true } = {}) {
+  if (!spot?.origin) throw new Error("This hand can't be played again.");
+  const { origin } = spot;
+  const runout = sameRunout ? spot.state.board.slice(spot.startBoard) : [];
+  // Picking a card an opponent held swapped it out of their hand: with the same runout they keep the swap.
+  const again = await rebuild(origin, { cards: sameRunout ? spot.cards : origin.table.cards, runout });
+  const setup = runout.length ? { ...origin.table.setup, boardMode: 'random' } : origin.table.setup;
+  return { ...again, setup, again: { count: (spot.again?.count ?? 0) + 1, sameRunout } };
+}
+
 async function tryDeal(setup, random) {
   const game = GAMES.find((g) => g.id === setup.game) ?? GAMES[0];
   const format = FORMATS.find((f) => f.id === setup.format) ?? FORMATS[1];
+  const threeBet = setup.pot === '3bet';
   const positions = TABLE_POSITIONS[game.tableSize];
   const heroSeat = Math.floor(random() * positions.length);
   const villainStackBB = setup.villains?.[0]?.stackBB ?? game.defaultStackBB;
@@ -131,44 +181,70 @@ async function tryDeal(setup, random) {
   const deck = createDeck(random);
   const cards = {};
   const classOfCodes = (codes) => classOf(codeToIndex(codes[0]), codeToIndex(codes[1]));
-  cards[heroSeat] = deck.dealHand((codes) => (format.id !== 'preflop' || random() < 0.5 || PREFLOP_BY_CLASS[classOfCodes(codes)].start < 0.6 ? 1 : 0));
+  cards[heroSeat] = deck.dealHand((codes) => (format.id !== 'preflop' || threeBet || random() < 0.5 || PREFLOP_BY_CLASS[classOfCodes(codes)].start < 0.6 ? 1 : 0));
   for (const p of players) if (p.seat !== heroSeat) cards[p.seat] = deck.dealHand();
 
-  let state = createHand({ players, positions, sb: game.sb, bb: game.bb, ante: game.ante });
   const stackBB = Math.min(setup.hero.stackBB, villainStackBB);
-  // Opponents with a read (setup.villains[0].profile, when reads are on) play their tendency; the rest GTO.
-  const models = readModels(players.map((p) => ({ ...p, profile: p.role === 'villain' ? setup.villains?.[0]?.profile : null })));
-  const gto = await createGtoHand({ state, stackBB, known: cards, detail: DETAIL, seed: Math.floor(random() * 2 ** 31), models });
-  const spot = { cards, heroSeat, villainSeats: players.filter((p) => p.role === 'villain').map((p) => p.seat), players, game, positions, setup, gto };
-  const finishSpot = (s) => ({ ...spot, state: s, deck: deck.cards, firstDecision: heroDecisions(s), status: 'hero' });
+  const table = { game, positions, players, cards, stackBB, seed: Math.floor(random() * 2 ** 31), setup };
+  const spot = await openTable(table);
+  const { gto } = spot;
+  let state = spot.state;
+  // Everything that happens before your spot, in order, so the spot can be played again (playAgain).
+  const script = [];
+  const play = (action) => {
+    state = act(spot, state, action);
+    script.push({ action });
+  };
+  const deal = (codes) => {
+    state = dealNext(spot, state, codes);
+    script.push({ codes });
+  };
+  const origin = (steps) => ({ table, script: steps, deck: [...deck.cards] });
+  const finishSpot = (s) => ({ ...spot, state: s, deck: deck.cards, firstDecision: heroDecisions(s), status: 'hero', origin: origin([...script]), startBoard: s.board.length });
 
-  // Preflop, everyone plays GTO with their cards (you too, unless the spot is preflop).
+  // Preflop, everyone plays GTO with their cards (you too, unless the spot is preflop). In 3-bet pots, a
+  // preflop spot is your decision the 3-bet is about: the 3-bet you make (facing one raise) or the one you
+  // face; everyone (you too) plays the hand GTO first to find one, then it's rebuilt up to that decision.
+  let threeBetDecision = -1;
   while (state.phase === 'action') {
     const actor = currentPlayer(state);
-    if (format.id === 'preflop' && actor.seat === heroSeat) return finishSpot(state);
+    if (format.id === 'preflop' && !threeBet && actor.seat === heroSeat) return finishSpot(state);
     const action = botAction(gto, state, cards[actor.seat], random);
+    if (threeBet && actor.seat === heroSeat && threeBetDecision < 0) {
+      const raises = preflopRaises(state);
+      const raising = action.type === 'raise' || action.type === 'allin';
+      // Facing a 3-bet counts once you're in the pot (you opened or called); cold, it's nearly always a fold.
+      const inPot = state.streets[0].actions.some((a) => a.actor === 'Hero' && (a.verb === 'calls' || a.verb.includes('raise') || a.verb.includes('-bets') || a.verb === 'all in'));
+      if ((raises === 2 && inPot) || (raises === 1 && raising)) threeBetDecision = script.length;
+    }
     if (format.players && actor.seat === heroSeat && action.type === 'fold') return null; // you're out: redeal
-    state = act(spot, state, action);
+    play(action);
     if (format.players && state.players.some((p) => p.allIn)) return null; // all in preflop: no postflop spot
   }
-  if (format.id === 'preflop' || state.phase !== 'board') return null;
+  if (format.id === 'preflop') {
+    if (!threeBet || threeBetDecision < 0) return null;
+    return rebuild(origin(script.slice(0, threeBetDecision)));
+  }
+  if (state.phase !== 'board') return null;
+  if (threeBet && preflopRaises(state) !== 2) return null; // a single-raised (or 4-bet) pot: not this practice
   const alive = state.players.filter((p) => !p.folded);
   if (alive.length !== format.players || !alive.some((p) => p.seat === heroSeat)) return null;
 
-  // Postflop: play on (everyone GTO) until it's your turn on the chosen street.
-  const target = pickWeighted(TARGET_STREETS, random);
+  // Postflop: play on (everyone GTO) until it's your turn on the chosen street (setup.street picks it, for
+  // checks like scripts/gto/leakScan.mjs; otherwise it's random).
+  const target = setup.street ?? pickWeighted(TARGET_STREETS, random);
   while (true) {
     if (state.phase === 'result') return null;
     if (state.phase === 'board') {
       if (state.street === 'River' || state.street === target) return null;
-      state = dealNext(spot, state, deck.deal(BOARD_CARDS[NEXT_STREET[state.street]]));
+      deal(deck.deal(BOARD_CARDS[NEXT_STREET[state.street]]));
       continue;
     }
     const actor = currentPlayer(state);
     if (actor.seat === heroSeat && state.street === target) return finishSpot(state);
     const action = botAction(gto, state, cards[actor.seat], random);
     if (actor.seat === heroSeat && action.type === 'fold') return null; // your autopilot gave up: not a spot
-    state = act(spot, state, action);
+    play(action);
     if (state.players.find((p) => p.seat === heroSeat).allIn) return null;
   }
 }

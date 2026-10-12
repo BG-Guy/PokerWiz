@@ -36,8 +36,11 @@ export function playability(cls) {
 
 // The realization model's settings: position effect by postflop order among the players who saw the flop
 // (heads-up: out of position, in position; 3-way: first, middle, last), how much stronger hands out-earn
-// their equity (gamma: 1 = not at all), and how much playability counts (playScale, 1 = as written above).
-export const DEFAULT_MODEL = { edge2: [-0.14, 0.1], edge3: [-0.12, -0.03, 0.09], gamma: 0.5, sprScale: 4 };
+// their equity (gamma: 1 = not at all), how much playability counts (playScale, 1 = as written above), and in
+// 3-way pots how much more it counts (play3Scale) plus a set-mining bonus for pairs below TT (pairBonus3).
+// The 3-way settings were checked on the 100 bb chart: the small blind stopped flatting A9o and 3-bets AJo and
+// KQo instead, and the big blind folds weak offsuit aces and calls small pairs into 3-way pots.
+export const DEFAULT_MODEL = { edge2: [-0.14, 0.1], edge3: [-0.12, -0.03, 0.09], gamma: 0.5, sprScale: 4, play3Scale: 3, pairBonus3: 0.06 };
 
 // How much of the postflop edge (position, playability, strength) applies at this stack-to-pot ratio: all of
 // it once there's `scale` pots behind, fading toward pure equity as the stacks get short.
@@ -65,6 +68,12 @@ export function createPayoffs(table, model = DEFAULT_MODEL) {
   // (model.play; 3-way pots weren't measured, so they keep the formula).
   const formulaPlay = Float64Array.from({ length: N }, (_, cls) => (model.playScale ?? 1) * playability(cls));
   const play = model.play ? Float64Array.from(model.play) : formulaPlay;
+  // 3-way: playability counts more (play3Scale), and pairs below TT get a set-mining bonus (pairBonus3). With two
+  // opponents, hands that make the nuts (sets, straights, flushes) win stacks and dominated offsuit hands make
+  // second-best ones; without this the small blind flatted A9o and folded 87s into 3-way pots.
+  const play3Scale = model.play3Scale ?? 1;
+  const multiwayPlay = Float64Array.from(formulaPlay, (v, cls) => play3Scale * v + (isPairClass(cls) && classRanks(cls)[0] <= 7 ? model.pairBonus3 ?? 0 : 0));
+  const typical3 = 0.02 * play3Scale; // a typical 3-way hand's playability, so the three shares add up to about 1
   const flopCache = new Map();
   function flop2(seat, spr) {
     const bucket = sprBucket(spr);
@@ -114,7 +123,7 @@ export function createPayoffs(table, model = DEFAULT_MODEL) {
     if (!share3Cache.has(key)) {
       const flat = new Float64Array(N * B * B);
       for (let i = 0; i < N; i++) {
-        const factor = isFlop ? 1 + sprWeight(bucket, model.sprScale) * (POSITION_EDGE[3][seat] + formulaPlay[i] - 0.02) : 1;
+        const factor = isFlop ? 1 + sprWeight(bucket, model.sprScale) * (POSITION_EDGE[3][seat] + multiwayPlay[i] - typical3) : 1;
         for (let k = 0; k < B * B; k++) flat[i * B * B + k] = threeWay[i][k] * factor;
       }
       share3Cache.set(key, flat);

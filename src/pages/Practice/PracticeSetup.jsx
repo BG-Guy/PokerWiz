@@ -1,8 +1,8 @@
-// Practice setup: the game (cash or tournament), the spot (preflop, heads-up, 3-way), how the next cards come
-// (random or picked by you), the stacks, and how strictly you're graded. Opponents all play GTO; player reads
-// (tendencies per opponent) come back here once the engine uses them (gto/config.js).
-import { GAMES, FORMATS } from '../../practice/generateSpot.js';
-import { LEVELS, applyLevel, defaultProfile, describeProfile, levelOf } from '../../coach/profiles.js';
+// Practice setup: the game (cash or tournament), the spot (preflop, heads-up, 3-way), which pots (any, or
+// 3-bet pots only), how the next cards come (random or picked by you), and the stacks. Opponents all play
+// GTO; player reads (tendencies per opponent) come back here once the engine uses them (gto/config.js).
+import { GAMES, FORMATS, POTS } from '../../practice/generateSpot.js';
+import { defaultProfile, describeProfile } from '../../coach/profiles.js';
 import { PLAYER_READS } from '../../gto/config.js';
 import ReadPicker from '../../components/ReadPicker/ReadPicker.jsx';
 import FilterChips from '../../components/FilterChips/FilterChips.jsx';
@@ -72,6 +72,17 @@ export default function PracticeSetup({ setup, onChange, onStart }) {
           {format.description} {game.id === 'mtt' ? 'Blinds 1/2 with a big-blind ante, 8-handed.' : 'Blinds $1/$2, 8-handed.'}
         </p>
         <div className="read-picker-group">
+          <span className="read-picker-label">Pots</span>
+          <FilterChips label="Pots" value={setup.pot} onChange={(pot) => onChange({ ...setup, pot })} options={POTS.map((p) => ({ value: p.id, label: p.label }))} />
+          <p className="read-picker-description">
+            {setup.pot !== '3bet'
+              ? 'Pots come as often as they would at a table of GTO players: mostly single-raised, some 3-bet and 4-bet.'
+              : format.id === 'preflop'
+                ? 'Only hands with a 3-bet: you make it, or you face it after opening or calling.'
+                : 'Only pots that were 3-bet before the flop: as the 3-bettor or the caller.'}
+          </p>
+        </div>
+        <div className="read-picker-group">
           <span className="read-picker-label">Next cards</span>
           <FilterChips
             label="Next cards"
@@ -108,22 +119,7 @@ export default function PracticeSetup({ setup, onChange, onStart }) {
           <Icon name="hero" size={18} /> You
         </h2>
         <StackPicker game={setup.game} label="Your stack" value={setup.hero.stackBB} onChange={(stackBB) => onChange({ ...setup, hero: { ...setup.hero, stackBB } })} />
-        <div className="read-picker-group">
-          <span className="read-picker-label">Grade me as</span>
-          <div className="read-picker-chips">
-            {LEVELS.map((level) => (
-              <button
-                key={level.id}
-                type="button"
-                className={`filter-chip ${levelOf(setup.hero.profile).id === level.id ? 'is-active' : ''}`}
-                onClick={() => onChange({ ...setup, hero: { ...setup.hero, profile: applyLevel(setup.hero.profile, level.id) } })}
-              >
-                {level.label}
-              </button>
-            ))}
-          </div>
-          <p className="read-picker-description">Higher levels get less slack on close decisions.</p>
-        </div>
+        <p className="read-picker-description">Everyone is graded the same way: against GTO, by how much each decision gives up.</p>
       </section>
 
       <button type="button" className="btn practice-start" onClick={onStart}>
