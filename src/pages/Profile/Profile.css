@@ -1,4 +1,4 @@
-/* Profile page layout: totals and the import tool, then the session log. */
+/* Profile page layout: totals beside export and import, then the session log. */
 
 .profile {
   display: flex;
@@ -17,4 +17,12 @@
   .profile-top {
     grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   }
+}
+
+/* Export above import, in one column */
+.profile-data {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
 }

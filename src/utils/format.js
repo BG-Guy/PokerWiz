@@ -97,6 +97,9 @@ export function formatLongDate(iso) {
   return parseDate(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+// "1 session", "12 sessions", "1,204 hands" (many: the plural when it isn't just an added "s").
+export const plural = (n, one, many = `${one}s`) => `${n.toLocaleString('en-US')} ${n === 1 ? one : many}`;
+
 // "September 2026"
 export function formatMonth(iso) {
   return parseDate(iso).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });

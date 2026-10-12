@@ -1,6 +1,6 @@
-/* Import tool: drop zone, preview of the chosen file, messages, and undo. */
+/* Import panel: drop zone, preview of the chosen file (backup or Regroup CSV), messages, and undo. */
 
-.import-sessions-intro {
+.import-data-intro {
   color: var(--text-muted);
   margin-bottom: 14px;
 }
@@ -25,6 +25,10 @@
 .import-drop:focus-within {
   border-color: var(--accent);
   background: var(--accent-soft);
+}
+.import-drop.is-reading {
+  cursor: progress;
+  opacity: 0.7;
 }
 .import-drop-input {
   position: absolute;
@@ -85,6 +89,12 @@
 }
 .import-preview-facts .is-negative {
   color: var(--negative);
+}
+/* A quiet line under the facts (what a backup leaves as it is) */
+.import-preview-note {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
 }
 
 /* Filled-in values, collapsed by default */

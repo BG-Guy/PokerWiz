@@ -6,11 +6,14 @@ import { fileURLToPath } from 'node:url';
 import { sessionsRouter } from './routes/sessions.js';
 import { handsRouter } from './routes/hands.js';
 import { goalsRouter } from './routes/goals.js';
+import { dataRouter } from './routes/data.js';
 
 const PORT = Number(process.env.PORT ?? 3001);
 const distDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 
 const app = express();
+// Backups and spreadsheets come first: a backup import reads its own, bigger request (routes/data.js).
+app.use('/api/data', dataRouter);
 app.use(express.json({ limit: '5mb' })); // room for a big session import with notes
 
 // API routes

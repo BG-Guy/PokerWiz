@@ -17,6 +17,7 @@ A poker tracker for mobile and desktop: a React frontend and a small Express + S
 - **Big blinds or dollars:** every amount shows in big blinds by default; the BB / $ switch (header on phones, sidebar on desktop) flips the whole app to dollars. Totals across stakes add up each session's result in its own big blinds.
 - **Bankroll chart:** bankroll against hours played. Hover or tap it to read any point.
 - **Equity calculator:** 2 to 6 hands plus an optional board. It gives exact results when possible and otherwise simulates random boards (in a web worker).
+- **Import and export (Profile):** download a backup of everything (sessions with their timelines, hands, goals) and import it again, on the same device or another: you see what it adds first, and importing the same file twice adds nothing. Spreadsheets (CSV) of your sessions and hands for Excel, Numbers or Google Sheets. Sessions from Regroup come in from its CSV export.
 
 ## Run it
 
@@ -83,6 +84,7 @@ src/
     HandHighlights/ HandInsights/
     HandReview/  GameHistory/  Insights/  Goals/
     Equity/              Calculator page + equity.worker.js
+    Profile/             Your record, export (backup, spreadsheets) and import (backup, Regroup CSV), session log
 ```
 
 ## API
@@ -103,6 +105,9 @@ src/
 | GET / POST | `/api/goals` | List goals / add one `{ title, metric, target, startDate, deadline }` |
 | PATCH / DELETE | `/api/goals/:id` | Edit or delete a goal |
 | GET | `/api/player-stats` | Tracker stats for Insights |
+| GET | `/api/data/backup` | Everything as a backup file (JSON) |
+| GET | `/api/data/sessions.csv`, `/api/data/hands.csv` | Spreadsheets of your sessions and hands |
+| POST | `/api/data/import` | Import a backup `{ backup, removeSamples }`; `?dryRun=1` only says what it would add |
 
 ## Design
 

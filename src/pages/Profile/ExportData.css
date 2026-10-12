@@ -1,0 +1,62 @@
+/* Export panel: the backup (icon, what's in it, when it was last downloaded here, the button), then the
+   spreadsheet downloads. */
+
+.export-backup {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px 14px;
+  align-items: start;
+}
+.export-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.export-backup-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.export-backup-text p,
+.export-sheets-text p {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.export-last {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+/* The button sits under the text, full width on phones */
+.export-backup-btn {
+  grid-column: 1 / -1;
+  min-height: 46px;
+}
+
+.export-sheets {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.export-sheets-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.export-sheets-links .btn {
+  border: 1px solid var(--border);
+}
+
+@media (min-width: 640px) {
+  .export-backup-btn {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
