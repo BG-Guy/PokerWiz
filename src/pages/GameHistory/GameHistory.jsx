@@ -77,7 +77,7 @@ export default function GameHistory() {
 
   return (
     <div className="game-history">
-      <PageHeader title="Game History" subtitle="Every session you logged, newest first. Open one to edit it." />
+      <PageHeader title="Game History" subtitle="Every session you logged, newest first, with its grade. Open one to see the whole session or edit it." />
 
       <div className="game-history-filters">
         <FilterChips options={GAME_OPTIONS} value={game} onChange={setGame} label="Filter by game" />
@@ -112,7 +112,7 @@ export default function GameHistory() {
                 key={session.id}
                 session={session}
                 rawSession={rawSessions.find((s) => s.id === session.id)}
-                handCount={hands.filter((hand) => hand.sessionId === session.id).length}
+                sessionHands={hands.filter((hand) => hand.sessionId === session.id)}
                 isOpen={openId === session.id}
                 onToggle={() => setOpenId(openId === session.id ? null : session.id)}
                 onSaved={replaceSession}

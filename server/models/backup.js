@@ -73,15 +73,29 @@ class DryRun extends Error {
   }
 }
 
+// Delete every session (their timelines go with them), hand and goal, inside the open transaction. Returns
+// how many of each there were.
+function deleteEverything() {
+  return {
+    sessions: Number(db.prepare('DELETE FROM sessions').run().changes),
+    hands: Number(db.prepare('DELETE FROM hands').run().changes),
+    goals: Number(db.prepare('DELETE FROM goals').run().changes),
+  };
+}
+
 // Add a backup (checked by routes/data.js) to the database, all or nothing. dryRun: work out what would happen
 // and change nothing. removeSamples: delete the sample data that came with the app from this install first.
 // The file's own copies of the sample data are always left out: they're made up, not part of anyone's record.
 // Returns { sessions, hands, goals } (each { added, skipped }), liveSkipped (a live session in the file while
 // one is already running here: it's left out), and removedSamples ({ sessions, hands } or null).
-export function importBackup(backup, { dryRun = false, removeSamples = false } = {}) {
+// mode 'add' (the default) adds what isn't here yet; 'replace' first deletes everything here (sessions with their
+// timelines, hands, goals, the sample data too), so the backup becomes your data. The result then also says what
+// was deleted: replaced { sessions, hands, goals }.
+export function importBackup(backup, { dryRun = false, removeSamples = false, mode = 'add' } = {}) {
   try {
     return transaction(() => {
-      const result = addBackup(backup, removeSamples);
+      const replaced = mode === 'replace' ? deleteEverything() : null;
+      const result = { ...addBackup(backup, removeSamples && !replaced), replaced };
       if (dryRun) throw new DryRun(result);
       return result;
     });

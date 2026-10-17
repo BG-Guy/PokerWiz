@@ -1,0 +1,67 @@
+/* One session: numbers in a row of tiles, then the grade (and notes) beside the timeline on wide screens,
+   stacked on phones. */
+
+.session-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.session-detail-stats div {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.session-detail-stats dt {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+.session-detail-stats dd {
+  margin-top: 4px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.session-detail-columns {
+  display: grid;
+  gap: 18px;
+}
+@media (min-width: 960px) {
+  .session-detail-columns {
+    grid-template-columns: minmax(280px, 360px) 1fr;
+    align-items: start;
+  }
+}
+.session-detail-side {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.session-detail-notes,
+.session-detail-story {
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.session-detail-notes h2,
+.session-detail-story h2 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+.session-detail-notes p {
+  white-space: pre-wrap;
+  color: var(--text-muted);
+}
+.session-detail-empty {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--text-muted);
+}

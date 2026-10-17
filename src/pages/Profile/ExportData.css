@@ -60,3 +60,14 @@
     justify-self: start;
   }
 }
+
+/* A download that failed */
+.export-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--negative);
+}

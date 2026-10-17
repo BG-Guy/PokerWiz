@@ -3,6 +3,8 @@ import { request } from './client.js';
 
 export const getSessions = () => request('/sessions');
 export const getLiveSession = () => request('/sessions/live');
+// One session with its timeline (events: notes, rebuys and hands, oldest first).
+export const getSession = (id) => request(`/sessions/${id}`);
 export const startSession = (session) => request('/sessions', { method: 'POST', body: session });
 
 // event: { type: 'note' | 'rebuy' | 'hand', text?, amount?, handId? }

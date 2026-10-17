@@ -9,6 +9,7 @@ import HandReview from './pages/HandReview/HandReview.jsx';
 import AddHand from './pages/AddHand/AddHand.jsx';
 import LiveSession from './pages/LiveSession/LiveSession.jsx';
 import GameHistory from './pages/GameHistory/GameHistory.jsx';
+import SessionDetail from './pages/GameHistory/SessionDetail.jsx';
 import Insights from './pages/Insights/Insights.jsx';
 import Goals from './pages/Goals/Goals.jsx';
 import Profile from './pages/Profile/Profile.jsx';
@@ -36,6 +37,7 @@ export default function App() {
         <Route path="hands/:handId/edit" element={<EditHand />} />
         <Route path="session" element={<LiveSession />} />
         <Route path="history" element={<GameHistory />} />
+        <Route path="history/:sessionId" element={<SessionDetail />} />
         <Route path="insights" element={<Insights />} />
         <Route path="goals" element={<Goals />} />
         <Route path="equity" element={<Equity />} />

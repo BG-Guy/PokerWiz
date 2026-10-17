@@ -1,10 +1,19 @@
 <!doctype html>
-<!-- App shell: loads fonts, sets the theme before first paint, and mounts React into #root. -->
+<!-- App shell: loads fonts, sets the theme before first paint, and mounts React into #root. Added to the Home
+     Screen it runs as an app: full screen (no browser bars or address), its own icon, no zooming. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#12181B" />
+    <meta name="format-detection" content="telephone=no" />
+    <!-- Home Screen app: full screen, status bar over the app (the header makes room for it), name and icon -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="PokerWiz" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>PokerWiz</title>
 
@@ -25,6 +34,10 @@
           theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
         document.documentElement.dataset.theme = theme;
+        // Opened from the Home Screen (no browser around it): the CSS makes room for the status bar.
+        if (navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+          document.documentElement.dataset.standalone = '';
+        }
       })();
     </script>
   </head>

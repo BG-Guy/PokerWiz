@@ -2,6 +2,7 @@
 // spreadsheets of your sessions and hands. Remembers on this device when you last downloaded a backup.
 import { useState } from 'react';
 import { DOWNLOADS } from '../../api/data.js';
+import { saveFile } from '../../utils/download.js';
 import { formatLongDate, todayIso } from '../../utils/format.js';
 import Panel from '../../components/Panel/Panel.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
@@ -20,8 +21,16 @@ function readLastBackup() {
 export default function ExportData() {
   const [lastBackup, setLastBackup] = useState(readLastBackup);
 
-  // The link downloads the file; note the day on this device.
-  const remember = () => {
+  const [error, setError] = useState(null);
+  // Save one of the files (in the Home Screen app, through the share sheet: no browser view).
+  const save = (url) => {
+    setError(null);
+    return saveFile(url).catch((err) => setError(err.message));
+  };
+
+  // Download the backup, and note the day on this device.
+  const remember = async () => {
+    await save(DOWNLOADS.backup);
     const today = todayIso();
     try {
       localStorage.setItem(LAST_BACKUP_KEY, today);
@@ -46,9 +55,9 @@ export default function ExportData() {
           </p>
           <span className="export-last">{lastBackup ? `Last backup from this device: ${formatLongDate(lastBackup)}` : 'No backup downloaded on this device yet'}</span>
         </div>
-        <a className="btn export-backup-btn" href={DOWNLOADS.backup} download onClick={remember}>
+        <button type="button" className="btn export-backup-btn" onClick={remember}>
           <Icon name="download" size={16} /> Download backup
-        </a>
+        </button>
       </div>
 
       {/* Spreadsheets, to look at the numbers elsewhere */}
@@ -58,14 +67,19 @@ export default function ExportData() {
           <p>For Excel, Numbers or Google Sheets. Amounts in dollars.</p>
         </div>
         <div className="export-sheets-links">
-          <a className="btn btn-ghost" href={DOWNLOADS.sessions} download>
+          <button type="button" className="btn btn-ghost" onClick={() => save(DOWNLOADS.sessions)}>
             <Icon name="download" size={16} /> Sessions (.csv)
-          </a>
-          <a className="btn btn-ghost" href={DOWNLOADS.hands} download>
+          </button>
+          <button type="button" className="btn btn-ghost" onClick={() => save(DOWNLOADS.hands)}>
             <Icon name="download" size={16} /> Hands (.csv)
-          </a>
+          </button>
         </div>
       </div>
+      {error && (
+        <p className="export-error" role="alert">
+          <Icon name="alert" size={16} /> {error}
+        </p>
+      )}
     </Panel>
   );
 }

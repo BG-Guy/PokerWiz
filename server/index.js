@@ -7,6 +7,7 @@ import { sessionsRouter } from './routes/sessions.js';
 import { handsRouter } from './routes/hands.js';
 import { goalsRouter } from './routes/goals.js';
 import { dataRouter } from './routes/data.js';
+import { takeSnapshot, startDailySnapshots } from './models/snapshots.js';
 
 const PORT = Number(process.env.PORT ?? 3001);
 const distDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
@@ -34,6 +35,14 @@ app.use((error, req, res, _next) => {
   console.error(error);
   res.status(500).json({ error: 'Something went wrong on the server' });
 });
+
+// An automatic backup of your data at every start (an update restarts the server), then one a day.
+try {
+  takeSnapshot('startup');
+} catch (error) {
+  console.error('Startup snapshot failed:', error);
+}
+startDailySnapshots();
 
 app.listen(PORT, () => {
   console.log(`PokerWiz API running on http://localhost:${PORT}`);

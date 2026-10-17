@@ -1,6 +1,7 @@
 // Profile (/profile): your whole poker record in one place. Lifetime totals for cash games and tournaments,
 // results by location, your data in and out (a backup to download and import back, spreadsheets, and
-// sessions from another app), and every session with all of its details and notes.
+// sessions from another app), the automatic backups that keep it safe, and every session with all of its
+// details and notes.
 import { getSessions, getSampleData } from '../../api/sessions.js';
 import { useApi } from '../../hooks/useApi.js';
 import { formatLongDate } from '../../utils/format.js';
@@ -8,6 +9,7 @@ import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import ProfileSummary from './ProfileSummary.jsx';
 import ExportData from './ExportData.jsx';
+import DataSafety from './DataSafety.jsx';
 import ImportData from './ImportData.jsx';
 import SessionLog from './SessionLog.jsx';
 import './Profile.css';
@@ -33,6 +35,7 @@ export default function Profile() {
         {sessions.length > 0 && <ProfileSummary sessions={sessions} />}
         <div className="profile-data">
           <ExportData />
+          <DataSafety />
           <ImportData samples={samples} importedCount={sessions.filter((s) => s.source === 'regroup').length} onChange={reload} />
         </div>
       </div>

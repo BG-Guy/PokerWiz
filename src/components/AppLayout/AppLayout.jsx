@@ -1,4 +1,5 @@
-// App shell: navigation (sidebar on desktop, bottom tabs on mobile) plus the active page.
+// App shell: navigation (sidebar on desktop, bottom tabs on mobile) plus the active page, and the guard that
+// keeps a copy of your data on this device (DataGuard).
 import { Suspense, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import NavBar from '../NavBar/NavBar.jsx';
@@ -6,6 +7,8 @@ import Brand from '../Brand/Brand.jsx';
 import ThemeToggle from '../ThemeToggle/ThemeToggle.jsx';
 import UnitToggle from '../UnitToggle/UnitToggle.jsx';
 import LoadState from '../LoadState/LoadState.jsx';
+import DataGuard from '../DataGuard/DataGuard.jsx';
+import { InstallBanner } from '../InstallGuide/InstallGuide.jsx';
 import './AppLayout.css';
 
 export default function AppLayout() {
@@ -30,8 +33,11 @@ export default function AppLayout() {
           </span>
         </header>
 
-        {/* Pages that load on first visit show the loading state meanwhile */}
+        {/* Pages that load on first visit show the loading state meanwhile. Above them: the offer to put your
+            data back if the server lost it (DataGuard, which also keeps this device's copy fresh). */}
         <main className="app-main">
+          <DataGuard />
+          <InstallBanner />
           <Suspense fallback={<LoadState />}>
             <Outlet />
           </Suspense>

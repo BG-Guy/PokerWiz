@@ -1,8 +1,10 @@
-// One session in Game History. Tapping it expands buy-in, cash-out, expenses, notes, a link to its hands, and
-// Edit (change or delete the session). Tournaments have no big blind, so their amounts are always in dollars.
+// One session in Game History, with its grade letter (utils/sessionGrade.js). Tapping it expands buy-in,
+// cash-out, expenses, notes, the whole session (timeline and grade, SessionDetail), its hands, and Edit (change or
+// delete the session). Tournaments have no big blind, so their amounts are always in dollars.
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { isTournament, sessionProfit } from '../../utils/stats.js';
+import { gradeSession } from '../../utils/sessionGrade.js';
 import { formatDuration, formatMoney, formatUnits, formatWeekday, parseDate } from '../../utils/format.js';
 import Money from '../../components/Money/Money.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
@@ -13,7 +15,7 @@ import EditSessionSheet from './EditSessionSheet.jsx';
 import './SessionRow.css';
 
 // session is the display copy (BB/$ unit); rawSession is the saved one in dollars, which the edit sheet changes.
-export default function SessionRow({ session, rawSession, handCount, isOpen, onToggle, onSaved, onDeleted }) {
+export default function SessionRow({ session, rawSession, sessionHands, isOpen, onToggle, onSaved, onDeleted }) {
   const [editing, setEditing] = useState(false);
   const [editSheet, editOpen] = useClosingValue(editing); // stays up while it slides closed
   const tournament = isTournament(session);
@@ -22,6 +24,8 @@ export default function SessionRow({ session, rawSession, handCount, isOpen, onT
   const profit = sessionProfit(session);
   const hourly = profit / (session.durationMin / 60);
   const detailsId = `session-details-${session.id}`;
+  const handCount = sessionHands.length;
+  const grade = gradeSession(rawSession, sessionHands);
 
   return (
     <li className={`session-row ${isOpen ? 'is-open' : ''}`}>
@@ -38,6 +42,9 @@ export default function SessionRow({ session, rawSession, handCount, isOpen, onT
           </span>
         </span>
         <span className="session-row-hands num">{session.hands} hands</span>
+        <span className={`session-row-grade is-${grade.letter.toLowerCase()}`} title={`Grade ${grade.letter}: ${grade.label} (${grade.score}/100)`}>
+          {grade.letter}
+        </span>
         <Money amount={profit} bb={unit} className="session-row-result" />
         <Icon name="chevronDown" size={18} className="session-row-chevron" />
       </button>
@@ -94,8 +101,12 @@ export default function SessionRow({ session, rawSession, handCount, isOpen, onT
 
           {/* Its hands, and editing the session */}
           <div className="session-row-actions">
+            <Link to={`/history/${session.id}`} className="btn session-row-link">
+              <Icon name="clock" size={16} /> The whole session · grade {grade.letter}
+              <Icon name="chevronRight" size={16} />
+            </Link>
             {handCount > 0 && (
-              <Link to={`/hands?session=${session.id}`} className="btn session-row-link">
+              <Link to={`/hands?session=${session.id}`} className="btn btn-ghost session-row-link">
                 Review {handCount} saved {handCount === 1 ? 'hand' : 'hands'}
                 <Icon name="chevronRight" size={16} />
               </Link>

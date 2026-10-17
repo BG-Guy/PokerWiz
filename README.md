@@ -17,7 +17,11 @@ A poker tracker for mobile and desktop: a React frontend and a small Express + S
 - **Big blinds or dollars:** every amount shows in big blinds by default; the BB / $ switch (header on phones, sidebar on desktop) flips the whole app to dollars. Totals across stakes add up each session's result in its own big blinds.
 - **Bankroll chart:** bankroll against hours played. Hover or tap it to read any point.
 - **Equity calculator:** 2 to 6 hands plus an optional board. It gives exact results when possible and otherwise simulates random boards (in a web worker).
-- **Import and export (Profile):** download a backup of everything (sessions with their timelines, hands, goals) and import it again, on the same device or another: you see what it adds first, and importing the same file twice adds nothing. Spreadsheets (CSV) of your sessions and hands for Excel, Numbers or Google Sheets. Sessions from Regroup come in from its CSV export.
+- **Swipe to edit or delete a hand:** in the Hands list, swipe a hand left for Edit and Delete (as in iOS Mail); a long swipe deletes at once. A deleted hand leaves the list with an Undo bar, and is only deleted on the server once the bar runs out.
+- **Use it as an app:** on iPhone, Safari > Share > Add to Home Screen (the app shows these steps in a banner and in More). From its icon it opens full screen, with no browser bars or address, no zooming, and the status bar over the app; downloads go through the share sheet instead of opening a browser view. Chrome, Edge and Android offer an Install button.
+- **Your data, kept safe:** the server saves an automatic backup of everything (in a `backups` folder next to the database) every time it starts, which every update does, once a day, and before your data is replaced; the newest 30 are kept, and each can be downloaded or put back from Profile. Your browser also keeps a copy and refreshes it while you use the app: if the server ever comes back without your data (a host without a persistent disk starts over on every deploy), the app offers to put it back.
+- **Session history:** each session gets a grade (A to F) from the hands you saved from it (the coach's accuracy, or your own ratings), the money won (bb per hour, or return on a tournament buy-in) and the hours played. Open a session to see the grade explained and the whole session in order: when you sat down, every note, rebuy and hand (with its cards, result and grade), and the cash-out.
+- **Import and export (Profile):** download a backup of everything (sessions with their timelines, hands, goals) and import it again, on the same device or another, either on top of your data (importing the same file twice adds nothing) or instead of it. You see what it does first. Spreadsheets (CSV) of your sessions and hands for Excel, Numbers or Google Sheets. Sessions from Regroup come in from its CSV export.
 
 ## Run it
 
@@ -108,7 +112,11 @@ src/
 | GET | `/api/player-stats` | Tracker stats for Insights |
 | GET | `/api/data/backup` | Everything as a backup file (JSON) |
 | GET | `/api/data/sessions.csv`, `/api/data/hands.csv` | Spreadsheets of your sessions and hands |
-| POST | `/api/data/import` | Import a backup `{ backup, removeSamples }`; `?dryRun=1` only says what it would add |
+| POST | `/api/data/import` | Import a backup `{ backup, removeSamples, mode }` (`add` on top of your data, or `replace` it, after an automatic backup); `?dryRun=1` only says what it would do |
+| GET | `/api/data/status` | How much of the data is yours (not the samples), and the newest automatic backup |
+| GET, POST | `/api/data/snapshots` | The automatic backups (newest first); POST saves one now |
+| GET | `/api/data/snapshots/:name` | Download one |
+| POST | `/api/data/snapshots/:name/restore` | Put one back (replaces your data, after saving what's here) |
 
 ## Design
 

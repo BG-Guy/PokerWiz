@@ -1,8 +1,10 @@
-// Phone-only sheet listing the sections that don't fit in the bottom tab bar.
+// Phone-only sheet listing the sections that don't fit in the bottom tab bar, and (in a browser) how to use
+// PokerWiz as an app.
 import { NavLink } from 'react-router-dom';
 import Modal from '../Modal/Modal.jsx';
 import Icon from '../Icon/Icon.jsx';
 import AppVersion from '../AppVersion/AppVersion.jsx';
+import { InstallButton } from '../InstallGuide/InstallGuide.jsx';
 import './MoreSheet.css';
 
 export default function MoreSheet({ open, onClose, items }) {
@@ -21,6 +23,7 @@ export default function MoreSheet({ open, onClose, items }) {
           </li>
         ))}
       </ul>
+      <InstallButton className="more-sheet-install" />
       {/* Phones have no sidebar, so the version lives at the bottom of this sheet */}
       <AppVersion className="more-sheet-version" />
     </Modal>

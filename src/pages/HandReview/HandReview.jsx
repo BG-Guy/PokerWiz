@@ -1,14 +1,17 @@
 // Hand Review page: searchable, sortable hand list plus a street-by-street replay of the selected hand, which
 // can be edited or deleted. Phones show one pane at a time (list, or the opened hand); desktop shows both.
-import { useState } from 'react';
+// Swiping a hand in the list deletes it with Undo: it leaves the list at once, and the server deletes it once the
+// Undo bar runs out (or right away if you leave the page or close the app).
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { getHands, updateHand } from '../../api/hands.js';
+import { getHands, updateHand, deleteHand } from '../../api/hands.js';
 import { getSessions } from '../../api/sessions.js';
 import { useApi } from '../../hooks/useApi.js';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import HandsTabs from '../../components/HandsTabs/HandsTabs.jsx';
+import UndoToast from '../../components/UndoToast/UndoToast.jsx';
 import HandList from './HandList.jsx';
 import HandDetail from './HandDetail.jsx';
 import './HandReview.css';
@@ -36,6 +39,31 @@ export default function HandReview() {
   const [query, setQuery] = useState('');
   const [saveError, setSaveError] = useState(null);
   const { data, error, reload, setData } = useApi(loadHandReview);
+  const [deleted, setDeleted] = useState(null); // the hand waiting for its Undo bar to run out
+  const pending = useRef(null); // that hand, and where it was in the list: { hand, index }
+
+  // Delete the waiting hand on the server now. keepalive lets it finish even as the page closes.
+  const commitDelete = useCallback(() => {
+    const hand = pending.current?.hand;
+    if (!hand) return;
+    pending.current = null;
+    setDeleted(null);
+    deleteHand(hand.id).catch((err) => {
+      setSaveError(err.message);
+      setData(([hands, list]) => [[hand, ...hands], list]);
+    });
+  }, [setData]);
+  useEffect(() => {
+    const onHide = () => {
+      if (pending.current) fetch(`/api/hands/${pending.current.hand.id}`, { method: 'DELETE', keepalive: true });
+      pending.current = null;
+    };
+    window.addEventListener('pagehide', onHide);
+    return () => {
+      window.removeEventListener('pagehide', onHide);
+      commitDelete(); // leaving the page: the delete goes through
+    };
+  }, [commitDelete]);
 
   if (!data) return <LoadState error={error} onRetry={reload} />;
   const [allHands, sessions] = data;
@@ -67,6 +95,23 @@ export default function HandReview() {
 
   // After an edit was saved (the edit sheet saves first): show the server's copy of the hand.
   const replaceHand = (saved) => setData(([hands, list]) => [hands.map((hand) => (hand.id === saved.id ? saved : hand)), list]);
+  // Swipe > Delete: off the list now, with Undo for a few seconds (a previous one still waiting goes through).
+  const swipeDelete = (hand) => {
+    commitDelete();
+    pending.current = { hand, index: data[0].findIndex((h) => h.id === hand.id) };
+    setDeleted(hand);
+    setData(([hands, list]) => [hands.filter((h) => h.id !== hand.id), list]);
+    if (handId === hand.id) navigate(`/hands${search}`);
+  };
+  const undoDelete = () => {
+    const waiting = pending.current;
+    pending.current = null;
+    setDeleted(null);
+    if (waiting) setData(([hands, list]) => [[...hands.slice(0, waiting.index), waiting.hand, ...hands.slice(waiting.index)], list]);
+  };
+  // Swipe > Edit: open the hand with its edit sheet up.
+  const swipeEdit = (hand) => navigate(`/hands/${hand.id}${search}`, { state: { edit: true } });
+
   // After a delete: drop it from the list and go back to the list.
   const removeHand = (id) => {
     setData(([hands, list]) => [hands.filter((hand) => hand.id !== id), list]);
@@ -101,6 +146,8 @@ export default function HandReview() {
             sort={sort}
             onSortChange={setSort}
             onRate={(id, rating) => updateReview(id, { rating })}
+            onEdit={swipeEdit}
+            onDelete={swipeDelete}
             query={query}
             onQueryChange={setQuery}
             session={session}
@@ -124,6 +171,8 @@ export default function HandReview() {
           )}
         </div>
       </div>
+
+      {deleted && <UndoToast key={deleted.id} message={`Deleted "${deleted.title}"`} onUndo={undoDelete} onDone={commitDelete} />}
     </div>
   );
 }

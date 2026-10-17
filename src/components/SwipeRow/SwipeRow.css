@@ -1,0 +1,67 @@
+/* Swipe-to-reveal row: the content slides left over action buttons that grow out from the right edge. A row
+   that's leaving (deleted) slides off and folds away. */
+
+.swipe-row {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.26s ease 0.12s, opacity 0.2s ease 0.12s, margin 0.26s ease 0.12s;
+}
+.swipe-row.is-leaving {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.swipe-row-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  overflow: hidden;
+  transition: width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.swipe-row.is-dragging .swipe-row-actions {
+  transition: none;
+}
+.swipe-row-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: flex-basis 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.swipe-row-action.is-neutral {
+  background: #7b8a90;
+}
+.swipe-row-action.is-danger {
+  background: #e5534b;
+}
+.swipe-row-action:active {
+  filter: brightness(0.9);
+}
+
+.swipe-row-content {
+  position: relative;
+  min-height: 0;
+  touch-action: pan-y; /* the page still scrolls up and down; sideways moves are the swipe */
+  transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+  will-change: transform;
+}
+.swipe-row.is-dragging .swipe-row-content {
+  transition: none;
+}
+.swipe-row-content a,
+.swipe-row-content img {
+  -webkit-user-drag: none;
+}

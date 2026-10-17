@@ -109,8 +109,8 @@ export default function ImportData({ samples, importedCount, onChange }) {
   return (
     <Panel title="Import" className="import-data">
       <p className="import-data-intro">
-        Restore a PokerWiz backup (.json), on this device or another. Or bring your history over from Regroup: export your sessions as
-        a CSV there. You'll see what's in the file before anything is saved.
+        Restore a PokerWiz backup (.json), on this device or another: on top of your data, or instead of it. Or bring your history over
+        from Regroup: export your sessions as a CSV there. You'll see what's in the file before anything is saved.
       </p>
 
       {/* File picker and drop zone */}
@@ -145,7 +145,11 @@ export default function ImportData({ samples, importedCount, onChange }) {
         <p className="import-message is-success" role="status">
           <Icon name="check" size={16} />
           <span>
-            {listOf(added) ? `Imported ${listOf(added)}` : 'Nothing new to import'}
+            {result.replaced
+              ? `Replaced your data with the backup: ${listOf(added) || 'nothing'}. Your previous data was saved as an automatic backup (see "Your data, kept safe")`
+              : listOf(added)
+                ? `Imported ${listOf(added)}`
+                : 'Nothing new to import'}
             {result.removedSamples && ', and removed the sample data'}. Everything is in History, Hands, Goals and Insights.
           </span>
         </p>

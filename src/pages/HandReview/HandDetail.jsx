@@ -1,7 +1,7 @@
 // Right pane of Hand Review: the table (board, your hand, villain hands), action replay, and your review
 // (verdict, star rating, tilt, notes). "Edit" opens the hand's edit sheet (details, the action, delete).
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { VERDICTS } from '../../constants/poker.js';
 import { bigBlindOf, formatLongDate, formatMoney } from '../../utils/format.js';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
@@ -39,7 +39,15 @@ function villainsOf(hand) {
 
 // onUpdate(changes, persist) for the review fields; onSaved(hand) after the edit sheet saves; onDeleted().
 export default function HandDetail({ hand, backTo, onUpdate, onSaved, onDeleted }) {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
+  // Arriving from a swipe's Edit: open the edit sheet (once: the request is cleared from the history entry).
+  useEffect(() => {
+    if (!location.state?.edit) return;
+    setEditing(true);
+    navigate(`${location.pathname}${location.search}`, { replace: true, state: null });
+  }, [location, navigate]);
   const [editSheet, editOpen] = useClosingValue(editing); // stays up while it slides closed
   const villains = villainsOf(hand);
   // Every Hold'em hand can be reviewed by the coach (missing details are rebuilt from the log).

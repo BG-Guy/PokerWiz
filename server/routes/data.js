@@ -1,9 +1,11 @@
-// Your data in and out: a full backup (JSON) to download and to import back, on this device or another, and
-// spreadsheets (CSV) of your sessions and hands. Downloads come as files named with the day's date.
+// Your data in and out: a full backup (JSON) to download and to import back (added to your data, or replacing
+// it), on this device or another, spreadsheets (CSV) of your sessions and hands, and the automatic backups the
+// server keeps (models/snapshots.js). Downloads come as files named with the day's date.
 import express, { Router } from 'express';
 import { createBackup, importBackup, BACKUP_APP, BACKUP_VERSION } from '../models/backup.js';
 import { sessionsCsv, handsCsv } from '../models/spreadsheets.js';
 import { GOAL_METRICS } from '../models/goals.js';
+import { countUserData, listSnapshots, readSnapshot, takeSnapshot } from '../models/snapshots.js';
 
 export const dataRouter = Router();
 
@@ -109,11 +111,57 @@ function backupProblem(b) {
   return null;
 }
 
-// Import a backup: { backup, removeSamples }. ?dryRun=1 only works out what would happen (the preview).
-// Replies { sessions, hands, goals } (each { added, skipped }), liveSkipped, removedSamples.
+// A replace needs something to replace with: an empty backup would just wipe everything.
+const isEmptyBackup = (b) => b.sessions.length + b.hands.length + b.goals.length === 0;
+
+// Import a backup: { backup, removeSamples, mode ('add' | 'replace') }. ?dryRun=1 only works out what would
+// happen (the preview). A real replace first saves an automatic backup of what's here. Replies { sessions,
+// hands, goals } (each { added, skipped }), liveSkipped, removedSamples, replaced (what was deleted, or null),
+// and snapshot (the automatic backup taken first, or null).
 dataRouter.post('/import', express.json({ limit: '50mb' }), (req, res) => {
-  const { backup, removeSamples = false } = req.body ?? {};
+  const { backup, removeSamples = false, mode = 'add' } = req.body ?? {};
+  if (!['add', 'replace'].includes(mode)) return res.status(400).json({ error: 'Unknown import mode' });
   const problem = backupProblem(backup);
   if (problem) return res.status(400).json({ error: problem });
-  res.json(importBackup(backup, { dryRun: req.query.dryRun === '1', removeSamples: removeSamples === true }));
+  if (mode === 'replace' && isEmptyBackup(backup)) return res.status(400).json({ error: 'This backup is empty: replacing your data with it would delete everything' });
+  const dryRun = req.query.dryRun === '1';
+  const snapshot = mode === 'replace' && !dryRun ? takeSnapshot('before-replace') : null;
+  res.json({ ...importBackup(backup, { dryRun, removeSamples: removeSamples === true, mode }), snapshot });
+});
+
+// ----- What's here, and the automatic backups -----
+
+// { userData: { sessions, hands, goals } (yours, not the sample data), snapshots: { count, newest } }.
+dataRouter.get('/status', (req, res) => {
+  const snapshots = listSnapshots();
+  res.set('Cache-Control', 'no-store');
+  res.json({ userData: countUserData(), snapshots: { count: snapshots.length, newest: snapshots[0]?.createdAt ?? null } });
+});
+
+// The automatic backups, newest first: [{ name, reason, createdAt, size }].
+dataRouter.get('/snapshots', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json(listSnapshots().map(({ hash, ...s }) => s));
+});
+
+// Save an automatic backup now. Replies the new one, or null when nothing changed since the last.
+dataRouter.post('/snapshots', (req, res) => {
+  res.status(201).json(takeSnapshot('manual'));
+});
+
+// Download one.
+dataRouter.get('/snapshots/:name', (req, res) => {
+  const backup = readSnapshot(req.params.name);
+  if (!backup) return res.status(404).json({ error: 'No such backup' });
+  download(res, req.params.name, 'application/json; charset=utf-8', JSON.stringify(backup, null, 1));
+});
+
+// Put one back: it replaces your data, after an automatic backup of what's here now.
+dataRouter.post('/snapshots/:name/restore', (req, res) => {
+  const backup = readSnapshot(req.params.name);
+  if (!backup) return res.status(404).json({ error: 'No such backup' });
+  const problem = backupProblem(backup);
+  if (problem) return res.status(400).json({ error: problem });
+  const snapshot = takeSnapshot('before-restore');
+  res.json({ ...importBackup(backup, { mode: 'replace' }), snapshot });
 });

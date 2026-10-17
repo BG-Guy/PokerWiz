@@ -15,7 +15,7 @@
 /* Summary grid; the hands column only appears on wider screens */
 .session-row-summary {
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) auto 18px;
+  grid-template-columns: 44px minmax(0, 1fr) 28px auto 18px;
   align-items: center;
   gap: 12px;
   width: 100%;
@@ -25,9 +25,34 @@
 .session-row-hands {
   display: none;
 }
+
+/* Grade letter: a small ring, green for A/B, teal C, amber D, red F */
+.session-row-grade {
+  --grade: var(--teal);
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--grade);
+  color: var(--grade);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+}
+.session-row-grade.is-a,
+.session-row-grade.is-b {
+  --grade: var(--positive);
+}
+.session-row-grade.is-d {
+  --grade: var(--warning);
+}
+.session-row-grade.is-f {
+  --grade: var(--negative);
+}
 @media (min-width: 640px) {
   .session-row-summary {
-    grid-template-columns: 48px minmax(0, 1fr) 100px 90px 18px;
+    grid-template-columns: 48px minmax(0, 1fr) 100px 32px 90px 18px;
     padding: 14px 18px;
   }
   .session-row-hands {

@@ -1,6 +1,7 @@
 // Left pane of Hand Review: search box, verdict filter chips, sort order, and the list of hands. Each row
 // shows the hand (cards, title, result, verdict), then your rating (rate or re-rate it right there), how
-// tilted you were and the last coach score, and a Coach button.
+// tilted you were and the last coach score, and a Coach button. Swipe a row left for Edit and Delete (a long
+// swipe deletes at once; HandReview offers Undo).
 import { Link } from 'react-router-dom';
 import { VERDICTS } from '../../constants/poker.js';
 import { bigBlindOf, formatDate } from '../../utils/format.js';
@@ -11,6 +12,7 @@ import VerdictBadge from '../../components/VerdictBadge/VerdictBadge.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import TiltFace from '../../components/TiltMeter/TiltFace.jsx';
 import { coachSupport } from '../../coach/savedHand.js';
+import SwipeRow from '../../components/SwipeRow/SwipeRow.jsx';
 import RatingPill from './RatingPill.jsx';
 import './HandList.css';
 
@@ -36,6 +38,8 @@ export default function HandList({
   onClearSession,
   linkSearch,
   onRate,
+  onEdit,
+  onDelete,
 }) {
   // Chip options with a count of hands per verdict.
   const verdictOptions = [
@@ -111,50 +115,59 @@ export default function HandList({
         {hands.map((hand) => {
           const coach = coachSupport(hand);
           return (
-            <li key={hand.id} className={`hand-list-row ${hand.id === selectedId ? 'is-selected' : ''}`}>
-              <div className="hand-list-body">
-                <Link to={{ pathname: `/hands/${hand.id}`, search: linkSearch }} className="hand-list-item">
-                  <span className="hand-list-cards">
-                    {hand.holeCards.map((code) => (
-                      <PlayingCard key={code} code={code} size="sm" />
-                    ))}
-                  </span>
-                  <span className="hand-list-main">
-                    <span className="hand-list-title">{hand.title}</span>
-                    <span className="hand-list-meta">
-                      {formatDate(hand.date)} · {hand.heroPosition} · {hand.stakes}
-                    </span>
-                  </span>
-                  <span className="hand-list-side">
-                    <Money amount={hand.result} bb={bigBlindOf(hand.stakes)} />
-                    <VerdictBadge verdict={hand.verdict} />
-                  </span>
-                </Link>
+            <li key={hand.id}>
+              <SwipeRow
+                actions={[
+                  { key: 'edit', label: 'Edit', icon: 'pencil', onClick: () => onEdit(hand) },
+                  { key: 'delete', label: 'Delete', icon: 'trash', tone: 'danger', leaves: true, onClick: () => onDelete(hand) },
+                ]}
+              >
+                <div className={`hand-list-row ${hand.id === selectedId ? 'is-selected' : ''}`}>
+                  <div className="hand-list-body">
+                    <Link to={{ pathname: `/hands/${hand.id}`, search: linkSearch }} className="hand-list-item">
+                      <span className="hand-list-cards">
+                        {hand.holeCards.map((code) => (
+                          <PlayingCard key={code} code={code} size="sm" />
+                        ))}
+                      </span>
+                      <span className="hand-list-main">
+                        <span className="hand-list-title">{hand.title}</span>
+                        <span className="hand-list-meta">
+                          {formatDate(hand.date)} · {hand.heroPosition} · {hand.stakes}
+                        </span>
+                      </span>
+                      <span className="hand-list-side">
+                        <Money amount={hand.result} bb={bigBlindOf(hand.stakes)} />
+                        <VerdictBadge verdict={hand.verdict} />
+                      </span>
+                    </Link>
 
-                {/* Your rating (tap to rate or change it), tilt, and the coach's last score */}
-                <div className="hand-list-footer">
-                  <RatingPill rating={hand.rating ?? null} title={hand.title} onRate={(rating) => onRate(hand.id, rating)} />
-                  {hand.tilt != null && (
-                    <span className="hand-list-tilt" title={`Tilt ${hand.tilt} of 5`}>
-                      <TiltFace level={hand.tilt} size={18} />
+                    {/* Your rating (tap to rate or change it), tilt, and the coach's last score */}
+                    <div className="hand-list-footer">
+                      <RatingPill rating={hand.rating ?? null} title={hand.title} onRate={(rating) => onRate(hand.id, rating)} />
+                      {hand.tilt != null && (
+                        <span className="hand-list-tilt" title={`Tilt ${hand.tilt} of 5`}>
+                          <TiltFace level={hand.tilt} size={18} />
+                        </span>
+                      )}
+                      {hand.coachAccuracy != null && <span className="hand-list-coach-score">Coach {hand.coachAccuracy}%</span>}
+                    </div>
+                  </div>
+
+                  {/* Coach review for this hand */}
+                  {coach.ok ? (
+                    <Link to={`/coach?hand=${hand.id}`} className="hand-list-coach" title="Coach review" aria-label={`Coach review: ${hand.title}`}>
+                      <Icon name="coach" size={18} />
+                      <span className="hand-list-coach-label">Coach</span>
+                    </Link>
+                  ) : (
+                    <span className="hand-list-coach is-disabled" title={coach.reason} aria-label={coach.reason}>
+                      <Icon name="coach" size={18} />
+                      <span className="hand-list-coach-label">Coach</span>
                     </span>
                   )}
-                  {hand.coachAccuracy != null && <span className="hand-list-coach-score">Coach {hand.coachAccuracy}%</span>}
                 </div>
-              </div>
-
-              {/* Coach review for this hand */}
-              {coach.ok ? (
-                <Link to={`/coach?hand=${hand.id}`} className="hand-list-coach" title="Coach review" aria-label={`Coach review: ${hand.title}`}>
-                  <Icon name="coach" size={18} />
-                  <span className="hand-list-coach-label">Coach</span>
-                </Link>
-              ) : (
-                <span className="hand-list-coach is-disabled" title={coach.reason} aria-label={coach.reason}>
-                  <Icon name="coach" size={18} />
-                  <span className="hand-list-coach-label">Coach</span>
-                </span>
-              )}
+              </SwipeRow>
             </li>
           );
         })}

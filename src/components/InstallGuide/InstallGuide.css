@@ -1,0 +1,89 @@
+/* Install guide: a compact banner at the top of the app, a row in the More sheet, and the steps sheet. */
+
+.install-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 10px 10px 10px 12px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.install-banner img,
+.install-button img {
+  border-radius: 9px;
+  flex-shrink: 0;
+}
+.install-banner-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+.install-banner-text strong {
+  font-size: 15px;
+}
+.install-banner-text span {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.install-banner-close {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--text-muted);
+}
+
+.install-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  font-weight: 700;
+  text-align: left;
+}
+.install-button span {
+  flex: 1;
+}
+
+.install-sheet-intro {
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.install-sheet-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  counter-reset: step;
+}
+.install-sheet-steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.install-sheet-step-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  flex-shrink: 0;
+}
+.install-sheet-step-icon img {
+  border-radius: 6px;
+}
+.install-sheet-install {
+  width: 100%;
+  justify-content: center;
+}

@@ -1,0 +1,91 @@
+/* Session grade: a big letter in a colored ring (green A/B, teal C, amber D, red F), then one row per part. */
+
+.session-grade {
+  --grade: var(--teal);
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.session-grade.is-a,
+.session-grade.is-b {
+  --grade: var(--positive);
+}
+.session-grade.is-d {
+  --grade: var(--warning);
+}
+.session-grade.is-f {
+  --grade: var(--negative);
+}
+
+.session-grade-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.session-grade-letter {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 4px solid var(--grade);
+  color: var(--grade);
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+}
+.session-grade-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.session-grade-title strong {
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+.session-grade-title span {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.session-grade-parts {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.session-grade-parts li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 10px;
+  align-items: center;
+}
+.session-grade-parts .progress-bar {
+  grid-column: 1 / -1;
+}
+.session-grade-part-name {
+  font-weight: 700;
+  font-size: 14px;
+}
+.session-grade-weight {
+  margin-left: 4px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.session-grade-part-score {
+  font-weight: 700;
+}
+.session-grade-part-detail {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.session-grade-note {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--text-muted);
+}

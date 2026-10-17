@@ -39,6 +39,14 @@
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
 }
+/* Opened from the Home Screen: the status bar (white text) sits over the app, so the header grows under it and
+   paints that strip dark, in both themes */
+:root[data-standalone] .app-mobile-header {
+  padding-top: calc(12px + env(safe-area-inset-top));
+  background-image: linear-gradient(#12181b, #12181b);
+  background-size: 100% env(safe-area-inset-top);
+  background-repeat: no-repeat;
+}
 
 /* Tablet: narrow icon rail on the left */
 @media (min-width: 768px) {

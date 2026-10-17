@@ -9,7 +9,7 @@ import { runMigrations } from './migrations.js';
 const here = dirname(fileURLToPath(import.meta.url));
 
 // Database file lives in server/data/ (git-ignored). Override with POKERWIZ_DB if needed.
-const DB_PATH = process.env.POKERWIZ_DB ?? join(here, '..', 'data', 'pokerwiz.db');
+export const DB_PATH = process.env.POKERWIZ_DB ?? join(here, '..', 'data', 'pokerwiz.db');
 mkdirSync(dirname(DB_PATH), { recursive: true });
 
 export const db = new DatabaseSync(DB_PATH);

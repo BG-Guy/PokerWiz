@@ -68,6 +68,18 @@ const ICONS = {
   flag: <path d="M4 22V4a1 1 0 0 1 1-1h13l-2 5 2 5H5" />,
   play: <path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5z" />,
   plus: <path d="M12 5v14M5 12h14" />,
+  share: (
+    <>
+      <path d="M12 15V3M8 7l4-4 4 4" />
+      <path d="M8 10H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1h-2" />
+    </>
+  ),
+  plusSquare: (
+    <>
+      <rect x="4" y="4" width="16" height="16" rx="3" />
+      <path d="M12 8v8M8 12h8" />
+    </>
+  ),
   check: <path d="m5 12.5 4.5 4.5L19 7.5" />,
   undo: (
     <>
