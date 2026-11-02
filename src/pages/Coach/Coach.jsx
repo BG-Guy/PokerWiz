@@ -2,13 +2,16 @@
 // often GTO makes it, the value of every option, villain ranges). The GTO engine runs in a web worker.
 // Opened as /coach?hand=<id> (the Coach button on any hand in Hands), it reviews that saved hand instead:
 // missing details are rebuilt from the log, your level can be changed on the spot (the review re-runs), and
-// the score is saved onto the hand.
+// the score is saved onto the hand (shown everywhere as a letter grade, A to F). Coach is one of the two elite
+// sections (with Practice): its own header, gold highlights and thinking state (the .elite tokens).
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { createHand, getHand, updateHand } from '../../api/hands.js';
 import { prepareSavedHand } from '../../coach/savedHand.js';
 import { getMoneyUnit } from '../../utils/format.js';
-import PageHeader from '../../components/PageHeader/PageHeader.jsx';
+import { letterGrade } from '../../utils/letterGrade.js';
+import EliteHeader from '../../components/EliteHeader/EliteHeader.jsx';
+import EliteThinking from '../../components/EliteThinking/EliteThinking.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import HandRecorder from '../../components/HandRecorder/HandRecorder.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
@@ -19,7 +22,7 @@ import './Coach.css';
 const STEPS = [
   { icon: 'cards', title: 'Replay the hand', text: 'Seats, stacks, cards and every action, on the table.' },
   { icon: 'target', title: 'Solved with GTO', text: 'Preflop charts for your stack depth; every postflop street solved from both ranges.' },
-  { icon: 'bulb', title: 'Get graded', text: 'Accuracy, the GTO play and how often it makes it, decision by decision.' },
+  { icon: 'bulb', title: 'Get graded', text: 'A letter from A to F for the hand and for every decision, with the GTO play beside yours.' },
 ];
 
 export default function Coach() {
@@ -112,8 +115,8 @@ export default function Coach() {
     if (!report || !savedHand || !record) return;
     const reads = Object.fromEntries(record.players.filter((p) => p.profile).map((p) => [p.role === 'hero' ? 'hero' : p.position, p.profile]));
     updateHand(savedHand.id, { coachAccuracy: report.accuracy, coachReads: reads })
-      .then(() => setStatus(`Score saved to this hand: ${report.accuracy}%.`))
-      .catch(() => setStatus('Could not save the score to the hand.'));
+      .then(() => setStatus(report.accuracy == null ? 'Review saved to this hand.' : `Grade saved to this hand: ${letterGrade(report.accuracy).letter}.`))
+      .catch(() => setStatus('Could not save the grade to the hand.'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [report]);
 
@@ -151,10 +154,11 @@ export default function Coach() {
   };
 
   return (
-    <div className="coach">
-      <PageHeader
+    <div className="coach elite">
+      <EliteHeader
         title="Coach"
-        subtitle={savedHandId ? 'A GTO review of a hand from your Hands.' : 'Replay a hand and get every decision graded against GTO.'}
+        kicker="GTO review"
+        subtitle={savedHandId ? 'A GTO review of a hand from your Hands.' : 'Replay a hand and get every decision graded against GTO, from A to F.'}
       >
         {savedHandId ? (
           <Link to="/coach" className="btn btn-ghost">
@@ -165,7 +169,7 @@ export default function Coach() {
             <Icon name="zap" size={16} /> Practice spots
           </Link>
         )}
-      </PageHeader>
+      </EliteHeader>
 
       {phase === 'record' && !savedHandId && (
         <>
@@ -209,11 +213,10 @@ export default function Coach() {
       )}
 
       {(phase === 'loading' || phase === 'analyzing') && (
-        <div className="coach-thinking" aria-live="polite">
-          <span className="coach-thinking-spinner" />
-          <p className="coach-thinking-title">{phase === 'loading' ? 'Loading the hand' : progress ? `${progress}...` : 'Solving the hand'}</p>
-          <p className="coach-thinking-text">Following the hand through the GTO charts and solving each postflop street from both ranges. A few seconds per street.</p>
-        </div>
+        <EliteThinking
+          title={phase === 'loading' ? 'Loading the hand' : progress ? `${progress}...` : 'Solving the hand'}
+          text="Following the hand through the GTO charts and solving each postflop street from both ranges. A few seconds per street."
+        />
       )}
 
       {phase === 'error' && (

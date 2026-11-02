@@ -1,0 +1,107 @@
+/* Custom stakes sheet: a live preview of the stakes, the fields (two to a row), seats, the table name, the
+   button, then your saved custom stakes. */
+
+.custom-stakes-sheet {
+  max-width: 520px;
+}
+.custom-stakes-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Preview card on felt: dims until there's a big blind, then the label settles in */
+.custom-stakes-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 16px 18px;
+  border-radius: var(--radius-sm);
+  background: var(--felt);
+  color: var(--snow);
+}
+.custom-stakes-preview-game {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-text);
+}
+.custom-stakes-preview-label {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.1;
+  opacity: 0.35;
+  transition: opacity 0.2s ease;
+}
+.custom-stakes-preview.is-ready .custom-stakes-preview-label {
+  opacity: 1;
+  animation: custom-stakes-settle 0.25s ease;
+}
+.custom-stakes-preview-details {
+  min-height: 1.5em;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.75;
+}
+@keyframes custom-stakes-settle {
+  from {
+    transform: translateY(3px);
+  }
+}
+
+/* Seat chips wrap inside the sheet */
+.custom-stakes-seats {
+  flex-wrap: wrap;
+}
+
+.custom-stakes-error {
+  color: var(--negative);
+  font-weight: 700;
+}
+.custom-stakes-use {
+  min-height: 50px;
+  font-size: 15px;
+}
+
+/* Saved custom stakes: a quiet list under the form */
+.custom-stakes-saved {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.custom-stakes-saved-title {
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  font-family: var(--font-body);
+}
+.custom-stakes-saved-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.custom-stakes-saved-row:last-child {
+  border-bottom: 0;
+}
+.custom-stakes-saved-pick {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px 0;
+  text-align: left;
+}
+.custom-stakes-saved-label {
+  font-size: 19px;
+  font-weight: 700;
+}
+.custom-stakes-saved-details {
+  font-size: 13px;
+  color: var(--text-muted);
+}

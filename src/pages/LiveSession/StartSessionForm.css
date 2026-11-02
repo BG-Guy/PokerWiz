@@ -108,7 +108,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--teal);
+  color: var(--accent);
 }
 .start-session-preview-game {
   font-family: var(--font-display);
@@ -123,7 +123,7 @@
   margin-top: 24px;
   font-size: 48px;
   font-weight: 700;
-  color: var(--teal);
+  color: var(--accent);
   line-height: 1;
 }
 .start-session-preview-depth {

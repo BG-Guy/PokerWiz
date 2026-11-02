@@ -6,17 +6,18 @@
   gap: 10px;
 }
 
-/* Slightly tilted badge gives the logo a playful, card-like feel */
+/* Black badge with a crimson spade, slightly tilted like a card being dealt */
 .brand-mark {
   display: grid;
   place-items: center;
   width: 38px;
   height: 38px;
   border-radius: 12px;
-  background: var(--accent);
-  color: var(--ink);
+  background: var(--ink);
+  border: 1px solid #2a2a30;
+  color: var(--crimson);
   transform: rotate(-6deg);
-  box-shadow: 0 4px 12px rgba(127, 200, 194, 0.35);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 35%, transparent);
   transition: transform 0.2s ease;
 }
 .brand:hover .brand-mark {
@@ -25,9 +26,10 @@
 
 .brand-name {
   font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 .brand-name-accent {
   color: var(--accent-text);

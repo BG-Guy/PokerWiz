@@ -7,6 +7,7 @@ import { bigBlindOf, formatLongDate, formatMoney } from '../../utils/format.js';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
 import Money from '../../components/Money/Money.jsx';
 import VerdictBadge from '../../components/VerdictBadge/VerdictBadge.jsx';
+import GradeBadge from '../../components/GradeBadge/GradeBadge.jsx';
 import FilterChips from '../../components/FilterChips/FilterChips.jsx';
 import StarRating from '../../components/StarRating/StarRating.jsx';
 import TiltMeter from '../../components/TiltMeter/TiltMeter.jsx';
@@ -74,7 +75,11 @@ export default function HandDetail({ hand, backTo, onUpdate, onSaved, onDeleted 
             <Icon name="pencil" size={16} /> Edit
           </button>
           <VerdictBadge verdict={hand.verdict} />
-          {hand.coachAccuracy != null && <span className="hand-detail-coach-score">Coach {hand.coachAccuracy}%</span>}
+          {hand.coachAccuracy != null && (
+            <span className="hand-detail-coach-score">
+              Coach <GradeBadge score={hand.coachAccuracy} size="sm" />
+            </span>
+          )}
         </div>
       </header>
 

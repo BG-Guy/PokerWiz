@@ -1,0 +1,44 @@
+/* Stakes buttons: pills that wrap onto new lines, custom ones with a details line, and a dashed Custom button. */
+
+.stakes-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 2px;
+}
+
+/* A custom stake: the label over its table details; pops in when it first appears */
+.stakes-picker-custom {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  padding: 4px 14px;
+  line-height: 1.15;
+  animation: stakes-picker-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+.stakes-picker-details {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+/* Custom: dashed outline so it reads as "add your own" rather than another stake */
+.stakes-picker-add {
+  border-style: dashed;
+  color: var(--text);
+}
+.stakes-picker-add:hover {
+  border-style: solid;
+}
+
+@keyframes stakes-picker-in {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+}

@@ -1,18 +1,19 @@
 // Theme state (light / dark): shared through React context and saved between visits.
 import { createContext, useContext, useEffect, useState } from 'react';
 
-const STORAGE_KEY = 'pokerwiz-theme';
+// v2: the black-and-red redesign starts everyone on the night theme once (an older choice is not carried over).
+const STORAGE_KEY = 'pokerwiz-theme-v2';
 const ThemeContext = createContext(null);
 
-// Pick the saved theme if there is one, otherwise follow the operating system setting.
+// The saved theme if there is one, otherwise night (black): the app's look.
 function getInitialTheme() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved === 'light' || saved === 'dark') return saved;
   } catch {
-    // Storage can be blocked (private mode); fall through to the system preference.
+    // Storage can be blocked (private mode): fall back to night.
   }
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return 'dark';
 }
 
 export function ThemeProvider({ children }) {

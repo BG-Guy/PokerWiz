@@ -1,17 +1,24 @@
-/* Practice mode: running tally, the action so far, and the next-spot button. */
+/* Practice mode: running tally, the action so far, the result card and the next-spot button. Practice is an
+   elite section: deep surfaces with gold hairlines (the .elite tokens in global.css). */
 
 .practice-tally {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px 18px;
   margin-bottom: 12px;
   padding: 10px 16px;
   border-radius: 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--elite-surface);
+  border: 1px solid var(--elite-border);
   font-size: 14px;
   font-weight: 700;
   color: var(--text-muted);
+}
+.practice-tally-grade {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 .practice-tally strong {
   color: var(--text);
@@ -23,8 +30,8 @@
   gap: 8px;
   padding: 12px 16px;
   border-radius: 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--elite-surface);
+  border: 1px solid var(--elite-border);
   font-size: 14px;
 }
 .practice-log li {
@@ -39,8 +46,8 @@
   font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  color: var(--gold);
 }
 .practice-log-cards {
   display: inline-flex;
@@ -84,7 +91,7 @@
   background: color-mix(in srgb, var(--surface) 88%, transparent);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--border);
+  border: 1px solid var(--elite-border);
   box-shadow: var(--shadow);
   animation: practice-next-in 0.25s ease-out;
 }
@@ -141,24 +148,63 @@
   font-weight: 700;
   color: var(--text-muted);
 }
-/* The small spinner while the GTO opponents decide */
-.practice-dealing .coach-thinking-spinner.is-small {
+/* The small gold spinner while the GTO opponents decide */
+.practice-spinner {
+  flex: none;
   width: 18px;
   height: 18px;
-  border-width: 3px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-soft);
+  border-top-color: var(--gold);
+  border-right-color: var(--gold);
+  animation: practice-spin 0.9s linear infinite;
+}
+@keyframes practice-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* End of hand: accuracy gauge and the outcome */
+/* End of hand: the grade ring and the outcome, on a deep card with gold light from the corner and a gold
+   hairline on top. It rises in, then the ring fills and the letter lands (AccuracyGauge). */
 .practice-summary {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 16px;
   padding: 18px;
   border-radius: var(--radius);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  background: radial-gradient(70% 120% at 0% 0%, var(--gold-soft), transparent 60%), var(--elite-surface);
+  border: 1px solid var(--elite-border);
+  box-shadow: var(--elite-shadow);
+  overflow: hidden;
+  animation: practice-summary-in 0.45s var(--elite-ease) both;
+}
+.practice-summary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--elite-grain);
+  opacity: var(--elite-grain-opacity);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+.practice-summary::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold) 35%, var(--gold-bright) 50%, var(--gold) 65%, transparent);
+  opacity: 0.6;
+}
+@keyframes practice-summary-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
 }
 /* Play the hand again: a row across the bottom of the result card */
 .practice-again {
@@ -168,7 +214,7 @@
   gap: 8px;
   flex: 1 1 100%;
   padding-top: 12px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--elite-border);
 }
 .practice-again-label {
   display: inline-flex;
@@ -185,16 +231,17 @@
   flex: 1 1 200px;
 }
 .practice-summary-kicker {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--accent-text);
+  letter-spacing: 0.16em;
+  color: var(--gold);
 }
 .practice-summary-outcome {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
+  letter-spacing: 0.01em;
 }
 .practice-summary-outcome.is-win {
   color: var(--positive);

@@ -6,15 +6,9 @@
 //               tends to suffer from fatigue (20%).
 // Without saved hands the grade comes from results and time alone (60/40), and says so.
 import { isTournament, sessionProfit } from './stats.js';
+import { letterGrade } from './letterGrade.js';
 
 const WEIGHTS = { decisions: 0.5, results: 0.3, time: 0.2 };
-export const LETTERS = [
-  [85, 'A', 'Excellent'],
-  [70, 'B', 'Good'],
-  [55, 'C', 'OK'],
-  [40, 'D', 'Rough'],
-  [0, 'F', 'Poor'],
-];
 
 const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
 const round = (x) => Math.round(x);
@@ -60,13 +54,9 @@ function decisionsPart(hands) {
   return null;
 }
 
-export function letterOf(score) {
-  const [, letter, label] = LETTERS.find(([min]) => score >= min);
-  return { letter, label };
-}
-
 // session: the saved session (amounts in dollars); hands: the hands saved from it.
-// Returns { score, letter, label, parts: [{ key, name, score, weight, detail }], note }.
+// Returns { score, letter, label, tone, parts: [{ key, name, score, weight, detail }], note }; the letter comes from
+// the shared A-F scale (utils/letterGrade.js).
 export function gradeSession(session, hands = []) {
   const decisions = decisionsPart(hands);
   const parts = [
@@ -79,7 +69,7 @@ export function gradeSession(session, hands = []) {
   const score = round(parts.reduce((sum, p) => sum + p.score * p.weight, 0));
   return {
     score,
-    ...letterOf(score),
+    ...letterGrade(score),
     parts,
     note: decisions ? null : 'No saved hands from this session, so the grade is results and time only. Save hands and review them with the Coach to grade your decisions.',
   };

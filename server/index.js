@@ -7,6 +7,7 @@ import { sessionsRouter } from './routes/sessions.js';
 import { handsRouter } from './routes/hands.js';
 import { goalsRouter } from './routes/goals.js';
 import { dataRouter } from './routes/data.js';
+import { settingsRouter } from './routes/settings.js';
 import { takeSnapshot, startDailySnapshots } from './models/snapshots.js';
 
 const PORT = Number(process.env.PORT ?? 3001);
@@ -22,6 +23,7 @@ app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.use('/api/sessions', sessionsRouter);
 app.use('/api/hands', handsRouter);
 app.use('/api/goals', goalsRouter);
+app.use('/api/settings', settingsRouter);
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
 
 // Production: serve the built app, falling back to index.html for client-side routes.

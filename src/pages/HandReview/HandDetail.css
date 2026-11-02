@@ -120,7 +120,7 @@
 }
 /* On felt, wins use the bright teal and losses a light coral for contrast */
 .hand-detail-result.is-positive {
-  color: var(--teal);
+  color: var(--accent);
 }
 .hand-detail-result.is-negative {
   color: #f2a39a;
@@ -195,9 +195,12 @@
   padding: 0 14px;
 }
 .hand-detail-coach-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
   font-weight: 800;
-  color: var(--accent-text);
+  color: var(--text-muted);
 }
 .hand-detail-coach {
   align-self: flex-start;

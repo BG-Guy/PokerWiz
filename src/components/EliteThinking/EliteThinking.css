@@ -1,0 +1,102 @@
+/* Elite thinking state: gold ring turning around a breathing spade, title, text, shimmering track.
+   With reduced motion the ring and spade hold still (global.css turns animations off). */
+
+.elite-thinking {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 44px 16px;
+  text-align: center;
+  animation: elite-thinking-in 0.35s var(--elite-ease, ease) both;
+}
+@keyframes elite-thinking-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.elite-thinking-orb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%);
+}
+/* The ring: a gold arc fading into the track, turning */
+.elite-thinking-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0deg, var(--gold, var(--accent)) 260deg, var(--gold-bright, var(--accent)) 340deg, transparent 360deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  animation: elite-thinking-spin 1.1s linear infinite;
+}
+.elite-thinking-orb::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid var(--gold-soft, var(--surface-2));
+}
+.elite-thinking-spade {
+  color: var(--accent);
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent) 55%, transparent));
+  animation: elite-thinking-breathe 1.6s ease-in-out infinite;
+}
+@keyframes elite-thinking-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes elite-thinking-breathe {
+  50% {
+    transform: scale(0.88);
+    opacity: 0.75;
+  }
+}
+
+.elite-thinking-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.elite-thinking-text {
+  max-width: 420px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* A thin track with a band of gold light running along it */
+.elite-thinking-track {
+  position: relative;
+  width: 140px;
+  height: 2px;
+  margin-top: 8px;
+  border-radius: 2px;
+  background: var(--gold-soft, var(--surface-2));
+  overflow: hidden;
+}
+.elite-thinking-track::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, var(--gold, var(--accent)), transparent);
+  animation: elite-thinking-run 1.4s ease-in-out infinite;
+}
+@keyframes elite-thinking-run {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}

@@ -5,23 +5,25 @@ A poker tracker for mobile and desktop: a React frontend and a small Express + S
 **Features**
 - **Log session (live):** start a session (game, stakes, venue, buy-in), then log hands, notes and rebuys on a timeline while you play. Finish with cash-out, a draggable 0 to 5 star rating (one decimal) and a 1 to 5 tilt scale with faces. Edit the setup or what you sat down with, fix or remove a note or rebuy (the buy-in follows), or discard the session.
 - **Add hand:** rebuild a hand on a poker table. You seat the hero and villains, set each stack (exact amount, or Short / Average / Big / Huge), pick known cards, then answer each player's action turn by turn in an animated carousel below the table, with a dealer button on the felt. All-ins and side pots are handled. Tap any step in "Hand so far" to go back to it.
-- **Coach:** record a hand and get every decision graded against GTO: solved 8-max preflop charts for the hand's stack depth (cash or tournament with antes), and each postflop street solved from the ranges the players arrived with, heads-up or 3-way, with the hand's real bet sizes. For your hand you see how often GTO takes each option and what each is worth, plus pot odds, equity against their ranges and their range grids. Saved hands can be opened in the coach too. See [docs/coach-algorithm.md](docs/coach-algorithm.md).
-- **Practice:** pick cash or tournament, a spot (preflop, heads-up, 3-way), any pots or 3-bet pots only, and the stacks, then play random hands to the end against an 8-handed table of GTO opponents (they play the solved strategy with their real cards), with the turn and river dealt at random or picked by you. Every decision is graded. Any hand can be played again from your spot, with the same runout or a new one. Hands play full screen: the table fills the screen (no header or tab bar, and no address bar on phones where the browser allows it) and Fold / Call / Raise stay docked in view, beside the table on wide screens. On phones, tap the street line above the buttons to slide the whole hand up, and tap it again to slide it back down. The full-screen setting is remembered. Every sheet in the app closes with its opening animation in reverse.
+- **Coach:** record a hand and get every decision graded against GTO: solved 8-max preflop charts for the hand's stack depth (cash or tournament with antes), and each postflop street solved from the ranges the players arrived with, heads-up or 3-way, with the hand's real bet sizes. For your hand you see how often GTO takes each option and what each is worth, plus pot odds, equity against their ranges and their range grids. The hand and each decision get a letter grade, A to F (the Hands list and History show it too). Saved hands can be opened in the coach too. See [docs/coach-algorithm.md](docs/coach-algorithm.md).
+- **Practice:** pick cash or tournament, a spot (preflop, heads-up, 3-way), any pots or 3-bet pots only, and the stacks, then play random hands to the end against an 8-handed table of GTO opponents (they play the solved strategy with their real cards), with the turn and river dealt at random or picked by you. Every decision gets a letter grade, A to F. Any hand can be played again from your spot, with the same runout or a new one. Hands play full screen: the table fills the screen (no header or tab bar, and no address bar on phones where the browser allows it) and Fold / Call / Raise stay docked in view, beside the table on wide screens. On phones, tap the street line above the buttons to slide the whole hand up, and tap it again to slide it back down. The full-screen setting is remembered. Every sheet in the app closes with its opening animation in reverse.
 - **Replay a hand:** in any Hold'em hand, pick Flop, Turn or River (or "Replay from here" on the timeline) and play it again from that point against GTO opponents. Seats, stacks, the action and the board so far carry over; the next cards come as they did, at random, or picked by you. Villains play their real cards when the hand shows them, otherwise a hand from the range GTO plays the way they did. Compare how it goes with the real result.
 - **Highlights:** Hall of Fame, Wall of Shame, Tilt Tower, Monster Pots and more, from your ratings and results. The top three are on Home.
 - **Hand review:** replay hands street by street with your hand and the villains' (face down unless shown), all-ins highlighted, plus verdict, star rating, tilt and notes. Every Hold'em hand has a **Coach** button (in the list and on the hand). Older hands without stacks are rebuilt from the action log, and the review shows what was assumed. The score is saved onto the hand. Each hand in the list shows its rating as a colored pill (tap it to rate or re-rate right there), its tilt and coach score, and the list sorts by rating.
 - **Edit anything:** a hand's title, date, stakes, cards, board, result and tags (Edit on the hand), or its whole action: "Edit the action" reopens the hand in the recorder at its last step. Sessions, goals and live-session entries have Edit too, and anything can be deleted (with a confirm).
 - **Game history:** past sessions by month, with filters, rating and tilt. Open a session to edit or delete it (its saved hands stay).
-- **Insights:** leaks and strengths plus hourly by venue, stakes, game and day, all from your sessions. Hand insights live in the Hands tab.
+- **Insights:** what your bankroll is telling you: the downswing you're in (or not), month to month, sessions, hours, an honest "is it normal?" check (2,000 simulated players with your own win rate and swings), and a short pep line. Tap any card, or a stat on Home, for the full story: a bottom sheet on phones, the card growing into a detail panel on larger screens. Hand insights live in the Hands tab.
 - **Goals:** measured from your real data (hands played, hours, sessions, profit, hands reviewed), with pace projections and a "focus next" pick. Add, edit and delete goals.
 - **Big blinds or dollars:** every amount shows in big blinds by default; the BB / $ switch (header on phones, sidebar on desktop) flips the whole app to dollars. Totals across stakes add up each session's result in its own big blinds.
-- **Bankroll chart:** bankroll against hours played. Hover or tap it to read any point.
+- **Bankroll chart:** bankroll against hours played. Hover or tap it to read any point. Full screen (works upright or sideways on phones; Escape or Back closes it) adds a time range, the x axis by hours, sessions or date, filters for cash or tournaments, game, stakes and venue, shaded downswings, peak and low markers, and a summary of what's on screen.
 - **Equity calculator:** 2 to 6 hands plus an optional board. It gives exact results when possible and otherwise simulates random boards (in a web worker).
 - **Swipe to edit or delete a hand:** in the Hands list, swipe a hand left for Edit and Delete (as in iOS Mail); a long swipe deletes at once. A deleted hand leaves the list with an Undo bar, and is only deleted on the server once the bar runs out.
 - **Use it as an app:** on iPhone, Safari > Share > Add to Home Screen (the app shows these steps in a banner and in More). From its icon it opens full screen, with no browser bars or address, no zooming, and the status bar over the app; downloads go through the share sheet instead of opening a browser view. Chrome, Edge and Android offer an Install button.
 - **Your data, kept safe:** the server saves an automatic backup of everything (in a `backups` folder next to the database) every time it starts, which every update does, once a day, and before your data is replaced; the newest 30 are kept, and each can be downloaded or put back from Profile. Your browser also keeps a copy and refreshes it while you use the app: if the server ever comes back without your data (a host without a persistent disk starts over on every deploy), the app offers to put it back.
 - **Session history:** each session gets a grade (A to F) from the hands you saved from it (the coach's accuracy, or your own ratings), the money won (bb per hour, or return on a tournament buy-in) and the hours played. Open a session to see the grade explained and the whole session in order: when you sat down, every note, rebuy and hand (with its cards, result and grade), and the cash-out.
-- **Import and export (Profile):** download a backup of everything (sessions with their timelines, hands, goals) and import it again, on the same device or another, either on top of your data (importing the same file twice adds nothing) or instead of it. You see what it does first. Spreadsheets (CSV) of your sessions and hands for Excel, Numbers or Google Sheets. Sessions from Regroup come in from its CSV export.
+- **Profile:** a settings screen. You at the table (name, nickname, home casino, usual stakes, favorite game, playing since, your record in three numbers), app settings (night or day, BB or $, the starting buy-in), your data, and the version. Your usual stakes, game and buy-in are picked for you when you start a session.
+- **Custom stakes:** when starting a session, Custom opens a sheet for blinds the buttons don't have, an ante or straddle, the game, and the table (seats, its name). Custom stakes you've played come back as buttons.
+- **Import and export (Profile):** download a backup of everything (sessions with their timelines, hands, goals, and your profile settings) and import it again, on the same device or another, either on top of your data (importing the same file twice adds nothing) or instead of it. You see what it does first. Spreadsheets (CSV) of your sessions and hands for Excel, Numbers or Google Sheets. Sessions from Regroup come in from its CSV export.
 
 ## Run it
 
@@ -62,7 +64,7 @@ server/                  Express API
   index.js               App setup, routes, static hosting of dist/
   db/                    SQLite connection, schema.sql, first-run seeding
   models/                Data access (sessions, hands, goals)
-  routes/                HTTP endpoints: /api/sessions, /api/hands, /api/goals
+  routes/                HTTP endpoints: /api/sessions, /api/hands, /api/goals, /api/settings, /api/data
   db/migrations.js       One-time data changes (e.g. computed goals)
   seed/                  Sample data loaded on first run
 
@@ -85,11 +87,11 @@ src/
     LiveSession/         Start form, live view, timeline, finish sheet, edit sheets (setup, note or rebuy)
     AddHand/             Records a hand with components/HandRecorder (table, seats, prompts)
     EditHand/            Reopens a saved hand in the recorder (HandRecorder/restoreHand.js) to change its action
-    Coach/               Coach mode and its report (accuracy gauge, decision cards, range grid)
+    Coach/               Coach mode and its report (grade ring, decision cards, range grid)
     HandHighlights/ HandInsights/
     HandReview/  GameHistory/  Insights/  Goals/
     Equity/              Calculator page + equity.worker.js
-    Profile/             Your record, export (backup, spreadsheets) and import (backup, Regroup CSV), session log
+    Profile/             You (profile, record), app settings, export (backup, spreadsheets) and import (backup, Regroup CSV), about
 ```
 
 ## API
@@ -98,7 +100,7 @@ src/
 | --- | --- | --- |
 | GET | `/api/sessions` | Finished sessions, newest first |
 | GET | `/api/sessions/live` | The running session with its timeline, or `null` |
-| POST | `/api/sessions` | Start a session `{ game, stakes, bigBlind, venue, buyIn }` |
+| POST | `/api/sessions` | Start a session `{ game, stakes, bigBlind, venue, buyIn }`, plus optional custom-stakes details `smallBlind`, `ante`, `straddle`, `tableSize` (2-10), `tableName` |
 | POST | `/api/sessions/:id/events` | Timeline entry `{ type: note \| rebuy \| hand, text?, amount?, handId? }` |
 | POST | `/api/sessions/:id/finish` | `{ cashOut, rating (0-5), tilt (1-5), notes, hands }` |
 | PATCH | `/api/sessions/:id` | Edit a session: everything on a finished one; `game`, `stakes`, `bigBlind`, `venue`, `startBuyIn` on a live one |
@@ -110,6 +112,7 @@ src/
 | GET / POST | `/api/goals` | List goals / add one `{ title, metric, target, startDate, deadline }` |
 | PATCH / DELETE | `/api/goals/:id` | Edit or delete a goal |
 | GET | `/api/player-stats` | Tracker stats for Insights |
+| GET / PATCH | `/api/settings` | Your profile and preferences (`name`, `nickname`, `homeCasino`, `usualStakes`, `favoriteGame`, `playingSince`, `buyInDepth`, `customStakes`); PATCH `{ key: value }`, `null` clears one |
 | GET | `/api/data/backup` | Everything as a backup file (JSON) |
 | GET | `/api/data/sessions.csv`, `/api/data/hands.csv` | Spreadsheets of your sessions and hands |
 | POST | `/api/data/import` | Import a backup `{ backup, removeSamples, mode }` (`add` on top of your data, or `replace` it, after an automatic backup); `?dryRun=1` only says what it would do |

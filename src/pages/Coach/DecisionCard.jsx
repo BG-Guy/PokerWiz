@@ -4,6 +4,7 @@
 import { formatMoney } from '../../utils/format.js';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
+import GradeBadge from '../../components/GradeBadge/GradeBadge.jsx';
 import RangeGrid from './RangeGrid.jsx';
 import './DecisionCard.css';
 
@@ -50,7 +51,8 @@ export default function DecisionCard({ decision, number, bb = null }) {
   const gradeId = d.graded ? d.grade.id : 'ungraded';
 
   return (
-    <article className={`decision-card is-${gradeId}`}>
+    // Cards come in one after another (--i staggers the entrance)
+    <article className={`decision-card is-${gradeId}`} style={{ '--i': Math.min(number - 1, 8) }}>
       <header className="decision-card-header">
         <span className="decision-card-number">{number}</span>
         <span className="decision-card-street">{d.street}</span>
@@ -61,10 +63,12 @@ export default function DecisionCard({ decision, number, bb = null }) {
             ))}
           </span>
         )}
+        {/* The decision's letter (from its 0-100 score) with the coach's word for it */}
         <span className={`decision-grade is-${gradeId}`}>
           {d.graded ? (
             <>
-              {d.grade.label} <span className="num">{d.score}</span>
+              <span className="decision-grade-label">{d.grade.label}</span>
+              <GradeBadge score={d.score} size="sm" />
             </>
           ) : (
             'Not graded'

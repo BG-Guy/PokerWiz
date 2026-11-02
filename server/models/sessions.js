@@ -31,6 +31,9 @@ function toSession(row) {
     format: row.format ?? 'cash',
     smallBlind: row.small_blind,
     ante: row.ante,
+    straddle: row.straddle ?? null,
+    tableSize: row.table_size ?? null,
+    tableName: row.table_name ?? null,
     expenses: row.expenses ?? 0,
     source: row.source,
     externalId: row.external_id,
@@ -74,13 +77,14 @@ export function findById(id) {
   return row ? withEvents(toSession(row)) : null;
 }
 
-// Start a new live session now.
-export function startSession({ game, stakes, bigBlind, venue, buyIn }) {
+// Start a new live session now. The small blind, ante, straddle and table details are optional (custom stakes).
+export function startSession({ game, stakes, bigBlind, venue, buyIn, smallBlind = null, ante = null, straddle = null, tableSize = null, tableName = null }) {
   const id = randomUUID();
   const now = new Date();
   db.prepare(`
-    INSERT INTO sessions (id, date, game, stakes, big_blind, venue, status, started_at, buy_in)
-    VALUES (?, ?, ?, ?, ?, ?, 'live', ?, ?)`).run(id, localDate(now), game, stakes, bigBlind, venue, now.toISOString(), buyIn);
+    INSERT INTO sessions (id, date, game, stakes, big_blind, small_blind, ante, straddle, table_size, table_name, venue, status, started_at, buy_in)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'live', ?, ?)`).run(id, localDate(now), game, stakes, bigBlind, smallBlind, ante, straddle, tableSize,
+    tableName, venue, now.toISOString(), buyIn);
   return findById(id);
 }
 
@@ -138,7 +142,10 @@ const FINISHED_COLUMNS = {
   rating: 'rating',
   tilt: 'tilt',
 };
-const LIVE_COLUMNS = { game: 'game', stakes: 'stakes', bigBlind: 'big_blind', venue: 'venue' };
+// The custom-stakes details (small blind, ante, straddle, table) can change on both.
+const TABLE_COLUMNS = { smallBlind: 'small_blind', ante: 'ante', straddle: 'straddle', tableSize: 'table_size', tableName: 'table_name' };
+Object.assign(FINISHED_COLUMNS, TABLE_COLUMNS);
+const LIVE_COLUMNS = { game: 'game', stakes: 'stakes', bigBlind: 'big_blind', venue: 'venue', ...TABLE_COLUMNS };
 
 // Edit a session. For a live session, startBuyIn sets what you sat down with (rebuys stay on top of it).
 export function updateSession(id, changes) {

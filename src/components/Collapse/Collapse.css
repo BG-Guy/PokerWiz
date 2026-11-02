@@ -1,0 +1,23 @@
+/* Height animates through the grid-rows trick (0fr to 1fr needs no measured height); the content fades and
+   slides down a little as it appears. */
+
+.collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.collapse.is-open {
+  grid-template-rows: 1fr;
+}
+.collapse-inner {
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.22s ease, transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.collapse.is-open .collapse-inner {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.06s;
+}

@@ -13,6 +13,9 @@ import './AppLayout.css';
 
 export default function AppLayout() {
   const { pathname } = useLocation();
+  // The section (first part of the URL): switching sections replays the page's entrance, moving inside one
+  // (a hand in Hands, a session in History) doesn't.
+  const section = pathname.split('/')[1] || 'home';
 
   // Start each page at the top when switching sections.
   useEffect(() => {
@@ -39,7 +42,9 @@ export default function AppLayout() {
           <DataGuard />
           <InstallBanner />
           <Suspense fallback={<LoadState />}>
-            <Outlet />
+            <div key={section} className="page-enter">
+              <Outlet />
+            </div>
           </Suspense>
         </main>
       </div>

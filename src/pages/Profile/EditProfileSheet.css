@@ -1,0 +1,21 @@
+/* Profile sheet: fields stacked (names two to a row), then Save. */
+
+.edit-profile-sheet {
+  max-width: 520px;
+}
+.edit-profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.edit-profile-year {
+  max-width: 160px;
+}
+.edit-profile-error {
+  color: var(--negative);
+  font-weight: 700;
+}
+.edit-profile-save {
+  min-height: 50px;
+  font-size: 15px;
+}

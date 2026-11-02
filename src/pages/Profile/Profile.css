@@ -1,4 +1,5 @@
-/* Profile page layout: totals beside export and import, then the session log. */
+/* Profile layout: one column of sections on phones (a settings screen), two columns on wide screens (you and the
+   app on the left, your data on the right). */
 
 .profile {
   display: flex;
@@ -6,23 +7,38 @@
   gap: 20px;
 }
 
-/* Phones and tablets: one column. Wide screens: totals beside the import tool. */
-.profile-top {
+.profile-columns {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 20px;
-  align-items: start;
+  gap: 28px;
+  width: 100%;
+  max-width: 720px;
 }
 @media (min-width: 1100px) {
-  .profile-top {
-    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  .profile-columns {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    max-width: none;
+    align-items: start;
   }
 }
 
-/* Export above import, in one column */
-.profile-data {
+.profile-column {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 28px;
   min-width: 0;
+}
+
+/* The data panels sit flat, like the groups beside them */
+.profile-data {
+  gap: 14px;
+}
+.profile-data .panel {
+  box-shadow: none;
+}
+
+.profile-error {
+  padding: 0 16px;
+  color: var(--negative);
+  font-weight: 700;
 }

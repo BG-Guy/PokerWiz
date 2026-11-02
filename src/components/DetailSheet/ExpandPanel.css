@@ -1,0 +1,78 @@
+/* Expanding detail panel (larger screens): centered over a dimmed page. The grow and shrink animations run in
+   ExpandPanel.jsx; this sets the panel's resting place and look. */
+
+.expand-panel-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+.expand-panel-layer.is-closing {
+  pointer-events: none;
+}
+
+.expand-panel-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.expand-panel {
+  position: relative;
+  width: min(760px, 100%);
+  max-height: min(860px, calc(100dvh - 64px));
+  display: flex;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+  transform-origin: top left;
+  outline: none;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.expand-panel-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+}
+
+.expand-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px 28px 6px;
+}
+.expand-panel-title {
+  font-size: 26px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.expand-panel-close {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.expand-panel-close:hover {
+  background: var(--border);
+}
+.expand-panel-close:active {
+  transform: scale(0.94);
+}
+
+.expand-panel-body {
+  padding: 12px 28px 28px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}

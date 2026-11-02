@@ -1,0 +1,42 @@
+/* Profile section: a quiet uppercase heading over a rounded group of rows, revealed with a short fade-up. */
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  animation: settings-section-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--order) * 60ms);
+}
+
+.settings-section-title {
+  padding: 0 16px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+}
+
+/* The rows, in one rounded card; rows draw their own dividers */
+.settings-section-group {
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.settings-section-footnote {
+  padding: 0 16px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-faint);
+}
+
+@keyframes settings-section-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}

@@ -180,6 +180,8 @@ Everyone is graded the same way, against GTO, whatever level they're set to:
 - Grades: Best move 97+, Good 80+, Inaccuracy 55+, Mistake 30+, Blunder.
 - Hand accuracy weighs bigger pots more (square root of the pot in big blinds), and bad decisions more (up to
   3x as the score falls), so a blunder isn't averaged away by the easy decisions around it.
+- Scores stay 0-100 in the data, but the app shows them as letters (src/utils/letterGrade.js, the same scale as
+  session grades): A from 85, B from 70, C from 55, D from 40, F below.
 
 The notes explain:
 - where the answer comes from

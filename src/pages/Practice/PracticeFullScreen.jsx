@@ -48,7 +48,9 @@ export default function PracticeFullScreen({ title, subtitle, table, log, peek, 
           <Icon name="shrink" size={18} />
         </button>
         <div className="practice-fs-title">
-          <strong>{title}</strong>
+          <strong>
+            {title} <span className="practice-fs-elite">Elite</span>
+          </strong>
           {subtitle && <span>{subtitle}</span>}
         </div>
         {log && (

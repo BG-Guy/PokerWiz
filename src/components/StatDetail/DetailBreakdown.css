@@ -1,0 +1,78 @@
+/* Breakdown rows: label and value on one line, a thin bar under them, and a hint. Rows slide in when the tab
+   changes. */
+
+.detail-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.detail-breakdown-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  animation: detail-breakdown-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 0.04s);
+}
+@keyframes detail-breakdown-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+
+.detail-breakdown-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.detail-breakdown-label {
+  font-weight: 700;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.detail-breakdown-value {
+  font-size: 18px;
+  font-weight: 600;
+}
+.detail-breakdown-value.is-negative {
+  color: var(--negative);
+}
+
+.detail-breakdown-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.detail-breakdown-bar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--text-muted);
+  transform-origin: left;
+  animation: detail-breakdown-grow 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  animation-delay: calc(0.1s + var(--i, 0) * 0.04s);
+}
+.detail-breakdown-bar.is-negative {
+  background: var(--negative);
+}
+@keyframes detail-breakdown-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.detail-breakdown-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-faint);
+}

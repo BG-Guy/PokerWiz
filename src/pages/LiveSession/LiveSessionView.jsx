@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { addSessionEvent, discardSession } from '../../api/sessions.js';
 import { formatClock, formatMoney, formatTime } from '../../utils/format.js';
+import { stakeDetails } from '../../utils/stakes.js';
 import { useClosingValue } from '../../hooks/useClosingValue.js';
 import Panel from '../../components/Panel/Panel.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
@@ -81,6 +82,8 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
           <p className="live-view-subtitle">
             {session.venue} · started {formatTime(session.startedAt)}
           </p>
+          {/* Custom stakes: the table's seats, ante, straddle and name */}
+          {stakeDetails(session) && <p className="live-view-table">{stakeDetails(session)}</p>}
           <div className="live-view-clock num" role="timer" aria-label="Time played">
             {formatClock(elapsedMs)}
           </div>

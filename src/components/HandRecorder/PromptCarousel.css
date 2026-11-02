@@ -176,7 +176,7 @@
   border-radius: 50%;
 }
 .prompt-player-avatar.is-hero {
-  background: var(--teal);
+  background: var(--accent);
   color: var(--ink);
 }
 .prompt-player-avatar.is-villain {

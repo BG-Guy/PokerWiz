@@ -11,7 +11,14 @@
   position: absolute;
   inset: 0 auto 0 0;
   border-radius: 999px;
+  transform-origin: left;
   transition: width 0.5s ease;
+  animation: progress-grow 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; /* fills in when it appears */
+}
+@keyframes progress-grow {
+  from {
+    transform: scaleX(0);
+  }
 }
 .progress-bar-fill.is-accent {
   background: var(--accent);

@@ -1,4 +1,5 @@
-/* Insights page layout. */
+/* Insights page: a grid of insight cards (two columns on phones, three on desktop, the pep line filling the
+   last spot), then the bankroll chart. Cards rise in one after another on load. */
 
 .insights {
   display: flex;
@@ -6,53 +7,41 @@
   gap: 16px;
 }
 
-.insights-stats {
+.insights-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
+.insights-grid-item {
+  display: flex;
+  min-width: 0;
+  animation: insights-rise 0.4s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 0.05s);
+}
+.insights-grid-item > * {
+  flex: 1;
+}
+@keyframes insights-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* Phones: cards with a sentence to say go full width; sessions and hours (the short ones) share a row */
+.insights-grid-item {
+  grid-column: 1 / -1;
+}
+.insights-grid-item.is-half {
+  grid-column: auto;
+}
+
 @media (min-width: 900px) {
-  .insights-stats {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .insights-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
   }
-}
-
-.insights-leak-list {
-  display: grid;
-  gap: 12px;
-}
-@media (min-width: 900px) {
-  .insights-leak-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .insights-grid-item {
+    grid-column: auto;
   }
-}
-
-.insights-breakdowns {
-  display: grid;
-  gap: 16px;
-  margin-top: 4px;
-}
-@media (min-width: 900px) {
-  .insights-breakdowns {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.insights-panel-note {
-  margin-bottom: 12px;
-  font-size: 12px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-faint);
-}
-.insights-panel-note-spaced {
-  margin-top: 20px;
-}
-
-.insights-empty {
-  padding: 16px 0;
-  color: var(--text-muted);
-  font-weight: 600;
 }

@@ -30,6 +30,6 @@
   color: var(--text);
 }
 .unit-toggle-option.is-active {
-  background: var(--accent);
-  color: var(--on-accent);
+  background: var(--selected-bg);
+  color: var(--selected-text);
 }

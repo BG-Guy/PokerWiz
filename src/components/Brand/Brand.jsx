@@ -1,4 +1,4 @@
-// PokerWiz logo: a teal spade badge plus the wordmark. Links back to the dashboard.
+// PokerWiz logo: a crimson spade on a black badge plus the wordmark. Links back to the dashboard.
 import { Link } from 'react-router-dom';
 import './Brand.css';
 

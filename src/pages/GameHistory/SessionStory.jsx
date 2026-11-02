@@ -7,6 +7,7 @@ import { formatDuration, formatMoney, formatTime } from '../../utils/format.js';
 import Money from '../../components/Money/Money.jsx';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
+import GradeBadge from '../../components/GradeBadge/GradeBadge.jsx';
 import '../LiveSession/SessionTimeline.css';
 import './SessionStory.css';
 
@@ -85,7 +86,11 @@ export default function SessionStory({ session, hands }) {
                     <span>{entry.hand?.title ?? entry.text}</span>
                     {(entry.hand?.coachAccuracy != null || entry.hand?.rating != null) && (
                       <span className="session-story-muted">
-                        {entry.hand.coachAccuracy != null && `Coach ${entry.hand.coachAccuracy}%`}
+                        {entry.hand.coachAccuracy != null && (
+                          <>
+                            Coach <GradeBadge score={entry.hand.coachAccuracy} size="xs" />
+                          </>
+                        )}
                         {entry.hand.coachAccuracy != null && entry.hand.rating != null && ' · '}
                         {entry.hand.rating != null && `Your rating ${entry.hand.rating.toFixed(1)}`}
                       </span>

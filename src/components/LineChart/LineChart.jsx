@@ -4,8 +4,9 @@ import './LineChart.css';
 
 const WIDTH = 600;
 
-// data: [{ label, value }]. formatLabel / formatValue control the axis text.
-export default function LineChart({ data, height = 220, compact = false, formatLabel = String, formatValue = String }) {
+// data: [{ label, value }]. formatLabel / formatValue control the axis text. tone: 'accent' (the brand red),
+// 'neutral' (white on black, for a curve that isn't good or bad news) or 'negative'.
+export default function LineChart({ data, height = 220, compact = false, formatLabel = String, formatValue = String, tone = 'accent' }) {
   const gradientId = `line-fill-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   const values = data.map((d) => d.value);
 
@@ -29,13 +30,13 @@ export default function LineChart({ data, height = 220, compact = false, formatL
   const labelIndexes = [...new Set([0, Math.floor((data.length - 1) / 2), data.length - 1])];
 
   return (
-    <div className={`line-chart ${compact ? 'is-compact' : ''}`}>
+    <div className={`line-chart is-${tone} ${compact ? 'is-compact' : ''}`}>
       <div className="line-chart-plot" style={{ height }}>
         <svg viewBox={`0 0 ${WIDTH} ${height}`} preserveAspectRatio="none" aria-hidden="true">
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.35" />
-              <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
+              <stop offset="0%" stopColor="var(--line-chart-color)" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="var(--line-chart-color)" stopOpacity="0" />
             </linearGradient>
           </defs>
           {!compact && min < 0 && <line className="line-chart-zero" x1="0" x2={WIDTH} y1={zeroY} y2={zeroY} />}

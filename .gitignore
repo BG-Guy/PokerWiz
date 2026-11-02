@@ -5,3 +5,6 @@ server/data/
 # TexasSolver reference runs and the local build (scripts/gto-reference/README.md)
 scripts/gto-reference/work/
 scripts/gto-reference/texassolver
+
+# Scratch databases from local checks
+.*-data-*/

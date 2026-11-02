@@ -3,6 +3,7 @@
 // sessions imported from another app also by that app's key), so importing the same backup twice adds nothing.
 import { db, transaction } from '../db/database.js';
 import { SAMPLE_SESSION_IDS, SAMPLE_HAND_IDS, deleteSampleRows } from './sampleData.js';
+import { storedSettings, saveSettings, clearSettings, knownSettings } from './settings.js';
 
 export const BACKUP_APP = 'PokerWiz';
 export const BACKUP_VERSION = 1;
@@ -28,6 +29,9 @@ const SESSION_COLUMNS = {
   format: 'format',
   smallBlind: 'small_blind',
   ante: 'ante',
+  straddle: 'straddle',
+  tableSize: 'table_size',
+  tableName: 'table_name',
   expenses: 'expenses',
   source: 'source',
   externalId: 'external_id',
@@ -39,7 +43,8 @@ const DEFAULTS = { status: 'finished', durationMin: 0, buyIn: 0, hands: 0, notes
 
 // ----- Export -----
 
-// The whole database as a backup: { app, version, exportedAt, sessions (with events), hands, goals }.
+// The whole database as a backup: { app, version, exportedAt, sessions (with events), hands, goals, settings }.
+// settings (your profile and preferences, only the ones you've set) is optional: older backups don't have it.
 // Hands and goals keep their stored data as it is ("data"), so a restore gives back exactly the same thing.
 export function createBackup() {
   const eventsBySession = new Map();
@@ -60,7 +65,7 @@ export function createBackup() {
     .prepare('SELECT * FROM goals ORDER BY position')
     .all()
     .map((row) => ({ id: row.id, position: row.position, data: JSON.parse(row.data) }));
-  return { app: BACKUP_APP, version: BACKUP_VERSION, exportedAt: new Date().toISOString(), sessions, hands, goals };
+  return { app: BACKUP_APP, version: BACKUP_VERSION, exportedAt: new Date().toISOString(), sessions, hands, goals, settings: storedSettings() };
 }
 
 // ----- Import -----
@@ -75,18 +80,20 @@ class DryRun extends Error {
 
 // Delete every session (their timelines go with them), hand and goal, inside the open transaction. Returns
 // how many of each there were.
-function deleteEverything() {
+// settings: also delete your saved settings (when the backup brings its own).
+function deleteEverything({ settings }) {
   return {
     sessions: Number(db.prepare('DELETE FROM sessions').run().changes),
     hands: Number(db.prepare('DELETE FROM hands').run().changes),
     goals: Number(db.prepare('DELETE FROM goals').run().changes),
+    settings: settings ? clearSettings() : 0,
   };
 }
 
 // Add a backup (checked by routes/data.js) to the database, all or nothing. dryRun: work out what would happen
 // and change nothing. removeSamples: delete the sample data that came with the app from this install first.
 // The file's own copies of the sample data are always left out: they're made up, not part of anyone's record.
-// Returns { sessions, hands, goals } (each { added, skipped }), liveSkipped (a live session in the file while
+// Returns { sessions, hands, goals, settings } (each { added, skipped }), liveSkipped (a live session in the file while
 // one is already running here: it's left out), and removedSamples ({ sessions, hands } or null).
 // mode 'add' (the default) adds what isn't here yet; 'replace' first deletes everything here (sessions with their
 // timelines, hands, goals, the sample data too), so the backup becomes your data. The result then also says what
@@ -94,7 +101,8 @@ function deleteEverything() {
 export function importBackup(backup, { dryRun = false, removeSamples = false, mode = 'add' } = {}) {
   try {
     return transaction(() => {
-      const replaced = mode === 'replace' ? deleteEverything() : null;
+      // A replace keeps your settings when the file has none (a backup from before settings existed).
+      const replaced = mode === 'replace' ? deleteEverything({ settings: backup.settings != null }) : null;
       const result = { ...addBackup(backup, removeSamples && !replaced), replaced };
       if (dryRun) throw new DryRun(result);
       return result;
@@ -164,6 +172,18 @@ function addBackup(backup, removeSamples) {
     }
     insertGoal.run(g.id, position++, JSON.stringify(g.data));
     result.goals.added++;
+  }
+
+  // Settings (newer backups only): the ones you haven't set here are filled in from the file; yours stay.
+  // After a replace nothing is set here, so the file's all come back.
+  result.settings = { added: 0, skipped: 0 };
+  if (backup.settings) {
+    const mine = storedSettings();
+    const theirs = knownSettings(backup.settings);
+    const missing = Object.fromEntries(Object.entries(theirs).filter(([key, value]) => value !== null && !Object.hasOwn(mine, key)));
+    saveSettings(missing, { inTransaction: true });
+    result.settings.added = Object.keys(missing).length;
+    result.settings.skipped = Object.keys(theirs).length - result.settings.added;
   }
   return result;
 }

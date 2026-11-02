@@ -6,8 +6,9 @@ import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { freePort } from './freePort.mjs';
 
-const PORT = 3400 + Math.floor(Math.random() * 400);
+const PORT = await freePort();
 const base = `http://localhost:${PORT}/api`;
 let server;
 let dir;

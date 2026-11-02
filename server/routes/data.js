@@ -5,6 +5,7 @@ import express, { Router } from 'express';
 import { createBackup, importBackup, BACKUP_APP, BACKUP_VERSION } from '../models/backup.js';
 import { sessionsCsv, handsCsv } from '../models/spreadsheets.js';
 import { GOAL_METRICS } from '../models/goals.js';
+import { settingsProblem, knownSettings } from '../models/settings.js';
 import { countUserData, listSnapshots, readSnapshot, takeSnapshot } from '../models/snapshots.js';
 
 export const dataRouter = Router();
@@ -58,6 +59,9 @@ function sessionProblem(s) {
   if (!optional(s.tilt, (v) => Number.isInteger(v) && v >= 1 && v <= 5)) return 'the tilt must be 1 to 5';
   if (!optional(s.notes, (v) => isText(v, 20000))) return 'the notes are too long';
   if (!optional(s.startedAt, isTime) || !optional(s.endedAt, isTime)) return 'a start or end time is unreadable';
+  if (!optional(s.straddle, (v) => isNumber(v) && v >= 0)) return 'the straddle must be zero or more';
+  if (!optional(s.tableSize, (v) => Number.isInteger(v) && v >= 2 && v <= 10)) return 'the table size must be 2 to 10 seats';
+  if (!optional(s.tableName, (v) => isText(v, 60))) return 'the table name is too long';
   if (!optional(s.source, (v) => isText(v, 40)) || !optional(s.externalId, (v) => isText(v, 200))) return 'its import details are unreadable';
   if (!optional(s.events, Array.isArray)) return 'its timeline is unreadable';
   for (const e of s.events ?? []) {
@@ -105,6 +109,12 @@ function backupProblem(b) {
       if (problem) return `${kind} ${i + 1} in the file: ${problem}`;
     }
     if (new Set(list.map((item) => item.id)).size !== list.length) return `The file has the same ${kind.toLowerCase()} twice`;
+  }
+  // Settings are optional (backups from before they existed have none). Ones this version doesn't know are ignored.
+  if (b.settings != null) {
+    if (!isObject(b.settings)) return "The file's settings are unreadable";
+    const problem = settingsProblem(knownSettings(b.settings));
+    if (problem) return `The file's settings: ${problem}`;
   }
   const eventIds = b.sessions.flatMap((s) => (s.events ?? []).map((e) => e.id));
   if (new Set(eventIds).size !== eventIds.length) return 'The file has the same timeline entry twice';

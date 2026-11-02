@@ -7,6 +7,7 @@ import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { freePort } from './freePort.mjs';
 
 const running = new Set();
 const dirs = [];
@@ -14,7 +15,7 @@ const dirs = [];
 // A server on the database in `dir` (a new throwaway one if not given), with a JSON helper and stop().
 async function startServer(dir = mkdtempSync(join(tmpdir(), 'pokerwiz-safety-'))) {
   if (!dirs.includes(dir)) dirs.push(dir);
-  const port = 4300 + Math.floor(Math.random() * 600);
+  const port = await freePort();
   const proc = spawn(process.execPath, ['--disable-warning=ExperimentalWarning', 'server/index.js'], {
     env: { ...process.env, PORT: String(port), POKERWIZ_DB: join(dir, 'test.db') },
     stdio: 'ignore',

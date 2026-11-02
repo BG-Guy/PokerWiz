@@ -45,10 +45,18 @@
 }
 
 .navbar-link.active {
-  color: var(--accent-text);
+  color: var(--text);
+}
+/* The tab you just picked pops a little */
+@keyframes tab-pop {
+  40% {
+    transform: scale(1.18);
+  }
 }
 .navbar-link.active .navbar-link-icon {
-  background: var(--accent-soft);
+  animation: tab-pop 0.35s ease;
+  background: var(--surface-2);
+  color: var(--accent-text);
 }
 
 /* Phone: the Practice button is a raised teal circle in the middle of the bar */
@@ -60,7 +68,7 @@
   border-radius: 50%;
   background: var(--accent);
   color: var(--on-accent);
-  box-shadow: 0 6px 18px rgba(127, 200, 194, 0.45), 0 0 0 5px var(--surface);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 45%, transparent), 0 0 0 5px var(--surface);
 }
 .navbar-link.is-primary:active .navbar-link-icon {
   transform: scale(0.94);
@@ -115,7 +123,12 @@
     color: var(--text);
   }
   .navbar-link.active {
-    background: var(--accent-soft);
+    background: var(--surface-2);
+    color: var(--text);
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+  .navbar-link.active .navbar-link-icon {
+    color: var(--accent-text);
   }
   .navbar-link-icon,
   .navbar-link.active .navbar-link-icon {
@@ -127,11 +140,22 @@
     display: none;
   }
 
-  /* Play becomes a solid accent button in the rail/sidebar */
-  .navbar-link.is-primary,
-  .navbar-link.is-primary:hover {
+  /* Practice stands out in the rail/sidebar with a red icon and outline, filled red only while it's open */
+  .navbar-link.is-primary {
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    color: var(--text);
+  }
+  .navbar-link.is-primary .navbar-link-icon {
+    color: var(--accent-text) !important;
+  }
+  .navbar-link.is-primary.active,
+  .navbar-link.is-primary.active:hover {
     background: var(--accent);
     color: var(--on-accent);
+    box-shadow: var(--glow);
+  }
+  .navbar-link.is-primary.active .navbar-link-icon {
+    color: var(--on-accent) !important;
   }
   .navbar-link.is-primary .navbar-link-icon,
   .navbar-link.is-primary.active .navbar-link-icon {

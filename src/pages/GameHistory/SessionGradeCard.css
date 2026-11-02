@@ -1,22 +1,11 @@
-/* Session grade: a big letter in a colored ring (green A/B, teal C, amber D, red F), then one row per part. */
+/* Session grade: the big letter tile (GradeBadge: green A/B, neutral C, amber D, red F), then one row per part. */
 
 .session-grade {
-  --grade: var(--teal);
   padding: 18px;
   border-radius: var(--radius);
   background: var(--surface);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
-}
-.session-grade.is-a,
-.session-grade.is-b {
-  --grade: var(--positive);
-}
-.session-grade.is-d {
-  --grade: var(--warning);
-}
-.session-grade.is-f {
-  --grade: var(--negative);
 }
 
 .session-grade-head {
@@ -24,18 +13,6 @@
   align-items: center;
   gap: 14px;
   margin-bottom: 14px;
-}
-.session-grade-letter {
-  display: grid;
-  place-items: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: 4px solid var(--grade);
-  color: var(--grade);
-  font-family: var(--font-display);
-  font-size: 32px;
-  font-weight: 700;
 }
 .session-grade-title {
   display: flex;

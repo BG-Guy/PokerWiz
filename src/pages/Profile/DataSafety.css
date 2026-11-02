@@ -64,11 +64,11 @@
   margin-top: 16px;
   padding: 12px 14px;
   border-radius: var(--radius-sm, 10px);
-  background: color-mix(in srgb, var(--accent, var(--teal)) 10%, var(--surface));
+  background: color-mix(in srgb, var(--accent, var(--accent)) 10%, var(--surface));
 }
 .data-safety-device > svg {
   flex-shrink: 0;
-  color: var(--accent-text, var(--teal));
+  color: var(--accent-text, var(--accent));
 }
 .data-safety-device p {
   flex: 1 1 220px;

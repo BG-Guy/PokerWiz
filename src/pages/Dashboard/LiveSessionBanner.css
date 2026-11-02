@@ -22,15 +22,15 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--teal);
+  background: var(--accent);
   animation: live-banner-pulse 1.6s ease-out infinite;
 }
 @keyframes live-banner-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(127, 200, 194, 0.7);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 70%, transparent);
   }
   100% {
-    box-shadow: 0 0 0 12px rgba(127, 200, 194, 0);
+    box-shadow: 0 0 0 12px color-mix(in srgb, var(--accent) 0%, transparent);
   }
 }
 
@@ -44,7 +44,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--teal);
+  color: var(--accent);
 }
 .live-banner-title {
   font-weight: 800;
@@ -66,7 +66,7 @@
   gap: 4px;
   font-size: 14px;
   font-weight: 800;
-  color: var(--teal);
+  color: var(--accent);
 }
 @media (min-width: 640px) {
   .live-banner {

@@ -13,6 +13,7 @@ const KINDS = [
   ['sessions', 'session'],
   ['hands', 'hand'],
   ['goals', 'goal'],
+  ['settings', 'profile setting'], // your profile and preferences (newer backups only)
 ];
 const MODES = [
   { value: 'add', label: 'Add to my data' },
@@ -33,8 +34,8 @@ export default function BackupPreview({ name, backup, preview, samples, onImport
   const [error, setError] = useState(null);
   const hasSamples = samples.sessions + samples.hands > 0;
   const shown = mode === 'replace' ? replacePreview : preview;
-  const adding = shown ? KINDS.filter(([key]) => shown[key].added > 0) : [];
-  const alreadyHere = KINDS.filter(([key]) => preview[key].skipped > 0);
+  const adding = shown ? KINDS.filter(([key]) => shown[key]?.added > 0) : [];
+  const alreadyHere = KINDS.filter(([key]) => preview[key]?.skipped > 0);
   const exported = typeof backup.exportedAt === 'string' ? backup.exportedAt.slice(0, 10) : null;
 
   // Switching to replace works out what it would delete and add (another dry run).
@@ -102,7 +103,7 @@ export default function BackupPreview({ name, backup, preview, samples, onImport
         <>
           <ul className="import-preview-facts">
             {listOf(replacePreview.replaced) && <li className="is-negative">Deleted: everything here now ({listOf(replacePreview.replaced)})</li>}
-            <li className="is-positive">In its place: {listOf({ sessions: replacePreview.sessions.added, hands: replacePreview.hands.added, goals: replacePreview.goals.added }) || 'nothing'}</li>
+            <li className="is-positive">In its place: {listOf(Object.fromEntries(KINDS.map(([key]) => [key, replacePreview[key]?.added ?? 0]))) || 'nothing'}</li>
           </ul>
           <p className="import-preview-note">
             Your data becomes exactly what's in this backup. An automatic backup of what's here now is saved first, so you can put it back

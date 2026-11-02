@@ -1,0 +1,39 @@
+/* Segmented switch: equal-width options on a dark track, with a sliding pill under the picked one. */
+
+.settings-segments {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--count), minmax(0, 1fr));
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+/* The pill: one option wide, moved under the picked option */
+.settings-segments-thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / var(--count));
+  border-radius: 999px;
+  background: var(--selected-bg);
+  transform: translateX(calc(var(--index) * 100%));
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.settings-segments-option {
+  position: relative;
+  min-width: 48px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+.settings-segments-option.is-active {
+  color: var(--selected-text);
+}

@@ -34,11 +34,8 @@
   color: var(--text);
 }
 .hands-tab.is-active {
-  background: var(--accent);
-  color: var(--on-accent);
-}
-.hands-tab.is-tool {
-  color: var(--accent-text);
+  background: var(--selected-bg);
+  color: var(--selected-text);
 }
 
 /* Desktop shows insights inside Highlights, so the separate tab goes away */

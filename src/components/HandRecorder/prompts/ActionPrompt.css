@@ -61,7 +61,7 @@
 .action-prompt-btn.is-aggressive {
   background: var(--accent);
   color: var(--on-accent);
-  box-shadow: 0 6px 16px rgba(127, 200, 194, 0.35);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 /* All-in: red, so it never gets pressed by accident */

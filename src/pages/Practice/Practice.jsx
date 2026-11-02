@@ -5,16 +5,20 @@
 // can be played again from your spot, with the same cards to come or new ones.
 // Hands are played full screen by default (PracticeFullScreen: the action buttons are always in view); the
 // choice is remembered. Two web workers do the heavy lifting: practice.worker.js plays the opponents (they solve their spots), and
-// the coach worker grades the hand when it's over.
+// the coach worker grades the hand when it's over. Grades show as letters, A to F (utils/letterGrade.js).
+// Practice is one of the two elite sections (with Coach): its own header, gold highlights and thinking state.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { getHand } from '../../api/hands.js';
 import { replayStreets } from '../../practice/replaySpot.js';
 import { GAMES, seenCards, spotRecord } from '../../practice/generateSpot.js';
-import { overallAccuracy, accuracyLabel } from '../../coach/grading.js';
+import { overallAccuracy } from '../../coach/grading.js';
 import { defaultProfile } from '../../coach/profiles.js';
 import { formatMoney, getMoneyUnit } from '../../utils/format.js';
-import PageHeader from '../../components/PageHeader/PageHeader.jsx';
+import { letterGrade } from '../../utils/letterGrade.js';
+import EliteHeader from '../../components/EliteHeader/EliteHeader.jsx';
+import EliteThinking from '../../components/EliteThinking/EliteThinking.jsx';
+import GradeBadge from '../../components/GradeBadge/GradeBadge.jsx';
 import PokerTable from '../../components/HandRecorder/PokerTable.jsx';
 import PromptCarousel from '../../components/HandRecorder/PromptCarousel.jsx';
 import ActionPrompt from '../../components/HandRecorder/prompts/ActionPrompt.jsx';
@@ -29,7 +33,6 @@ import ReplaySetup from './ReplaySetup.jsx';
 import PracticeFullScreen from './PracticeFullScreen.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import '../../components/HandRecorder/HandRecorder.css';
-import '../Coach/Coach.css';
 import './Practice.css';
 
 const STORAGE_KEY = 'pokerwiz-practice-setup';
@@ -104,7 +107,7 @@ export default function Practice() {
   const [replayOptions, setReplayOptions] = useState(null);
   const [spot, setSpot] = useState(null);
   const [thinking, setThinking] = useState(false); // the opponents are deciding (practice worker busy)
-  const [review, setReview] = useState(null); // { accuracy, label, decisions }
+  const [review, setReview] = useState(null); // { accuracy (0-100, shown as a letter), decisions }
   const [progress, setProgress] = useState(null); // what the coach is solving while grading
   const [error, setError] = useState(null);
   const [tally, setTally] = useState({ hands: 0, total: 0, netBB: 0 });
@@ -187,7 +190,7 @@ export default function Practice() {
       // Only your decisions from the spot on count (earlier streets were played for you).
       const decisions = report.decisions.slice(firstDecisionRef.current);
       const accuracy = overallAccuracy(decisions.filter((d) => d.graded), report.stakes.bb);
-      setReview({ accuracy, label: accuracyLabel(accuracy), decisions });
+      setReview({ accuracy, decisions });
       setTally((t) => ({ hands: t.hands + 1, total: t.total + (accuracy ?? 0), netBB: t.netBB + report.result / report.stakes.bb }));
       setPhase('result');
     };
@@ -284,8 +287,8 @@ export default function Practice() {
 
   if (phase === 'replay') {
     return (
-      <div className="practice">
-        <PageHeader title="Replay" subtitle="Take a hand from any street and play it differently." />
+      <div className="practice elite">
+        <EliteHeader title="Replay" kicker="GTO practice" subtitle="Take a hand from any street and play it differently." />
         {error && (
           <p className="practice-error" role="alert">
             <Icon name="alert" size={16} /> {error}
@@ -298,8 +301,8 @@ export default function Practice() {
 
   if (phase === 'setup') {
     return (
-      <div className="practice">
-        <PageHeader title="Practice" subtitle="Play spots against opponents who all play GTO, and get graded on every decision." />
+      <div className="practice elite">
+        <EliteHeader title="Practice" kicker="GTO practice" subtitle="Play spots against opponents who all play GTO, and get a grade from A to F on every decision." />
         {error && (
           <p className="practice-error" role="alert">
             <Icon name="alert" size={16} /> {error}
@@ -320,7 +323,7 @@ export default function Practice() {
   );
   // Full screen: the same shell for dealing and playing, so it stays up from one hand to the next.
   const fullScreenView = (props) => (
-    <div className="practice">
+    <div className="practice elite">
       <PracticeFullScreen title={title} nextLabel={nextLabel} onExit={() => setFullScreen(false)} {...props} />
     </div>
   );
@@ -328,20 +331,16 @@ export default function Practice() {
   // Dealing the first hand (or the next one): nothing on the table yet.
   if (phase === 'dealing' || !spot) {
     const dealing = (
-      <div className="coach-thinking" aria-live="polite">
-        <span className="coach-thinking-spinner" />
-        <p className="coach-thinking-title">Dealing</p>
-        <p className="coach-thinking-text">The GTO players are playing the hand up to your spot. Postflop spots are solved on the way, so this can take a few seconds.</p>
-      </div>
+      <EliteThinking title="Dealing" text="The GTO players are playing the hand up to your spot. Postflop spots are solved on the way, so this can take a few seconds." />
     );
     if (fullScreen) return fullScreenView({ subtitle: replayHand ? replayHand.title : 'Dealing a hand', table: dealing, dock: errorNote });
     return (
-      <div className="practice">
-        <PageHeader title={title} subtitle={replayHand ? replayHand.title : 'Dealing a hand'}>
+      <div className="practice elite">
+        <EliteHeader compact title={title} subtitle={replayHand ? replayHand.title : 'Dealing a hand'}>
           <button type="button" className="btn btn-ghost" onClick={backToSetup}>
             <Icon name="chevronLeft" size={16} /> Setup
           </button>
-        </PageHeader>
+        </EliteHeader>
         {dealing}
       </div>
     );
@@ -379,10 +378,11 @@ export default function Practice() {
   const lines = actionLines(state);
   const handLabel = `Hand ${handNumber}${spot.again ? ' · played again' : ''}`;
   const subtitle = replay ? `${replay.title} · from the ${replay.street.toLowerCase()}` : `${handLabel} · ${spot.game.label}`;
-  // The running score, short enough for the full-screen top bar.
+  // The running score (the average grade as a letter), short enough for the full-screen top bar.
+  const averageAccuracy = tally.hands > 0 ? tally.total / tally.hands : null;
   const tallyText =
     tally.hands > 0 &&
-    `${Math.round(tally.total / tally.hands)}% avg · ${tally.netBB >= 0 ? '+' : ''}${Math.round(tally.netBB * 10) / 10} bb over ${tally.hands} ${tally.hands === 1 ? 'hand' : 'hands'}`;
+    `Grade ${letterGrade(averageAccuracy).letter} avg · ${tally.netBB >= 0 ? '+' : ''}${Math.round(tally.netBB * 10) / 10} bb over ${tally.hands} ${tally.hands === 1 ? 'hand' : 'hands'}`;
 
   // ----- The pieces both views share: the table, the action so far, and what's needed now -----
   const table = <PokerTable seats={seats} board={state.board} pot={state.pot} bb={state.bb} rotation={heroSeat} />;
@@ -418,7 +418,7 @@ export default function Practice() {
     <>
       {phase === 'play' && thinking && (
         <p className="practice-dealing" aria-live="polite">
-          <span className="coach-thinking-spinner is-small" /> Opponents are thinking...
+          <span className="practice-spinner" aria-hidden="true" /> Opponents are thinking...
         </p>
       )}
 
@@ -443,20 +443,14 @@ export default function Practice() {
         </p>
       )}
 
-      {phase === 'grading' && (
-        <div className="coach-thinking" aria-live="polite">
-          <span className="coach-thinking-spinner" />
-          <p className="coach-thinking-title">Grading your decisions</p>
-          <p className="coach-thinking-text">{progress ? `${progress}...` : 'Comparing every decision with GTO.'}</p>
-        </div>
-      )}
+      {phase === 'grading' && <EliteThinking title="Grading your decisions" text={progress ? `${progress}...` : 'Comparing every decision with GTO.'} />}
     </>
   );
 
   // Hand over: the grade and how it went.
   const summary = phase === 'result' && (
     <section className="practice-summary">
-      {review && <AccuracyGauge value={review.accuracy ?? 0} label={review.label} />}
+      {review && <AccuracyGauge value={review.accuracy} />}
       <div className="practice-summary-text">
         <span className="practice-summary-kicker">Hand over</span>
         <p className={`practice-summary-outcome ${spot.result > 0 ? 'is-win' : spot.result < 0 ? 'is-loss' : ''}`}>{outcomeText(spot)}</p>
@@ -533,7 +527,7 @@ export default function Practice() {
             </div>
           )}
           {decisionCards && (
-            <Modal open={decisionsOpen} onClose={() => setDecisionsOpen(false)} title="Your decisions" className="practice-decisions-sheet">
+            <Modal open={decisionsOpen} onClose={() => setDecisionsOpen(false)} title="Your decisions" className="practice-decisions-sheet elite">
               <div className="practice-decisions">{decisionCards}</div>
             </Modal>
           )}
@@ -544,8 +538,8 @@ export default function Practice() {
 
   // ----- Page view: header, tally, then the table and the panel -----
   return (
-    <div className={`practice ${phase === 'result' ? 'has-next-bar' : ''}`}>
-      <PageHeader title={title} subtitle={subtitle}>
+    <div className={`practice elite ${phase === 'result' ? 'has-next-bar' : ''}`}>
+      <EliteHeader compact title={title} subtitle={subtitle}>
         <button type="button" className="btn btn-ghost" onClick={backToSetup}>
           <Icon name="chevronLeft" size={16} /> Setup
         </button>
@@ -558,15 +552,15 @@ export default function Practice() {
             {nextLabel} <Icon name="chevronRight" size={16} />
           </button>
         )}
-      </PageHeader>
+      </EliteHeader>
 
       {tally.hands > 0 && (
         <div className="practice-tally" aria-live="polite">
           <span>
             <strong className="num">{tally.hands}</strong> {tally.hands === 1 ? 'hand' : 'hands'}
           </span>
-          <span>
-            Average accuracy <strong className="num">{Math.round(tally.total / tally.hands)}%</strong>
+          <span className="practice-tally-grade">
+            Average grade <GradeBadge score={averageAccuracy} size="xs" withLabel />
           </span>
           <span>
             Net{' '}

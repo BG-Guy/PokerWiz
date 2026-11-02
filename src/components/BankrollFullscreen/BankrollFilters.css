@@ -1,0 +1,70 @@
+/* Full-screen chart filters: labelled rows of chips, two pickers side by side, and the on-chart switches. */
+
+.bankroll-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.bankroll-filters-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.bankroll-filters-title {
+  font-size: 18px;
+}
+
+.bankroll-filters-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.bankroll-filters-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+
+.bankroll-filters-selects {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.bankroll-filters-selects:empty {
+  display: none;
+}
+.bankroll-filters-select {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.bankroll-filters-select select {
+  min-height: 40px;
+  width: 100%;
+  padding: 0 32px 0 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-2)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right 12px center;
+  appearance: none;
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.bankroll-filters-select select:hover {
+  border-color: var(--text-faint);
+}
+
+.bankroll-filters-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

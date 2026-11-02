@@ -28,7 +28,7 @@
   font-size: 56px;
   font-weight: 700;
   line-height: 1;
-  color: var(--teal);
+  color: var(--accent);
 }
 .goals-summary-total {
   font-size: 28px;
@@ -60,7 +60,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--teal);
+  color: var(--accent);
 }
 .goals-summary-focus-title {
   font-family: var(--font-display);

@@ -1,4 +1,5 @@
-// Tabs across the Hands area: the hand list, Highlights, hand Insights, and a shortcut to the Equity calculator.
+// Tabs across the Hands area: the hand list, Highlights and hand Insights. (The Equity calculator has its own
+// place in the main navigation.)
 // The Insights tab is phone/tablet only: on desktop, Highlights already shows the insights next to it.
 import { Link, useLocation } from 'react-router-dom';
 import Icon from '../Icon/Icon.jsx';
@@ -28,10 +29,6 @@ export default function HandsTabs() {
           {tab.label}
         </Link>
       ))}
-      <Link to="/equity" className="hands-tab is-tool">
-        <Icon name="calculator" size={16} />
-        Equity calc
-      </Link>
     </nav>
   );
 }

@@ -5,11 +5,17 @@
   background: var(--surface);
   border: 1px solid var(--border);
   overflow: hidden;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.2s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
-.session-row:hover,
+.session-row:hover {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+}
 .session-row.is-open {
   border-color: var(--accent);
+  box-shadow: var(--shadow);
+}
+.session-row-summary:active {
+  transform: scale(0.995);
 }
 
 /* Summary grid; the hands column only appears on wider screens */
@@ -26,29 +32,9 @@
   display: none;
 }
 
-/* Grade letter: a small ring, green for A/B, teal C, amber D, red F */
+/* The session's letter (GradeBadge), centered in its column */
 .session-row-grade {
-  --grade: var(--teal);
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 2px solid var(--grade);
-  color: var(--grade);
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 700;
-}
-.session-row-grade.is-a,
-.session-row-grade.is-b {
-  --grade: var(--positive);
-}
-.session-row-grade.is-d {
-  --grade: var(--warning);
-}
-.session-row-grade.is-f {
-  --grade: var(--negative);
+  justify-self: center;
 }
 @media (min-width: 640px) {
   .session-row-summary {

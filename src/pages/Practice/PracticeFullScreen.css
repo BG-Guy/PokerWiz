@@ -14,7 +14,9 @@
   grid-template-areas: 'bar' 'table' 'side';
   height: 100dvh;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-  background: var(--bg);
+  /* Elite room: a low crimson glow behind the table and a touch of gold light from the top corner */
+  background: radial-gradient(70% 50% at 50% 42%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%),
+    radial-gradient(60% 40% at 100% 0%, var(--gold-soft), transparent 60%), var(--bg);
   animation: practice-fs-in 0.2s ease-out;
 }
 @keyframes practice-fs-in {
@@ -32,6 +34,8 @@
   gap: 4px;
   min-height: 56px;
   padding: 6px 10px;
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent, var(--gold-line), transparent) 1;
 }
 .practice-fs-title {
   display: flex;
@@ -41,9 +45,24 @@
   line-height: 1.25;
 }
 .practice-fs-title strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+/* The small gold "Elite" mark beside the title */
+.practice-fs-elite {
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--gold-line);
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
 }
 .practice-fs-title span {
   overflow: hidden;
@@ -114,8 +133,8 @@
   min-height: 38px;
   padding: 6px 12px;
   border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border: 1px solid var(--elite-border);
+  background: var(--elite-surface);
   color: var(--text-muted);
   text-align: left;
 }
@@ -124,8 +143,8 @@
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--accent-text);
+  letter-spacing: 0.1em;
+  color: var(--gold);
 }
 .practice-fs-peek-cards {
   display: inline-flex;
@@ -150,7 +169,7 @@
   transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1);
 }
 .practice-fs-peek.is-open {
-  border-color: var(--accent);
+  border-color: var(--gold);
 }
 .practice-fs-peek.is-open .practice-fs-peek-chevron {
   transform: none;
@@ -242,15 +261,13 @@
   width: 92px;
   height: 92px;
 }
-.practice-fs-dock .accuracy-gauge-number {
-  font-size: 28px;
-}
-.practice-fs-dock .accuracy-gauge-number small {
-  font-size: 14px;
+.practice-fs-dock .accuracy-gauge-letter {
+  font-size: 42px;
 }
 .practice-fs-dock .accuracy-gauge-label {
   margin-top: 2px;
-  font-size: 12px;
+  font-size: 9px;
+  letter-spacing: 0.06em;
 }
 
 .practice-fs-result-actions {

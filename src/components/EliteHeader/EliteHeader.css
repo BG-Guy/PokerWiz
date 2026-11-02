@@ -1,0 +1,156 @@
+/* Elite page title: a deep panel (crimson and gold light from the corners, grain, a sheen that passes once),
+   the gold crest, then the title. Uses the .elite tokens from global.css. */
+
+.elite-header {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px 24px;
+  margin-bottom: 18px;
+  padding: 20px 18px 18px;
+  border-radius: var(--radius);
+  background: var(--elite-hero);
+  border: 1px solid var(--elite-border);
+  box-shadow: var(--elite-shadow);
+  overflow: hidden;
+  animation: elite-header-in 0.5s var(--elite-ease) both;
+}
+/* Grain over the panel, and a gold hairline along its top edge */
+.elite-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--elite-grain);
+  opacity: var(--elite-grain-opacity);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+.elite-header::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold) 30%, var(--gold-bright) 50%, var(--gold) 70%, transparent);
+  opacity: 0.7;
+}
+/* The sheen: a soft band of light that crosses the panel once when the page opens */
+.elite-header-main::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--elite-sheen);
+  transform: translateX(-100%);
+  animation: elite-sheen 1.6s 0.2s var(--elite-ease) both;
+  pointer-events: none;
+}
+@keyframes elite-sheen {
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes elite-header-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.elite-header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* "Elite" mark: the crest and word in gold, then what the section is */
+.elite-header-mark {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.elite-crest {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px 3px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--gold-line);
+  background: var(--gold-soft);
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.elite-header-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.elite-header-title {
+  font-size: clamp(30px, 7vw, 44px);
+  letter-spacing: 0.05em;
+}
+.elite-header-subtitle {
+  max-width: 560px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.elite-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* While a hand is on the table: one slim row, so the table keeps the room */
+.elite-header.is-compact {
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+}
+.elite-header.is-compact {
+  gap: 4px 16px;
+}
+/* The crest sits on the title's line, the subtitle under both */
+.elite-header.is-compact .elite-header-main {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 10px;
+}
+.elite-header.is-compact .elite-header-mark {
+  order: 2;
+}
+.elite-header.is-compact .elite-header-title {
+  font-size: clamp(22px, 5vw, 28px);
+}
+.elite-header.is-compact .elite-header-subtitle {
+  order: 3;
+  flex-basis: 100%;
+  font-size: 13px;
+}
+.elite-header.is-compact .elite-header-actions {
+  gap: 0 2px;
+  margin-left: -10px; /* ghost buttons line up with the title */
+}
+
+@media (min-width: 768px) {
+  .elite-header {
+    margin-bottom: 24px;
+    padding: 28px 28px 24px;
+  }
+  .elite-header.is-compact {
+    padding: 14px 20px;
+  }
+}

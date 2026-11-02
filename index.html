@@ -5,7 +5,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#12181B" />
+    <meta name="theme-color" content="#09090B" />
     <meta name="format-detection" content="telephone=no" />
     <!-- Home Screen app: full screen, status bar over the app (the header makes room for it), name and icon -->
     <meta name="mobile-web-app-capable" content="yes" />
@@ -17,22 +17,21 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>PokerWiz</title>
 
-    <!-- Game-style fonts: Fredoka for headings and numbers, Nunito for body text -->
+    <!-- Fonts: Barlow Condensed (bold, condensed) for headings and numbers, Inter for body text -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
 
     <!-- Apply the saved (or system) theme early so the page never flashes the wrong colors -->
     <script>
       (function () {
+        // Night (black) unless the day theme was picked since the black-and-red redesign
         var theme;
-        try { theme = localStorage.getItem('pokerwiz-theme'); } catch (e) {}
-        if (theme !== 'light' && theme !== 'dark') {
-          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
+        try { theme = localStorage.getItem('pokerwiz-theme-v2'); } catch (e) {}
+        if (theme !== 'light' && theme !== 'dark') theme = 'dark';
         document.documentElement.dataset.theme = theme;
         // Opened from the Home Screen (no browser around it): the CSS makes room for the status bar.
         if (navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {

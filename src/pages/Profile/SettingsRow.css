@@ -1,0 +1,79 @@
+/* Profile row: icon tile, label, then a value and chevron or a control. Dividers start after the icon, like iOS. */
+
+.settings-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 16px;
+  text-align: left;
+  color: var(--text);
+}
+/* Hairline between rows, inset to line up with the text */
+.settings-row + .settings-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 64px;
+  border-top: 1px solid var(--border);
+}
+
+.settings-row.is-button {
+  transition: background-color 0.15s ease;
+}
+.settings-row.is-button:hover {
+  background: var(--surface-2);
+}
+.settings-row.is-button:active {
+  background: var(--surface-2);
+  transition: none;
+}
+
+.settings-row-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.settings-row-text {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+}
+.settings-row-label {
+  font-size: 15px;
+  font-weight: 600;
+}
+.settings-row-detail {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* The value on the right: muted, cut short if long. "Add" when empty. */
+.settings-row-value {
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  color: var(--text-muted);
+}
+.settings-row-value.is-empty {
+  color: var(--text-faint);
+}
+.settings-row-chevron {
+  flex-shrink: 0;
+  color: var(--text-faint);
+}
+.settings-row-control {
+  flex-shrink: 0;
+}

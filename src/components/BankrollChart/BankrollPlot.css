@@ -1,0 +1,193 @@
+/* Bankroll plot. The SVG is drawn at the container's real pixel size, so text and lines stay crisp. The line is
+   white on black (red stays for losses and downswings) and draws itself in from left to right. */
+
+.bankroll-plot {
+  position: relative;
+  width: 100%;
+}
+.bankroll-plot.is-fill {
+  height: 100%;
+  min-height: 200px;
+}
+.bankroll-plot svg {
+  display: block;
+  touch-action: pan-y;
+  cursor: crosshair;
+  overflow: visible;
+}
+.bankroll-plot svg:focus-visible {
+  outline-offset: 4px;
+}
+
+.bankroll-grid {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+.bankroll-grid.is-vertical {
+  stroke-dasharray: 2 4;
+}
+.bankroll-grid.is-zero {
+  stroke: var(--text-faint);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+
+.bankroll-axis-label {
+  fill: var(--text-faint);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-display);
+}
+.bankroll-axis-title {
+  fill: var(--text-muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* The curve: a quick draw-in, the fill fading in behind it */
+.bankroll-line {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  animation: bankroll-draw 0.9s cubic-bezier(0.3, 0.7, 0.2, 1) both;
+}
+.bankroll-area {
+  animation: bankroll-fade 0.6s ease 0.25s both;
+}
+@keyframes bankroll-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes bankroll-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.bankroll-dot {
+  stroke: var(--surface);
+  stroke-width: 2;
+  transition: r 0.15s ease;
+  animation: bankroll-fade 0.4s ease 0.5s both;
+}
+.bankroll-dot.is-win {
+  fill: var(--positive);
+}
+.bankroll-dot.is-loss {
+  fill: var(--negative);
+}
+
+/* Shaded downswings with their depth above */
+.bankroll-downswing rect {
+  fill: var(--negative);
+  opacity: 0.1;
+  animation: bankroll-shade 0.4s ease both;
+}
+.bankroll-downswing text {
+  fill: var(--negative);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  animation: bankroll-fade 0.4s ease both;
+}
+@keyframes bankroll-shade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Peak and low markers */
+.bankroll-marker circle {
+  fill: none;
+  stroke-width: 2;
+}
+.bankroll-marker text {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+.bankroll-marker.is-peak circle {
+  stroke: var(--positive);
+}
+.bankroll-marker.is-peak text {
+  fill: var(--positive);
+}
+.bankroll-marker.is-low circle {
+  stroke: var(--negative);
+}
+.bankroll-marker.is-low text {
+  fill: var(--negative);
+}
+.bankroll-marker {
+  animation: bankroll-fade 0.35s ease 0.6s both;
+}
+
+.bankroll-crosshair line {
+  stroke: var(--text);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.5;
+}
+.bankroll-badge {
+  fill: var(--text);
+}
+.bankroll-badge-text {
+  fill: var(--bg);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-display);
+}
+
+/* Details card */
+.bankroll-tooltip {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 170px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  font-size: 13px;
+  color: var(--text-muted);
+  transform: translate(14px, -50%);
+  pointer-events: none;
+  animation: bankroll-fade 0.15s ease;
+}
+.bankroll-tooltip.is-left {
+  transform: translate(calc(-100% - 14px), -50%);
+}
+.bankroll-tooltip.is-top {
+  transform: translateX(-50%);
+}
+.bankroll-tooltip-title {
+  font-weight: 800;
+  color: var(--text);
+}
+.bankroll-tooltip-meta {
+  font-size: 12px;
+  color: var(--text-faint);
+  margin-bottom: 2px;
+}
+.bankroll-tooltip strong {
+  color: var(--text);
+}
+.bankroll-tooltip .is-win {
+  color: var(--positive);
+}
+.bankroll-tooltip .is-loss {
+  color: var(--negative);
+}

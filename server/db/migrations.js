@@ -59,6 +59,20 @@ const MIGRATIONS = [
       db.exec('CREATE UNIQUE INDEX IF NOT EXISTS sessions_external_id ON sessions (external_id) WHERE external_id IS NOT NULL');
     },
   },
+  {
+    // Custom stakes: a straddle, the table's size and its name. New databases get them from schema.sql.
+    name: 'session-table-columns-v1',
+    run(db) {
+      const existing = new Set(db.prepare('PRAGMA table_info(sessions)').all().map((column) => column.name));
+      for (const [name, type] of [
+        ['straddle', 'REAL'],
+        ['table_size', 'INTEGER'],
+        ['table_name', 'TEXT'],
+      ]) {
+        if (!existing.has(name)) db.exec(`ALTER TABLE sessions ADD COLUMN ${name} ${type}`);
+      }
+    },
+  },
 ];
 
 export function runMigrations(db) {

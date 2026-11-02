@@ -1,0 +1,85 @@
+/* Letter grade tile: the letter in the display font on a soft wash of its tone, with a hairline in the tone. */
+
+.grade-badge {
+  --tone: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+  line-height: 1;
+}
+.grade-badge.is-good {
+  --tone: var(--positive);
+}
+.grade-badge.is-neutral {
+  --tone: var(--text-muted);
+}
+.grade-badge.is-warning {
+  --tone: var(--warning);
+}
+.grade-badge.is-bad {
+  --tone: var(--negative);
+}
+.grade-badge.is-none {
+  --tone: var(--text-faint);
+}
+
+.grade-badge-letter {
+  display: inline-grid;
+  place-items: center;
+  width: var(--size, 24px);
+  height: var(--size, 24px);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--tone) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 55%, transparent);
+  color: var(--tone);
+  font-family: var(--font-display);
+  font-size: calc(var(--size, 24px) * 0.62);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.grade-badge-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* Sizes: in a line of text, in a card header, beside a title, and on its own */
+.grade-badge.is-xs {
+  --size: 18px;
+}
+.grade-badge.is-xs .grade-badge-letter {
+  border-radius: 5px;
+}
+.grade-badge.is-sm {
+  --size: 24px;
+}
+.grade-badge.is-md {
+  --size: 34px;
+}
+.grade-badge.is-md .grade-badge-letter {
+  border-radius: 10px;
+}
+.grade-badge.is-lg {
+  --size: 56px;
+}
+.grade-badge.is-lg .grade-badge-letter {
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tone) 65%, transparent);
+}
+.grade-badge.is-lg .grade-badge-label {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* A grade that just came in pops into place */
+.grade-badge.is-reveal .grade-badge-letter {
+  animation: grade-badge-in 0.45s cubic-bezier(0.2, 1.3, 0.4, 1) both;
+}
+@keyframes grade-badge-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}

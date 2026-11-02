@@ -12,8 +12,8 @@
   padding: 12px 12px 12px 16px;
   border-radius: 16px;
   overflow: hidden;
-  background: #1d2529;
-  color: #f6fbfb;
+  background: #18181b;
+  color: #fafafa;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
   transform: translateX(-50%);
   animation: undo-toast-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2);
@@ -40,7 +40,7 @@
   gap: 6px;
   padding: 8px 12px;
   border-radius: 10px;
-  color: #7fc8c2;
+  color: var(--accent);
   font-weight: 800;
 }
 .undo-toast-undo:active {
@@ -52,7 +52,7 @@
   bottom: 0;
   height: 3px;
   width: 100%;
-  background: #7fc8c2;
+  background: var(--accent);
   transform-origin: left;
   animation: undo-toast-timer linear forwards;
 }

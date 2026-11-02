@@ -7,12 +7,13 @@ import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { freePort } from './freePort.mjs';
 
 const servers = [];
 
 // A server on its own port and database, with a JSON helper.
 async function startServer(name) {
-  const port = 3800 + servers.length * 50 + Math.floor(Math.random() * 50);
+  const port = await freePort();
   const dir = mkdtempSync(join(tmpdir(), `pokerwiz-data-${name}-`));
   const proc = spawn(process.execPath, ['--disable-warning=ExperimentalWarning', 'server/index.js'], {
     env: { ...process.env, PORT: String(port), POKERWIZ_DB: join(dir, 'test.db') },

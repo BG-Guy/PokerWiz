@@ -1,34 +1,52 @@
-/* Accuracy ring: fills up on mount. */
+/* Grade ring: the arc fills on mount, then the letter lands with a soft glow in its color. */
 
 .accuracy-gauge {
-  --tone: var(--teal);
+  --tone: var(--text-muted);
+  --tone-light: var(--text);
   position: relative;
   width: 156px;
   height: 156px;
   flex-shrink: 0;
 }
-.accuracy-gauge.is-warn {
-  --tone: #e9c46a;
+.accuracy-gauge.is-good {
+  --tone: var(--positive);
+  --tone-light: color-mix(in srgb, var(--positive) 45%, #ffffff);
+}
+.accuracy-gauge.is-neutral {
+  --tone: color-mix(in srgb, var(--text) 72%, transparent);
+  --tone-light: var(--text);
+}
+.accuracy-gauge.is-warning {
+  --tone: var(--warning);
+  --tone-light: color-mix(in srgb, var(--warning) 45%, #ffffff);
 }
 .accuracy-gauge.is-bad {
-  --tone: #ec8c82;
+  --tone: var(--negative);
+  --tone-light: color-mix(in srgb, var(--negative) 45%, #ffffff);
 }
 
 .accuracy-gauge svg {
   width: 100%;
   height: 100%;
+  overflow: visible;
+}
+/* A thin gold rim around the ring (crimson outside the elite sections) */
+.accuracy-gauge-rim {
+  fill: none;
+  stroke: var(--gold-line, var(--accent-soft));
+  stroke-width: 1;
 }
 .accuracy-gauge-track {
   fill: none;
-  stroke: rgba(246, 251, 251, 0.15);
-  stroke-width: 12;
+  stroke: color-mix(in srgb, currentColor 13%, transparent);
+  stroke-width: 9;
 }
 .accuracy-gauge-value {
   fill: none;
-  stroke: var(--tone);
-  stroke-width: 12;
+  stroke-width: 9;
   stroke-linecap: round;
-  animation: accuracy-gauge-fill 1.1s cubic-bezier(0.3, 1, 0.4, 1);
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--tone) 45%, transparent));
+  animation: accuracy-gauge-fill 0.9s cubic-bezier(0.3, 1, 0.4, 1) both;
 }
 @keyframes accuracy-gauge-fill {
   from {
@@ -44,17 +62,34 @@
   align-items: center;
   justify-content: center;
 }
-.accuracy-gauge-number {
-  font-size: 44px;
+.accuracy-gauge-letter {
+  font-family: var(--font-display);
+  font-size: 68px;
   font-weight: 700;
-  line-height: 1;
+  line-height: 0.9;
   color: var(--tone);
+  text-shadow: 0 0 24px color-mix(in srgb, var(--tone) 40%, transparent);
+  animation: accuracy-gauge-letter 0.5s 0.55s cubic-bezier(0.2, 1.3, 0.4, 1) both;
 }
-.accuracy-gauge-number small {
-  font-size: 20px;
+@keyframes accuracy-gauge-letter {
+  from {
+    opacity: 0;
+    transform: scale(1.5);
+    filter: blur(6px);
+  }
 }
 .accuracy-gauge-label {
   margin-top: 4px;
+  font-size: 11px;
   font-weight: 800;
-  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  animation: accuracy-gauge-label 0.4s 0.8s ease both;
+}
+@keyframes accuracy-gauge-label {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
 }

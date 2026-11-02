@@ -1,0 +1,40 @@
+/* About section: the install button drawn as one more row (icon, label, chevron), with the same divider. */
+
+.install-button.app-info-install {
+  position: relative;
+  border-radius: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 16px;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  transition: background-color 0.15s ease;
+}
+.app-info-install::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 64px;
+  border-top: 1px solid var(--border);
+}
+.install-button.app-info-install:hover {
+  background: var(--surface-2);
+}
+.app-info-install img {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+.app-info-install span {
+  flex: 1;
+}
+.app-info-install svg {
+  color: var(--text-faint);
+}

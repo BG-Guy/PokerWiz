@@ -106,7 +106,7 @@ export default function GameHistory() {
             {/* Cash games in the BB/$ unit (tournament results are on their own rows, in dollars) */}
             <Money amount={cashGames(month.sessions).reduce((sum, s) => sum + sessionProfit(s), 0)} bb={1} />
           </div>
-          <ul className="game-history-list">
+          <ul className="game-history-list stagger-in">
             {month.sessions.map((session) => (
               <SessionRow
                 key={session.id}

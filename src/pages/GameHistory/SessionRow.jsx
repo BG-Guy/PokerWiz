@@ -8,9 +8,11 @@ import { gradeSession } from '../../utils/sessionGrade.js';
 import { formatDuration, formatMoney, formatUnits, formatWeekday, parseDate } from '../../utils/format.js';
 import Money from '../../components/Money/Money.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
+import GradeBadge from '../../components/GradeBadge/GradeBadge.jsx';
 import StarRating from '../../components/StarRating/StarRating.jsx';
 import TiltMeter from '../../components/TiltMeter/TiltMeter.jsx';
 import { useClosingValue } from '../../hooks/useClosingValue.js';
+import Collapse from '../../components/Collapse/Collapse.jsx';
 import EditSessionSheet from './EditSessionSheet.jsx';
 import './SessionRow.css';
 
@@ -42,16 +44,14 @@ export default function SessionRow({ session, rawSession, sessionHands, isOpen, 
           </span>
         </span>
         <span className="session-row-hands num">{session.hands} hands</span>
-        <span className={`session-row-grade is-${grade.letter.toLowerCase()}`} title={`Grade ${grade.letter}: ${grade.label} (${grade.score}/100)`}>
-          {grade.letter}
-        </span>
+        <GradeBadge score={grade.score} size="sm" className="session-row-grade" />
         <Money amount={profit} bb={unit} className="session-row-result" />
         <Icon name="chevronDown" size={18} className="session-row-chevron" />
       </button>
 
-      {/* Expanded details */}
-      {isOpen && (
-        <div className="session-row-details" id={detailsId}>
+      {/* Expanded details: slide open and closed (Collapse) */}
+      <Collapse open={isOpen} id={detailsId}>
+        <div className="session-row-details">
           <dl className="session-row-stats">
             <div>
               <dt>Buy-in</dt>
@@ -116,7 +116,7 @@ export default function SessionRow({ session, rawSession, sessionHands, isOpen, 
             </button>
           </div>
         </div>
-      )}
+      </Collapse>
 
       {editSheet && (
         <EditSessionSheet

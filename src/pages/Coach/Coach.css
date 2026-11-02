@@ -1,4 +1,4 @@
-/* Coach page: intro steps, the thinking state, and error state. The recorder and report style themselves. */
+/* Coach page: intro steps and the error state. The header, thinking state, recorder and report style themselves. */
 
 .coach-steps {
   display: grid;
@@ -13,14 +13,28 @@
     margin-bottom: 20px;
   }
 }
+/* Each step: a gold-framed icon on a deep card, rising in one after another */
 .coach-step {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
+  gap: 12px;
+  padding: 14px 16px;
   border-radius: 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--elite-surface);
+  border: 1px solid var(--elite-border);
+  animation: coach-step-in 0.45s var(--elite-ease) both;
+}
+.coach-step:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.coach-step:nth-child(3) {
+  animation-delay: 0.14s;
+}
+@keyframes coach-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 }
 .coach-step-icon {
   display: grid;
@@ -29,8 +43,9 @@
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background: var(--accent-soft);
-  color: var(--accent-text);
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-line);
+  color: var(--gold);
 }
 .coach-step-text {
   display: flex;
@@ -40,7 +55,10 @@
 }
 .coach-step-text strong {
   color: var(--text);
-  font-size: 14px;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
 }
 /* On phones the steps collapse to one line each to keep the table in view */
 @media (max-width: 767px) {
@@ -51,38 +69,6 @@
     padding: 8px 12px;
     align-items: center;
   }
-}
-
-.coach-thinking {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 60px 16px;
-  text-align: center;
-}
-.coach-thinking-spinner {
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  border: 5px solid var(--surface-2);
-  border-top-color: var(--accent);
-  border-right-color: var(--accent);
-  animation: coach-spin 0.9s linear infinite;
-}
-@keyframes coach-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-.coach-thinking-title {
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 600;
-}
-.coach-thinking-text {
-  color: var(--text-muted);
-  font-weight: 600;
 }
 
 .coach-error {

@@ -1,6 +1,7 @@
 // Hand highlights: "awards" picked from the recorded hands (best and worst played by your own rating,
 // most tilted, biggest pots won and lost, multiway wars, big laydowns, preflop fireworks, all-in thrillers).
 import { formatUnits } from './format.js';
+import { letterGrade } from './letterGrade.js';
 
 const dollars = (n) => formatUnits(n, { sign: false }); // hands arrive converted (handsForDisplay)
 const TILT_WORDS = ['', 'Zen', 'Calm', 'Uneasy', 'Frustrated', 'Full tilt'];
@@ -124,10 +125,10 @@ export const HIGHLIGHT_CATEGORIES = [
   {
     id: 'coach',
     title: 'Coach\'s Pick',
-    subtitle: 'Your highest coach accuracy',
+    subtitle: 'Your best coach grade',
     icon: 'coach',
     pick: (hands) => hands.filter((h) => h.coachAccuracy != null).sort((a, b) => b.coachAccuracy - a.coachAccuracy),
-    stat: (h) => `${h.coachAccuracy}% accuracy`,
+    stat: (h) => `Coach grade ${letterGrade(h.coachAccuracy).letter}`,
     empty: 'Save a hand from Coach mode to see it here.',
   },
 ];

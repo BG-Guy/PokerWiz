@@ -1,5 +1,5 @@
-// The coach's report for one hand: accuracy gauge and summary, the players, every decision graded against
-// GTO, and a short explanation of how the numbers are made.
+// The coach's report for one hand: the letter grade (A to F) and summary, the players, every decision graded
+// against GTO, and a short explanation of how the grades are made.
 import { Link } from 'react-router-dom';
 import Money from '../../components/Money/Money.jsx';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
@@ -24,9 +24,9 @@ export default function CoachReport({ report, onNewHand, onSave, saveState, canS
     <div className="coach-report">
       {/* Summary */}
       <section className="coach-report-summary">
-        <AccuracyGauge value={report.accuracy ?? 0} label={report.label} />
+        <AccuracyGauge value={report.accuracy} />
         <div className="coach-report-summary-text">
-          <span className="coach-report-kicker">Hand accuracy</span>
+          <span className="coach-report-kicker">Your grade for this hand</span>
           <p className="coach-report-headline">
             {report.decisions.length} {report.decisions.length === 1 ? 'decision' : 'decisions'} reviewed ·{' '}
             {report.evLostBB > 0 ? `${report.evLostBB} bb given up to GTO` : 'no EV given up to GTO'}
@@ -104,7 +104,10 @@ export default function CoachReport({ report, onNewHand, onSave, saveState, canS
           </li>
           <li>Postflop: each street is solved (Discounted CFR) from the ranges everyone arrived with, heads-up or multiway, with the real bet sizes from the hand in the game tree.</li>
           <li>For your hand the coach shows how often GTO takes each option and what each one is worth. An option GTO plays often enough is as good as the best one; anything else is graded by how much it gives up.</li>
-          <li>Accuracy weighs bigger pots more. Your level sets how strict the grading is.</li>
+          <li>
+            Each decision gets a letter from A to F (A from 85% accuracy, B from 70%, C from 55%, D from 40%). The hand's grade weighs bigger pots
+            more. Your level sets how strict the grading is.
+          </li>
           <li>Everyone is assumed to play GTO; player reads aren't used yet. Solves use a few bet sizes and sampled runouts, so values are close estimates, not exact to the cent.</li>
         </ul>
       </details>

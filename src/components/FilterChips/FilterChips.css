@@ -31,9 +31,9 @@
   color: var(--text);
 }
 .filter-chip.is-active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
+  background: var(--selected-bg);
+  border-color: var(--selected-bg);
+  color: var(--selected-text);
 }
 
 .filter-chip-count {

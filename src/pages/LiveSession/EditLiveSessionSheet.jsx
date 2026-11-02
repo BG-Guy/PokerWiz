@@ -35,6 +35,9 @@ export default function EditLiveSessionSheet({ session, open, onClose, onSaved }
     const changes = {};
     if (game !== session.game) changes.game = game;
     if (stakes !== session.stakes) Object.assign(changes, { stakes, bigBlind });
+    // Switching to one of the common stakes drops the custom blinds (small blind, ante, straddle).
+    const preset = STAKES.find((s) => s.label === stakes);
+    if (stakes !== session.stakes && preset) Object.assign(changes, { smallBlind: preset.sb, ante: null, straddle: null });
     if (venue !== session.venue) changes.venue = venue;
     if (amount !== startBuyIn) changes.startBuyIn = amount;
     if (!Object.keys(changes).length) return onClose();

@@ -1,0 +1,100 @@
+/* Month bars: a readout line, then columns that grow in from the base line one after another. */
+
+.detail-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-bars-readout {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.detail-bars-readout strong {
+  font-size: 20px;
+  color: var(--text);
+}
+.detail-bars-readout .is-positive {
+  color: var(--positive);
+}
+.detail-bars-readout .is-negative {
+  color: var(--negative);
+}
+
+.detail-bars-plot {
+  display: flex;
+  gap: 4px;
+  height: 130px;
+}
+.detail-bars-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  min-width: 0;
+  border-radius: 8px;
+}
+.detail-bars-track {
+  position: relative;
+  flex: 1;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+.detail-bars-col:hover .detail-bars-track,
+.detail-bars-col.is-picked .detail-bars-track {
+  background: var(--surface-2);
+}
+/* Base line through the middle when there are losses */
+.is-signed .detail-bars-track::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--border);
+}
+
+.detail-bars-bar {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  min-height: 2px;
+  border-radius: 4px;
+  background: var(--text-muted);
+  transform-origin: bottom;
+  animation: detail-bars-grow 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  animation-delay: calc(0.15s + var(--i, 0) * 0.03s);
+  transition: background-color 0.15s ease;
+}
+.detail-bars-bar.is-positive {
+  background: var(--positive);
+}
+.detail-bars-bar.is-negative {
+  background: var(--negative);
+  transform-origin: top;
+}
+.detail-bars-col:not(.is-picked) .detail-bars-bar {
+  opacity: 0.75;
+}
+@keyframes detail-bars-grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+.detail-bars-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-faint);
+}
+.detail-bars-col.is-picked .detail-bars-label {
+  color: var(--text);
+}

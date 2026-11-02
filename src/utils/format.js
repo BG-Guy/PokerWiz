@@ -148,3 +148,18 @@ export function formatClock(ms) {
 export function formatTime(iso) {
   return new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 }
+
+// Amount formatters for a chart: full ("+312 bb", "+$1,240") and compact axis labels ("1.2k bb", "$1.2k").
+// dollars: true for tournament results, which have no big blind and always show in dollars.
+export function amountFormatters({ dollars = false } = {}) {
+  const inBB = !dollars && moneyUnit === 'bb';
+  const full = (value, { sign = true } = {}) =>
+    dollars ? formatMoney(Math.round(value), { sign }) : formatUnits(value, { whole: true, sign });
+  const compact = (value) => {
+    const minus = value < 0 ? '-' : '';
+    if (Math.abs(value) < 1000) return `${minus}${full(Math.abs(value), { sign: false })}`;
+    const k = `${Math.round(Math.abs(value) / 100) / 10}k`;
+    return inBB ? `${minus}${k} bb` : `${minus}$${k}`;
+  };
+  return { full, compact, unit: inBB ? 'bb' : '$' };
+}

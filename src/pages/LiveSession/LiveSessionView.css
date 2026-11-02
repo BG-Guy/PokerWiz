@@ -63,8 +63,8 @@
   gap: 8px;
   padding: 4px 12px;
   border-radius: 999px;
-  background: rgba(127, 200, 194, 0.18);
-  color: var(--teal);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--accent);
   font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
@@ -74,15 +74,15 @@
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: var(--teal);
+  background: var(--accent);
   animation: live-view-pulse 1.6s ease-out infinite;
 }
 @keyframes live-view-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(127, 200, 194, 0.7);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 70%, transparent);
   }
   100% {
-    box-shadow: 0 0 0 10px rgba(127, 200, 194, 0);
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 0%, transparent);
   }
 }
 .live-view-title {
@@ -93,12 +93,18 @@
   opacity: 0.8;
   font-weight: 700;
 }
+.live-view-table {
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.65;
+}
 .live-view-clock {
   margin: 14px 0 6px;
   font-size: clamp(44px, 12vw, 60px);
   font-weight: 600;
   line-height: 1;
-  color: var(--teal);
+  color: var(--accent);
   letter-spacing: 0.02em;
 }
 .live-view-numbers {

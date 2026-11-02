@@ -21,6 +21,9 @@ CREATE TABLE IF NOT EXISTS sessions (
   format       TEXT NOT NULL DEFAULT 'cash', -- cash | tournament (tournaments have big_blind 0)
   small_blind  REAL,
   ante         REAL,
+  straddle     REAL,                       -- custom stakes: the straddle, if the table plays one
+  table_size   INTEGER,                    -- seats at the table (2 to 10), when given
+  table_name   TEXT,                       -- the table or game's own name, e.g. "Friday home game"
   expenses     REAL NOT NULL DEFAULT 0,    -- tips, food, fees: counted against the result
   source       TEXT,                       -- where an imported session came from, e.g. "regroup"
   external_id  TEXT                        -- the import's own key for the session (unique, see migrations.js)
@@ -51,4 +54,10 @@ CREATE TABLE IF NOT EXISTS goals (
   id       TEXT PRIMARY KEY,
   position INTEGER NOT NULL,
   data     TEXT NOT NULL
+);
+
+-- Your profile and app preferences, one row per setting; values are JSON (see models/settings.js).
+CREATE TABLE IF NOT EXISTS settings (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL
 );

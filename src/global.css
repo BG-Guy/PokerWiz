@@ -1,55 +1,101 @@
 /* Global styles: theme color tokens, resets and base typography shared by every page.
    Component-specific styles live next to each component instead. */
 
-/* Light theme (default). Brand palette first, then semantic tokens the components use. */
+/* Day theme. Brand palette first (black, steel, crimson), then semantic tokens the components use. */
 :root {
-  --ink: #12181b;
-  --slate: #3f5a60;
-  --teal: #7fc8c2;
-  --mist: #d9f0ee;
-  --snow: #f6fbfb;
+  --ink: #09090b;
+  --steel: #52525b;
+  --crimson: #e5383b;
+  --ash: #ececee;
+  --snow: #fafafa;
+  --teal: var(--crimson); /* older name for the brand color, kept for components that still use it */
 
-  --bg: var(--snow);
+  --bg: #f4f4f5;
   --surface: #ffffff;
-  --surface-2: var(--mist);
-  --border: #d3e6e4;
+  --surface-2: var(--ash);
+  --border: #dedee3;
   --text: var(--ink);
-  --text-muted: var(--slate);
-  --text-faint: #6f8a8f;
-  --accent: var(--teal);
-  --accent-soft: rgba(127, 200, 194, 0.3);
-  --accent-text: #2c6e68;
-  --on-accent: var(--ink);
-  --positive: #2c7f74;
-  --negative: #c0514a;
-  --warning: #a86c14;
-  --felt: radial-gradient(ellipse at 50% 0%, #52757c 0%, var(--slate) 55%, #2f454a 100%);
-  --shadow: 0 1px 2px rgba(18, 24, 27, 0.04), 0 8px 24px rgba(18, 24, 27, 0.06);
+  --text-muted: var(--steel);
+  --text-faint: #71717a;
+  --accent: #d62839;
+  --accent-soft: rgba(214, 40, 57, 0.1);
+  --accent-text: #b3172a;
+  --on-accent: #ffffff;
+  --positive: #15803d;
+  --negative: #dc2626;
+  --warning: #b45309;
+  --felt: radial-gradient(ellipse at 50% 0%, #3a3a42 0%, #232328 55%, #141417 100%);
+  --shadow: 0 1px 2px rgba(9, 9, 11, 0.05), 0 8px 24px rgba(9, 9, 11, 0.08);
+  --glow: 0 0 0 1px rgba(214, 40, 57, 0.25), 0 8px 28px rgba(214, 40, 57, 0.18);
+  /* What's picked (filter chips, toggles, the current section): black on white by day, white on black by night.
+     Red stays for the brand, the main action, and losses. */
+  --selected-bg: var(--ink);
+  --selected-text: #ffffff;
 
-  --radius: 20px;
+  --radius: 18px;
   --radius-sm: 12px;
-  --font-display: 'Fredoka', system-ui, sans-serif;
-  --font-body: 'Nunito', system-ui, sans-serif;
+  --font-display: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
   color-scheme: light;
 }
 
-/* Dark theme: ink background, teal accents. */
+/* Night theme (the default): black surfaces, white text, crimson for the brand and the main actions only. */
 :root[data-theme='dark'] {
   --bg: var(--ink);
-  --surface: #1a2327;
-  --surface-2: #233238;
-  --border: #2b3b41;
+  --surface: #131316;
+  --surface-2: #1c1c21;
+  --border: #26262c;
   --text: var(--snow);
-  --text-muted: #a9c3c5;
-  --text-faint: #7b9498;
-  --accent-soft: rgba(127, 200, 194, 0.15);
-  --accent-text: var(--teal);
-  --positive: var(--teal);
-  --negative: #ec8c82;
-  --warning: #e6b35a;
-  --felt: radial-gradient(ellipse at 50% 0%, #4a6a71 0%, #34494e 55%, #1f2d31 100%);
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+  --text-muted: #a1a1aa;
+  --text-faint: #71717a;
+  --accent: var(--crimson);
+  --accent-soft: rgba(229, 56, 59, 0.15);
+  --accent-text: #ff5c61;
+  --positive: #4ade80;
+  --negative: #f87171;
+  --warning: #fbbf24;
+  --felt: radial-gradient(ellipse at 50% 0%, #2c2c33 0%, #18181c 55%, #0c0c0e 100%);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.45);
+  --glow: 0 0 0 1px rgba(229, 56, 59, 0.35), 0 10px 32px rgba(229, 56, 59, 0.25);
+  --selected-bg: #f4f4f5;
+  --selected-text: var(--ink);
   color-scheme: dark;
+}
+
+/* Elite sections (Coach and Practice): the same black and crimson, plus a champagne-gold highlight, deeper
+   surfaces, a faint grain and a light sheen. Scoped to .elite so the rest of the app is unchanged. Red stays
+   for the main action and losses; gold marks what's premium (the crest, hairlines, the grade ring). */
+.elite {
+  --gold: #9a7430;
+  --gold-bright: #b8903f;
+  --gold-soft: rgba(154, 116, 48, 0.1);
+  --gold-line: rgba(154, 116, 48, 0.28);
+  --gold-metal: linear-gradient(135deg, #c9a253 0%, #9a7430 45%, #6f521d 70%, #b38a3e 100%);
+  --elite-surface: linear-gradient(165deg, #ffffff 0%, #fbfaf7 100%);
+  --elite-surface-2: #f6f3ec;
+  --elite-hero: radial-gradient(120% 160% at 0% 0%, rgba(214, 40, 57, 0.1) 0%, transparent 45%),
+    radial-gradient(90% 140% at 100% 0%, rgba(184, 144, 63, 0.16) 0%, transparent 55%), linear-gradient(165deg, #ffffff 0%, #f5f2ea 100%);
+  --elite-border: color-mix(in srgb, var(--gold) 22%, var(--border));
+  --elite-shadow: 0 1px 2px rgba(9, 9, 11, 0.05), 0 14px 34px rgba(60, 44, 14, 0.1);
+  --elite-sheen: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%);
+  --elite-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --elite-grain-opacity: 0.25;
+  --elite-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+:root[data-theme='dark'] .elite {
+  --gold: #d6b46e;
+  --gold-bright: #f0d89c;
+  --gold-soft: rgba(214, 180, 110, 0.1);
+  --gold-line: rgba(214, 180, 110, 0.26);
+  --gold-metal: linear-gradient(135deg, #f6e4b0 0%, #d6b46e 38%, #8e6b31 64%, #e9cf8e 100%);
+  --elite-surface: linear-gradient(165deg, #19181c 0%, #121215 55%, #0e0e11 100%);
+  --elite-surface-2: #1b1a1e;
+  --elite-hero: radial-gradient(120% 160% at 0% 0%, rgba(229, 56, 59, 0.2) 0%, transparent 45%),
+    radial-gradient(90% 140% at 100% 0%, rgba(214, 180, 110, 0.14) 0%, transparent 55%), linear-gradient(165deg, #1a181b 0%, #0d0d10 100%);
+  --elite-border: color-mix(in srgb, var(--gold) 16%, var(--border));
+  --elite-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 1px 2px rgba(0, 0, 0, 0.5), 0 16px 40px rgba(0, 0, 0, 0.5);
+  --elite-sheen: linear-gradient(105deg, transparent 30%, rgba(255, 236, 190, 0.09) 50%, transparent 70%);
+  --elite-grain-opacity: 0.5;
 }
 
 /* Minimal reset */
@@ -124,7 +170,7 @@ label,
   }
 }
 
-/* Base typography: playful display font for headings, readable body font for text */
+/* Base typography: a bold condensed display font for headings and numbers, a clean body font for text */
 body {
   background: var(--bg);
   color: var(--text);
@@ -139,9 +185,13 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  font-weight: 600;
-  line-height: 1.2;
+  font-weight: 700;
+  line-height: 1.1;
   letter-spacing: 0.01em;
+}
+h1 {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 /* Numbers use the display font with fixed-width digits so columns line up */
@@ -168,12 +218,19 @@ h4 {
   border-radius: 999px;
   font-weight: 700;
   font-size: 14px;
+  letter-spacing: 0.01em;
   background: var(--accent);
   color: var(--on-accent);
-  transition: transform 0.15s ease, filter 0.15s ease;
+  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.2s ease;
 }
 .btn:hover {
-  filter: brightness(1.05);
+  filter: brightness(1.08);
+  box-shadow: var(--glow);
+}
+.btn-ghost:hover,
+.btn-danger:hover,
+.btn-danger-ghost:hover {
+  box-shadow: none;
 }
 .btn:active {
   transform: scale(0.97);
@@ -227,6 +284,36 @@ h4 {
   opacity: 0.55;
   cursor: default;
 }
+
+/* Motion shared by every page: a page eases in when you switch sections (AppLayout), and lists marked
+   .stagger-in bring their items in one after another. */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+}
+/* Only while playing (no fill afterwards): a lasting transform would trap fixed-position children such as full
+   screen Practice or the Undo bar inside the page. */
+.page-enter {
+  animation: page-in 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.stagger-in > * {
+  animation: rise-in 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.stagger-in > :nth-child(2) { animation-delay: 0.04s; }
+.stagger-in > :nth-child(3) { animation-delay: 0.08s; }
+.stagger-in > :nth-child(4) { animation-delay: 0.12s; }
+.stagger-in > :nth-child(5) { animation-delay: 0.16s; }
+.stagger-in > :nth-child(6) { animation-delay: 0.2s; }
+.stagger-in > :nth-child(7) { animation-delay: 0.24s; }
+.stagger-in > :nth-child(n + 8) { animation-delay: 0.28s; }
 
 /* Respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {

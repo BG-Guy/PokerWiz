@@ -1,0 +1,147 @@
+/* Detailed stat view: a big lead number, then sections that rise in one after another (--i is the order). */
+
+.stat-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.stat-detail-lead {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat-detail-lead-value {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+}
+.stat-detail-lead-caption {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.stat-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: stat-detail-rise 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  animation-delay: calc(0.12s + var(--i, 0) * 0.05s);
+}
+@keyframes stat-detail-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.stat-detail-title {
+  font-size: 13px;
+  font-family: var(--font-body);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+
+/* Facts: a tiled grid of small numbers */
+.stat-detail-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+/* The last tile stretches over any empty spots in its row */
+.stat-detail-fact:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+@media (min-width: 640px) {
+  .stat-detail-facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .stat-detail-fact:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+  .stat-detail-fact:last-child:nth-child(3n + 1) {
+    grid-column: 1 / -1;
+  }
+  .stat-detail-fact:last-child:nth-child(3n + 2) {
+    grid-column: span 2;
+  }
+}
+.stat-detail-fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--surface);
+  min-width: 0;
+}
+.stat-detail-fact dt {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.stat-detail-fact dd {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+.stat-detail-fact .stat-detail-hint {
+  font-size: 12px;
+}
+
+.stat-detail-hint {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+
+/* Lists: label and hint on the left, value on the right */
+.stat-detail-list {
+  display: flex;
+  flex-direction: column;
+}
+.stat-detail-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.stat-detail-list li:last-child {
+  border-bottom: 0;
+}
+.stat-detail-list-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.stat-detail-list-label {
+  font-weight: 700;
+}
+.stat-detail-list-value {
+  flex-shrink: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.stat-detail-text {
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.stat-detail .is-positive {
+  color: var(--positive);
+}
+.stat-detail .is-negative {
+  color: var(--negative);
+}

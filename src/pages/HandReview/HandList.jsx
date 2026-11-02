@@ -9,6 +9,7 @@ import FilterChips from '../../components/FilterChips/FilterChips.jsx';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
 import Money from '../../components/Money/Money.jsx';
 import VerdictBadge from '../../components/VerdictBadge/VerdictBadge.jsx';
+import GradeBadge from '../../components/GradeBadge/GradeBadge.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import TiltFace from '../../components/TiltMeter/TiltFace.jsx';
 import { coachSupport } from '../../coach/savedHand.js';
@@ -111,7 +112,7 @@ export default function HandList({
         </div>
       )}
 
-      <ul className="hand-list-items">
+      <ul className="hand-list-items stagger-in">
         {hands.map((hand) => {
           const coach = coachSupport(hand);
           return (
@@ -142,7 +143,7 @@ export default function HandList({
                       </span>
                     </Link>
 
-                    {/* Your rating (tap to rate or change it), tilt, and the coach's last score */}
+                    {/* Your rating (tap to rate or change it), tilt, and the coach's last grade (A to F) */}
                     <div className="hand-list-footer">
                       <RatingPill rating={hand.rating ?? null} title={hand.title} onRate={(rating) => onRate(hand.id, rating)} />
                       {hand.tilt != null && (
@@ -150,7 +151,11 @@ export default function HandList({
                           <TiltFace level={hand.tilt} size={18} />
                         </span>
                       )}
-                      {hand.coachAccuracy != null && <span className="hand-list-coach-score">Coach {hand.coachAccuracy}%</span>}
+                      {hand.coachAccuracy != null && (
+                        <span className="hand-list-coach-score">
+                          Coach <GradeBadge score={hand.coachAccuracy} size="xs" />
+                        </span>
+                      )}
                     </div>
                   </div>
 

@@ -86,11 +86,20 @@ sessionsRouter.get('/:id', (req, res) => {
 // Start a session. Only one can run at a time.
 sessionsRouter.post('/', (req, res) => {
   if (Sessions.findLive()) return res.status(409).json({ error: 'A session is already running' });
-  const { game, stakes, bigBlind, venue, buyIn } = req.body ?? {};
+  const { game, stakes, bigBlind, venue, buyIn, smallBlind = null, ante = null, straddle = null, tableSize = null, tableName = null } = req.body ?? {};
   if (!game || !stakes || !venue || !isNumber(bigBlind) || bigBlind <= 0 || !isNumber(buyIn) || buyIn < 0) {
     return res.status(400).json({ error: 'Game, stakes, venue and a valid buy-in are required' });
   }
-  res.status(201).json(Sessions.startSession({ game, stakes, bigBlind, venue, buyIn }));
+  // Custom stakes: optional blinds and table details.
+  for (const [key, value] of Object.entries({ smallBlind, ante, straddle })) {
+    if (value !== null && (!isNumber(value) || value < 0)) return res.status(400).json({ error: `The ${key} must be zero or more` });
+  }
+  if (tableSize !== null && !(Number.isInteger(tableSize) && tableSize >= 2 && tableSize <= 10)) {
+    return res.status(400).json({ error: 'A table seats 2 to 10 players' });
+  }
+  if (tableName !== null && !isText(tableName, 60)) return res.status(400).json({ error: 'The table name is too long' });
+  const name = tableName?.trim() || null;
+  res.status(201).json(Sessions.startSession({ game, stakes, bigBlind, venue, buyIn, smallBlind, ante, straddle, tableSize, tableName: name }));
 });
 
 // Add a timeline entry: a note, a rebuy (amount) or a saved hand.
@@ -124,6 +133,11 @@ function editProblem(c) {
   for (const key of ['buyIn', 'cashOut', 'expenses', 'startBuyIn']) {
     if (c[key] !== undefined && (!isNumber(c[key]) || c[key] < 0)) return 'Amounts must be zero or more';
   }
+  for (const key of ['smallBlind', 'ante', 'straddle']) {
+    if (c[key] != null && (!isNumber(c[key]) || c[key] < 0)) return 'Blinds, ante and straddle must be zero or more';
+  }
+  if (c.tableSize != null && !(Number.isInteger(c.tableSize) && c.tableSize >= 2 && c.tableSize <= 10)) return 'A table seats 2 to 10 players';
+  if (c.tableName != null && !isText(c.tableName, 60)) return 'The table name is too long';
   if (c.durationMin !== undefined && (!Number.isInteger(c.durationMin) || c.durationMin < 0 || c.durationMin > 72 * 60)) return 'The length must be up to 72 hours';
   if (c.hands !== undefined && (!Number.isInteger(c.hands) || c.hands < 0)) return 'Hands played must be a whole number';
   if (c.notes !== undefined && !isText(c.notes, 20000)) return 'Notes are too long';

@@ -1,0 +1,108 @@
+/* Profile card: avatar, names and Edit on one line, then the record in three columns. */
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  animation: settings-section-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.profile-card-who {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Initials on a white disc (black by day), like an account picture */
+.profile-card-avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--selected-bg);
+  color: var(--selected-text);
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.profile-card-names {
+  flex: 1;
+  min-width: 0;
+}
+.profile-card-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 26px;
+}
+.profile-card-name.is-empty {
+  color: var(--text-faint);
+}
+.profile-card-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* Edit: a quiet pill, not the red main action */
+.profile-card-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 14px;
+  font-weight: 700;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.profile-card-edit:hover {
+  background: var(--border);
+}
+.profile-card-edit:active {
+  transform: scale(0.96);
+}
+
+/* Record: three equal columns divided by hairlines */
+.profile-card-record {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.profile-card-record div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.profile-card-record div + div {
+  border-left: 1px solid var(--border);
+}
+.profile-card-record dt {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+.profile-card-record dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+}
