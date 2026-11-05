@@ -1,0 +1,68 @@
+/* Summary card of the current spot: a tappable box that lifts a little on hover and presses in on tap. */
+
+.rg-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px 12px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  text-align: left;
+  transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1), border-color 0.2s ease;
+}
+.rg-summary:active {
+  transform: scale(0.985);
+  transition-duration: 0.1s;
+}
+@media (hover: hover) {
+  .rg-summary:hover {
+    border-color: var(--text-faint);
+    transform: translateY(-2px);
+  }
+  .rg-summary:hover .rg-summary-change {
+    color: var(--text);
+  }
+}
+
+.rg-summary-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rg-summary-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.rg-summary-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.05;
+}
+.rg-summary-sub {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+.rg-summary-change {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 1px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-faint);
+  transition: color 0.2s ease;
+}

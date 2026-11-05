@@ -98,15 +98,18 @@ async function scanPreflop() {
       }
       if (stackBB === 100) console.log(`  ${pos} opens ${pct(spot.total.raise + (pos === 'SB' ? spot.total.call : 0))}`);
       if (stackBB !== 100) continue;
-      // Hands every chart treats the same way: the button opens all suited aces and the strong suited and
-      // broadway hands; nobody opens trash from under the gun.
+      // Hands every chart treats the same way: the button opens all suited aces, the strong suited and
+      // broadway hands and the suited connectors; under the gun opens JTs at least some of the time, and
+      // nobody opens trash there.
       if (pos === 'BTN') {
-        for (const name of ['A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s', 'KTs', 'QTs', 'JTs', 'T9s', 'KQo', 'KJo', 'QJo', '55', '22']) {
+        for (const name of ['A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s', 'KTs', 'QTs', 'JTs', 'T9s', '98s', '87s', '76s', '65s', '54s', 'KQo', 'KJo', 'QJo', '55', '22']) {
           const f = at(spot, name);
           if (f.fold > 0.1) check(`${pos} open`, `${name} opens`, 1 - f.fold, false, `${name} folds ${pct(f.fold)}`);
         }
       }
       if (pos === 'UTG') {
+        const jts = at(spot, 'JTs');
+        if (jts.fold > 0.5) check(`${pos} open`, 'JTs opens', 1 - jts.fold, false, `JTs folds ${pct(jts.fold)}`);
         for (const name of ['72o', '83o', '94o', 'T4o', 'J5o', 'Q3o', 'K4o', '32o', '64o', '75o']) {
           const f = at(spot, name);
           if (f.fold < 0.95) check(`${pos} open`, `${name} folds`, f.fold, false, `${name} opens ${pct(1 - f.fold)}`);
@@ -138,11 +141,13 @@ async function scanPreflop() {
         }
         if (label === 'BB vs UTG') check(label, 'big blind defends', 1 - t.fold, t.fold <= 0.78, `defends only ${pct(1 - t.fold)} (folds ${pct(t.fold)})`);
         if (label === 'BTN vs CO') check(label, 'button flats some hands', t.call, t.call >= 0.03, `flats only ${pct(t.call)} of hands`);
-        // Small pairs: set-mining hands are called more than 3-bet; a range that 3-bets 44 and flats KJ is upside down.
-        const small = ['22', '33', '44', '55', '66'].map((n) => at(spot, n));
+        // Small and middle pairs (22-99): set-mining hands are called more than 3-bet; a range that 3-bets 77 and
+        // flats KJ is upside down. Held to it where the pair has position or the big blind's price (the small blind
+        // 3-bets or folds more).
+        const small = ['22', '33', '44', '55', '66', '77', '88', '99'].map((n) => at(spot, n));
         const smallRaise = small.reduce((s, f) => s + f.raise, 0) / small.length;
         const smallCall = small.reduce((s, f) => s + f.call, 0) / small.length;
-        if (label.startsWith('BB')) check(label, 'small pairs mostly flat', smallCall, smallRaise <= smallCall, `3-bets small pairs (22-66) ${pct(smallRaise)} of the time and flats them ${pct(smallCall)}: they should mostly flat`);
+        if (label === 'BB vs BTN' || label === 'BTN vs CO' || label === 'BB vs UTG') check(label, 'pairs mostly flat', smallCall, smallRaise <= smallCall, `3-bets pairs (22-99) ${pct(smallRaise)} of the time and flats them ${pct(smallCall)}: they should mostly flat`);
       }
     }
     // Facing a 3-bet: AA and KK 4-bet or get it in, never fold.

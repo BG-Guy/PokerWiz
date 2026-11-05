@@ -136,6 +136,13 @@
   background: var(--surface);
   border: 1px solid var(--border);
 }
+/* Under the action replay when it carries grades */
+.hand-detail-grades-hint {
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--text-faint);
+}
+
 .hand-detail-section-title {
   font-size: 18px;
 }

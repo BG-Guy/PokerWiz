@@ -96,6 +96,13 @@ const ICONS = {
     </>
   ),
   trash: <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />,
+  // Two sheets: copy to the clipboard
+  copy: (
+    <>
+      <rect x="8" y="8" width="12" height="12" rx="2" />
+      <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
+    </>
+  ),
   pencil: (
     <>
       <path d="M4 20h4L19 9a2.83 2.83 0 0 0-4-4L4 16z" />
@@ -160,6 +167,22 @@ const ICONS = {
     </>
   ),
   // All-in: warning octagon with a double exclamation mark
+  // A droplet: a leak
+  drop: <path d="M12 3c3.6 4.3 6 7.1 6 10.4a6 6 0 0 1-12 0C6 10.1 8.4 7.3 12 3z" />,
+  // A 3x3 grid of cells: a range chart
+  grid: (
+    <>
+      <rect x="3" y="3" width="5" height="5" rx="1" />
+      <rect x="9.5" y="3" width="5" height="5" rx="1" />
+      <rect x="16" y="3" width="5" height="5" rx="1" />
+      <rect x="3" y="9.5" width="5" height="5" rx="1" />
+      <rect x="9.5" y="9.5" width="5" height="5" rx="1" />
+      <rect x="16" y="9.5" width="5" height="5" rx="1" />
+      <rect x="3" y="16" width="5" height="5" rx="1" />
+      <rect x="9.5" y="16" width="5" height="5" rx="1" />
+      <rect x="16" y="16" width="5" height="5" rx="1" />
+    </>
+  ),
   allIn: (
     <>
       <path d="M7.9 2h8.2L22 7.9v8.2L16.1 22H7.9L2 16.1V7.9z" />

@@ -1,0 +1,78 @@
+/* Desktop spot list: seat chips on top, then groups of compact rows. Scrolls on its own when it is taller than
+   the window. */
+
+.rg-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rg-list-seats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.rg-list-seat {
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+.rg-list-seat:active {
+  transform: scale(0.95);
+}
+@media (hover: hover) {
+  .rg-list-seat:hover:not(.is-active) {
+    border-color: var(--text-faint);
+    color: var(--text);
+  }
+}
+.rg-list-seat.is-active {
+  background: var(--selected-bg);
+  border-color: var(--selected-bg);
+  color: var(--selected-text);
+}
+
+.rg-list-heading {
+  margin-bottom: 8px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+.rg-list-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+/* Tighter than the sheet's rows: a desktop list shows a lot at once */
+.rg-list .rg-list-row {
+  min-height: 56px;
+  padding: 8px 12px;
+  gap: 10px;
+}
+.rg-list .rg-list-row .drill-row-title {
+  font-size: 14px;
+}
+.rg-list .rg-list-row .drill-row-subtitle {
+  display: none;
+  font-size: 12px;
+}
+@media (min-width: 1360px) {
+  .rg-list .rg-list-row .drill-row-subtitle {
+    display: block;
+  }
+}
+.rg-list .rg-list-row .drill-row-value {
+  font-size: 18px;
+}
+/* The list stays on screen and shows where you are; the arrow would only take room from the names */
+.rg-list .rg-list-row .drill-row-chevron {
+  display: none;
+}

@@ -1,0 +1,35 @@
+/* Ranges as text: a heading with the action's colour and share, then the copyable notation. */
+
+.rg-text {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.rg-text-lead {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+.rg-text-lead strong {
+  color: var(--text);
+}
+.rg-text-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rg-text-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+}
+.rg-text-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+}
+.rg-text-share {
+  margin-left: auto;
+  font-size: 22px;
+}

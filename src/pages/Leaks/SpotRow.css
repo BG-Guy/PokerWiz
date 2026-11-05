@@ -1,0 +1,73 @@
+/* A decision in a leak's list: cards on the left, the spot and what you did in the middle, the cost on the right. */
+
+.spot-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 72px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-align: left;
+  transition: transform 0.18s cubic-bezier(0.2, 0.9, 0.3, 1), border-color 0.18s ease, background-color 0.18s ease;
+}
+.spot-row:active {
+  transform: scale(0.985);
+  background: var(--surface-2);
+  transition-duration: 0.08s;
+}
+@media (hover: hover) {
+  .spot-row:hover {
+    border-color: var(--text-faint);
+  }
+}
+
+.spot-row-cards {
+  display: flex;
+  flex-shrink: 0;
+  gap: 3px;
+}
+.spot-row-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.spot-row-title {
+  font-size: 14.5px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+.spot-row-line {
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+.spot-row-meta {
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+.spot-row-end {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  gap: 4px;
+}
+.spot-row-loss {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-muted);
+}
+.spot-row-loss.is-negative {
+  color: var(--negative);
+}
+.spot-row-chevron {
+  flex-shrink: 0;
+  color: var(--text-faint);
+}

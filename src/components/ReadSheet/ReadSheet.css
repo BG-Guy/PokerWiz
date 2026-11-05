@@ -1,0 +1,121 @@
+/* The read sheet: what they're called and how they play, a grid of player types (name and usual numbers), a line on
+   how to adjust, how well they play, and the two buttons. */
+
+.read-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.read-sheet-lead {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.read-sheet-label {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.05;
+}
+.read-sheet-text {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.read-sheet-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.read-sheet-heading {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.read-sheet-legend {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--text-faint);
+}
+
+/* Player types: two across on a phone, four on a roomy sheet */
+.read-sheet-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.read-sheet-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+  transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+.read-sheet-card:active {
+  transform: scale(0.98);
+}
+.read-sheet-card.is-active {
+  border-color: var(--text);
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--text);
+}
+.read-sheet-card-stats {
+  flex-shrink: 0;
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+/* How to adjust: the point of the sheet, in a tinted box */
+.read-sheet-exploit {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+.read-sheet-exploit svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent-text);
+}
+.read-sheet-exploit strong {
+  color: var(--text);
+}
+
+.read-sheet-levels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* The buttons stay at the foot of the sheet while the rest scrolls */
+.read-sheet-actions {
+  position: sticky;
+  bottom: -20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 -20px -20px;
+  padding: 14px 20px 20px;
+  background: linear-gradient(to bottom, transparent, var(--surface) 22%);
+}
+.read-sheet-actions .btn {
+  flex: 1 1 140px;
+  min-height: 48px;
+}

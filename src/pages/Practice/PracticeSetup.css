@@ -47,6 +47,11 @@
 .practice-card-title svg {
   color: var(--gold);
 }
+/* The opponents' read: one chip that opens the sheet */
+.practice-reads {
+  display: flex;
+}
+
 .practice-card-badge {
   margin-left: auto;
   padding: 3px 10px;

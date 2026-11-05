@@ -1,0 +1,60 @@
+/* Mixed hands list: a row per hand with its name, split and colour bar. */
+
+.rg-mixed-lead {
+  margin-bottom: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+.rg-mixed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rg-mixed-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-align: left;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.rg-mixed-row:active {
+  transform: scale(0.985);
+}
+@media (hover: hover) {
+  .rg-mixed-row:hover {
+    border-color: var(--text-faint);
+  }
+}
+.rg-mixed-name {
+  min-width: 52px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+}
+.rg-mixed-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+.rg-mixed-text {
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.rg-mixed-bar {
+  height: 7px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+.rg-mixed-chevron {
+  flex-shrink: 0;
+  color: var(--text-faint);
+}

@@ -1,0 +1,113 @@
+/* Drill-down row: a big, tappable line with a leading icon, title and subtitle, a value and a chevron.
+   Presses in on tap; on a pointer device it lifts a little and the chevron nudges right. */
+
+.drill-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-align: left;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.18s cubic-bezier(0.2, 0.9, 0.3, 1), border-color 0.18s ease, background-color 0.18s ease;
+}
+.drill-row:active {
+  transform: scale(0.985);
+  background: var(--surface-2);
+  transition-duration: 0.08s;
+}
+@media (hover: hover) {
+  .drill-row:hover {
+    border-color: var(--text-faint);
+    transform: translateY(-1px);
+  }
+  .drill-row:hover .drill-row-chevron {
+    transform: translateX(3px);
+    color: var(--text);
+  }
+}
+.drill-row.is-selected {
+  border-color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--text);
+}
+
+.drill-row-lead {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  min-width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.drill-row-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.drill-row-title {
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.25;
+}
+.drill-row-subtitle {
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+/* How much, as a thin bar under the text */
+.drill-row-meter {
+  display: block;
+  height: 4px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.drill-row-meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--text-faint);
+  transition: width 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.drill-row-end {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  gap: 1px;
+  text-align: right;
+}
+.drill-row-value {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.drill-row-value.is-positive {
+  color: var(--positive);
+}
+.drill-row-value.is-negative {
+  color: var(--negative);
+}
+.drill-row-hint {
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+.drill-row-chevron {
+  flex-shrink: 0;
+  color: var(--text-faint);
+  transition: transform 0.18s ease, color 0.18s ease;
+}

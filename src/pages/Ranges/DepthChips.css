@@ -1,0 +1,87 @@
+/* Stack depth: a label and six equal chips that always fit (even at 320px), the picked one filled. */
+
+.rg-depth {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rg-depth-label {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+.rg-depth-unit {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.rg-depth-chips {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.rg-depth-chip {
+  min-height: 44px;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+}
+.rg-depth-chip:active {
+  transform: scale(0.94);
+}
+@media (hover: hover) {
+  .rg-depth-chip:hover:not(.is-active) {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+}
+.rg-depth-chip.is-active {
+  background: var(--selected-bg);
+  color: var(--selected-text);
+}
+.rg-depth[aria-busy='true'] .rg-depth-chip.is-active {
+  animation: rg-depth-pulse 0.9s ease-in-out infinite;
+}
+@keyframes rg-depth-pulse {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* In the desktop list: the label on its own line, so the chips have the full width */
+.rg-depth.is-stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+.rg-depth.is-stacked .rg-depth-label {
+  flex-direction: row;
+  gap: 5px;
+}
+
+/* A narrow phone: the label gives its room to the chips (each stays 44px wide) and the unit moves onto the picked chip */
+@media (max-width: 389px) {
+  .rg-depth-label {
+    display: none;
+  }
+  .rg-depth-chip.is-active::after {
+    content: 'bb';
+    margin-left: 2px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+}

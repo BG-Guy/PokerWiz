@@ -1,0 +1,177 @@
+/* Ranges page: the colour of each action (tokens used by every Ranges component, sheets included, so they live on
+   :root) and the page layout. Phone: one column, the grid a little wider than the text column. Desktop (1100px
+   and up): the spot list on the left, the grid and the hand panel on the right. */
+
+/* Action colours: fold blue-grey, call green, check teal, raises red from light to dark, all in darkest. All of them
+   carry white text; the dim and out colours are for cells that aren't part of the picture. */
+:root {
+  --rg-fold: #56657d;
+  --rg-call: #25905a;
+  --rg-check: #1a8a98;
+  --rg-raise-1: #e5565b;
+  --rg-raise-2: #d63a45;
+  --rg-raise-3: #b82233;
+  --rg-allin: #7a1424;
+  --rg-range: #c43541;
+  --rg-dim: var(--surface-2);
+}
+:root[data-theme='dark'] {
+  --rg-fold: #55647c;
+  --rg-call: #2a9b61;
+  --rg-check: #1f95a4;
+  --rg-raise-2: #e0434d;
+  --rg-allin: #8a1830;
+  --rg-range: #d63f4b;
+  --rg-dim: #1d1d23;
+}
+
+/* Header: tighter than other pages, the grid is what the page is about. On a phone the title shares its row with
+   the full-screen button (just the icon) and the subtitle is left out. */
+.ranges .page-header {
+  align-items: center;
+  flex-wrap: nowrap;
+  margin-bottom: 12px;
+}
+.ranges .page-header-subtitle {
+  display: none;
+  font-size: 13px;
+}
+@media (min-width: 640px) {
+  .ranges .page-header-subtitle {
+    display: block;
+  }
+}
+.ranges-fullscreen {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 14px;
+  font-weight: 700;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.ranges-fullscreen-label {
+  display: none;
+}
+@media (min-width: 640px) {
+  .ranges-fullscreen {
+    padding: 0 16px 0 14px;
+  }
+  .ranges-fullscreen-label {
+    display: inline;
+  }
+}
+.ranges-fullscreen:active {
+  transform: scale(0.96);
+}
+@media (hover: hover) {
+  .ranges-fullscreen:hover {
+    border-color: var(--text-faint);
+  }
+}
+
+.ranges-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+/* Phone and tablet: a single column */
+.ranges-phone {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 620px;
+  margin: 0 auto;
+}
+.ranges-board {
+  min-width: 0;
+}
+.ranges-hint {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text-faint);
+}
+/* The grid takes the screen width, a little beyond the text margins, so the cells are as big as can be */
+@media (max-width: 639px) {
+  .ranges-phone .ranges-board {
+    margin: 2px -8px;
+  }
+}
+
+/* Desktop: the spot list on the left (narrow, so the grid gets the room), the grid with its legend above and its
+   numbers below, and the hand panel beside it (below it on windows too narrow for both). */
+.ranges-wide {
+  display: grid;
+  grid-template-columns: 244px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+@media (min-width: 1360px) {
+  .ranges-wide {
+    grid-template-columns: 268px minmax(0, 1fr);
+  }
+}
+.ranges-side {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: calc(100dvh - 48px);
+  padding-right: 6px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.ranges-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.ranges-headline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 14px;
+}
+.ranges-spot {
+  font-size: 34px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.ranges-spot-sub {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.ranges-board-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+@media (min-width: 1280px) {
+  .ranges-board-row {
+    grid-template-columns: minmax(0, 1fr) 244px;
+    gap: 20px;
+  }
+}
+.ranges-main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+/* Square, and never taller than the window leaves room for */
+.ranges-wide .ranges-board {
+  max-width: max(340px, calc(100dvh - 340px));
+}

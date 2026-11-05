@@ -7,6 +7,11 @@ A poker tracker for mobile and desktop: a React frontend and a small Express + S
 - **Add hand:** rebuild a hand on a poker table. You seat the hero and villains, set each stack (exact amount, or Short / Average / Big / Huge), pick known cards, then answer each player's action turn by turn in an animated carousel below the table, with a dealer button on the felt. All-ins and side pots are handled. Tap any step in "Hand so far" to go back to it.
 - **Coach:** record a hand and get every decision graded against GTO: solved 8-max preflop charts for the hand's stack depth (cash or tournament with antes), and each postflop street solved from the ranges the players arrived with, heads-up or 3-way, with the hand's real bet sizes. For your hand you see how often GTO takes each option and what each is worth, plus pot odds, equity against their ranges and their range grids. The hand and each decision get a letter grade, A to F (the Hands list and History show it too). Saved hands can be opened in the coach too. See [docs/coach-algorithm.md](docs/coach-algorithm.md).
 - **Practice:** pick cash or tournament, a spot (preflop, heads-up, 3-way), any pots or 3-bet pots only, and the stacks, then play random hands to the end against an 8-handed table of GTO opponents (they play the solved strategy with their real cards), with the turn and river dealt at random or picked by you. Every decision gets a letter grade, A to F. Any hand can be played again from your spot, with the same runout or a new one. Hands play full screen: the table fills the screen (no header or tab bar, and no address bar on phones where the browser allows it) and Fold / Call / Raise stay docked in view, beside the table on wide screens. On phones, tap the street line above the buttons to slide the whole hand up, and tap it again to slide it back down. The full-screen setting is remembered. Every sheet in the app closes with its opening animation in reverse.
+- **Leaks:** where your play gives up the most against GTO. The coach grades your saved hands in the background (a card shows how far it is) and adds the decisions up by kind of spot: opening, limped pots, facing an open, a 3-bet or a 4-bet, and betting or facing a bet on the flop, turn and river. Headline cards (how you grade, your biggest leak, what you play well) each open their full story in a sheet. Open a leak to see your play against GTO's as two bars (tap a play to see only those spots), a breakdown by seat, hand, pot, position or role (tap a row to narrow the spots), and the spots themselves, down to the hand: its sheet has the bars, what it cost, and buttons to review the whole hand with the Coach, replay it in Practice, drill spots like it, or open the saved hand. Your actions in a saved hand's replay carry their grades too. Early reads say so (fewer than 5 spots is a hint, 12 or more is solid). See [docs/coach-algorithm.md](docs/coach-algorithm.md).
+- **Drill a leak:** every leak, group and decision has a drill button that opens Practice dealing only that kind of spot (a seat facing a river bet, the big blind against a button open...), one hand after another, with your grade over the drill.
+- **Reads:** tell the coach how a player plays (a nit, a calling station, a maniac... and how well) from the review of a saved hand (a chip per villain) or for all opponents in Practice. They play that way, and the best play and your grade are against them; the report says so. No read means GTO. Each type comes with a line on how to adjust.
+- **Ranges:** browse the solved preflop charts like a solver's range viewer: pick the stack depth and a spot, see all 169 hands at once, split by how often GTO folds, calls or raises, and tap a hand for the numbers.
+- **Flag a decision:** think the coach got a decision wrong? Flag it (in a review or in Practice), add a note, and export the flags from Profile to have them replayed against the current engine.
 - **Replay a hand:** in any Hold'em hand, pick Flop, Turn or River (or "Replay from here" on the timeline) and play it again from that point against GTO opponents. Seats, stacks, the action and the board so far carry over; the next cards come as they did, at random, or picked by you. Villains play their real cards when the hand shows them, otherwise a hand from the range GTO plays the way they did. Compare how it goes with the real result.
 - **Highlights:** Hall of Fame, Wall of Shame, Tilt Tower, Monster Pots and more, from your ratings and results. The top three are on Home.
 - **Hand review:** replay hands street by street with your hand and the villains' (face down unless shown), all-ins highlighted, plus verdict, star rating, tilt and notes. Every Hold'em hand has a **Coach** button (in the list and on the hand). Older hands without stacks are rebuilt from the action log, and the review shows what was assumed. The score is saved onto the hand. Each hand in the list shows its rating as a colored pill (tap it to rate or re-rate right there), its tilt and coach score, and the list sorts by rating.
@@ -90,6 +95,8 @@ src/
     Coach/               Coach mode and its report (grade ring, decision cards, range grid)
     HandHighlights/ HandInsights/
     HandReview/  GameHistory/  Insights/  Goals/
+    Leaks/               The leak report: a list of leaks, one leak's page (bars, breakdown, spots), the scan card
+    Ranges/              The preflop range browser (scenario picker, strategy grid, hand sheets, full screen)
     Equity/              Calculator page + equity.worker.js
     Profile/             You (profile, record), app settings, export (backup, spreadsheets) and import (backup, Regroup CSV), about
 ```
@@ -107,7 +114,7 @@ src/
 | DELETE | `/api/sessions/:id` | Discard a live session or delete a finished one (its hands are kept) |
 | PATCH / DELETE | `/api/sessions/:id/events/:eventId` | Edit a live session's note `{ text }` or rebuy `{ amount }`, or remove it |
 | GET / POST | `/api/hands` | List hands / save a recorded hand |
-| PATCH | `/api/hands/:id` | Edit a hand: review fields, `title`, `date`, `stakes`, `holeCards`, `board`, `potSize`, `result`, `tags`, `streets`, `players` (checked) |
+| PATCH | `/api/hands/:id` | Edit a hand: review fields, the coach's `coachAccuracy`, `coachReads` and `coachDecisions` (its graded decisions, dropped when the hand itself changes), `title`, `date`, `stakes`, `holeCards`, `board`, `potSize`, `result`, `tags`, `streets`, `players` (checked) |
 | DELETE | `/api/hands/:id` | Delete a hand (and its line on a session timeline) |
 | GET / POST | `/api/goals` | List goals / add one `{ title, metric, target, startDate, deadline }` |
 | PATCH / DELETE | `/api/goals/:id` | Edit or delete a goal |
@@ -126,7 +133,7 @@ src/
 - **Palette:** `#12181B` ink, `#3F5A60` slate, `#7FC8C2` teal, `#D9F0EE` mist, `#F6FBFB` snow. The tokens are in `src/global.css`.
 - **Fonts:** Fredoka for headings and numbers, Nunito for body text.
 - **Breakpoints:**
-  - Phones (below 768px) get bottom tabs with a raised Practice button and a More sheet (Log session is first in it).
+  - Phones (below 768px) get bottom tabs with a raised Practice button and a More sheet in groups (Study: Leaks, Ranges, Equity; Track: Log session, History, Insights, Goals; You: Profile). Sheets can be dragged: down to close, up for full screen. See [docs/ux-patterns.md](docs/ux-patterns.md).
   - Tablets (768px and up) get an icon rail.
   - Desktops (1100px and up) get the full sidebar.
 - **Icons**, card suits, card backs, and the hero/villain avatars are all inline SVG. There are no emojis.

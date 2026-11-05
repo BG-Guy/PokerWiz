@@ -36,6 +36,22 @@
   }
 }
 
+/* Buttons at the end of a detail (leaks): where to go from here */
+.stat-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.btn-secondary {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover {
+  box-shadow: none;
+  border-color: var(--text-faint);
+}
+
 .stat-detail-title {
   font-size: 13px;
   font-family: var(--font-body);

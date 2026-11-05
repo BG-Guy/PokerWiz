@@ -9,6 +9,26 @@
   margin-bottom: 20px;
 }
 
+/* "< Leaks": the way back up the branch, a comfortable tap target above the title */
+.page-header-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 36px;
+  margin: -6px 0 2px -6px;
+  padding: 0 10px 0 4px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.page-header-back:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
 .page-header-title {
   font-size: clamp(26px, 6vw, 38px);
   font-weight: 700;

@@ -26,6 +26,7 @@ function editProblem(changes) {
   if (changes.tags !== undefined && !(Array.isArray(changes.tags) && changes.tags.every((tag) => typeof tag === 'string' && tag.length <= 40))) {
     return 'Tags must be short words';
   }
+  if (changes.coachDecisions != null && !(typeof changes.coachDecisions === 'object' && Array.isArray(changes.coachDecisions.decisions ?? []))) return 'Invalid coach decisions';
   if (changes.streets !== undefined && !Array.isArray(changes.streets)) return 'Invalid action log';
   if (changes.players !== undefined && !Array.isArray(changes.players)) return 'Invalid players';
   return null;

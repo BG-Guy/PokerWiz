@@ -1,6 +1,6 @@
-// Opens the detailed view of a card: on phones a bottom sheet (Modal) slides up; on larger screens the card
-// itself grows into a big panel (ExpandPanel) and shrinks back into it on close. Either way, focus returns to
-// the card afterwards.
+// Opens the detailed view of a card: on phones a bottom sheet (Modal) slides up (drag it down to close, up or
+// the expand button for full screen); on larger screens the card itself grows into a big panel (ExpandPanel)
+// and shrinks back into it on close. Either way, focus returns to the card afterwards.
 import { useEffect, useRef } from 'react';
 import { useMediaQuery } from '../../hooks/useMediaQuery.js';
 import Modal from '../Modal/Modal.jsx';
@@ -19,7 +19,7 @@ export default function DetailSheet({ open, onClose, title, originRef, children 
 
   if (!wide) {
     return (
-      <Modal open={open} onClose={onClose} title={title} className="detail-sheet">
+      <Modal open={open} onClose={onClose} title={title} className="detail-sheet" expandable>
         {children}
       </Modal>
     );

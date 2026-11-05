@@ -1,0 +1,63 @@
+/* Caller variants: a labelled row of chips (44px tall) that scrolls sideways when it is longer than the screen. */
+
+.rg-variants {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.rg-variants-label {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+.rg-variants-chips {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.rg-variants-chips::-webkit-scrollbar {
+  display: none;
+}
+.rg-variant {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+.rg-variant:active {
+  transform: scale(0.95);
+}
+@media (hover: hover) {
+  .rg-variant:hover:not(.is-active) {
+    border-color: var(--text-faint);
+    color: var(--text);
+  }
+}
+.rg-variant.is-active {
+  background: var(--selected-bg);
+  border-color: var(--selected-bg);
+  color: var(--selected-text);
+}
+.rg-variant.is-more {
+  border-style: dashed;
+}
+
+.rg-variants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

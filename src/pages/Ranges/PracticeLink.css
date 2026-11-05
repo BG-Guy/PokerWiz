@@ -1,0 +1,60 @@
+/* Practice link: the crimson main action, a full-width row with a bolt, two lines of text and a chevron. */
+
+.rg-practice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--on-accent);
+  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.2s ease;
+}
+.rg-practice:active {
+  transform: scale(0.98);
+}
+@media (hover: hover) {
+  .rg-practice:hover {
+    filter: brightness(1.08);
+    box-shadow: var(--glow);
+  }
+}
+.rg-practice-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.18);
+}
+.rg-practice-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+.rg-practice-title {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.15;
+}
+.rg-practice-sub {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  opacity: 0.85;
+}
+.rg-practice.is-compact {
+  min-height: 44px;
+  padding: 4px 12px;
+}
+.rg-practice.is-compact .rg-practice-title {
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}

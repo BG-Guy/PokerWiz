@@ -36,11 +36,16 @@ export function playability(cls) {
 
 // The realization model's settings: position effect by postflop order among the players who saw the flop
 // (heads-up: out of position, in position; 3-way: first, middle, last), how much stronger hands out-earn
-// their equity (gamma: 1 = not at all), how much playability counts (playScale, 1 = as written above), and in
-// 3-way pots how much more it counts (play3Scale) plus a set-mining bonus for pairs below TT (pairBonus3).
+// their equity (gamma: 0 = not at all), how much playability counts (playScale, 1 = as written above), the
+// heads-up implied-odds bonus (implied2), and in 3-way pots how much more playability counts (play3Scale, on
+// top of playScale) plus a set-mining bonus for pairs below TT (pairBonus3).
 // The 3-way settings were checked on the 100 bb chart: the small blind stopped flatting A9o and 3-bets AJo and
 // KQo instead, and the big blind folds weak offsuit aces and calls small pairs into 3-way pots.
-export const DEFAULT_MODEL = { edge2: [-0.14, 0.1], edge3: [-0.12, -0.03, 0.09], gamma: 0.5, sprScale: 4, play3Scale: 3, pairBonus3: 0.06 };
+// The heads-up ones were retuned on 2026-11-02 against scripts/gto/leakScan.mjs (gamma 0.5 -> 0.2, a smaller
+// position edge, playScale 1.4, implied odds 0.06; play3Scale 3 -> 2.14 keeps 3-way pots where they were): the
+// big blind defends ~69% against a button open (was 52%) and ~28% against UTG (was 17%), calls small pairs
+// more than it 3-bets them, and the button opens JTs-76s (it still folds 65s and 54s, 0.05-0.2 bb decisions).
+export const DEFAULT_MODEL = { edge2: [-0.1, 0.08], edge3: [-0.12, -0.03, 0.09], gamma: 0.2, sprScale: 4, playScale: 1.4, implied2: 0.06, play3Scale: 2.14, pairBonus3: 0.06 };
 
 // How much of the postflop edge (position, playability, strength) applies at this stack-to-pot ratio: all of
 // it once there's `scale` pots behind, fading toward pure equity as the stacks get short.
@@ -73,7 +78,17 @@ export function createPayoffs(table, model = DEFAULT_MODEL) {
   // second-best ones; without this the small blind flatted A9o and folded 87s into 3-way pots.
   const play3Scale = model.play3Scale ?? 1;
   const multiwayPlay = Float64Array.from(formulaPlay, (v, cls) => play3Scale * v + (isPairClass(cls) && classRanks(cls)[0] <= 7 ? model.pairBonus3 ?? 0 : 0));
-  const typical3 = 0.02 * play3Scale; // a typical 3-way hand's playability, so the three shares add up to about 1
+  const typical3 = 0.02 * play3Scale * (model.playScale ?? 1); // a typical 3-way hand's playability, so the three shares add up to about 1
+  // Heads-up implied-odds bonus (model.implied2, 0 = none): pairs up to 99, suited connectors and one-gappers,
+  // and suited wheel aces.
+  // impliedPairs (0 = none) adds to that for the pairs alone, up to TT: a pair wins a whole stack when it flops a
+  // set, so against a single raise it flats more often than it re-raises.
+  const implied = Float64Array.from({ length: N }, (_, cls) => {
+    const [high, low] = classRanks(cls);
+    const hits = isPairClass(cls) ? high <= 7 : isSuitedClass(cls) && (high - low <= 2 || (high === 12 && low <= 3));
+    const pairs = isPairClass(cls) && high <= 8 ? model.impliedPairs ?? 0 : 0;
+    return (hits ? model.implied2 ?? 0 : 0) + pairs;
+  });
   const flopCache = new Map();
   function flop2(seat, spr) {
     const bucket = sprBucket(spr);
@@ -99,11 +114,15 @@ export function createPayoffs(table, model = DEFAULT_MODEL) {
     }
     const gamma = 1 + model.gamma * w; // stronger hands win more than their share when stacks are deep
     const [mine, theirs] = seat === 0 ? POSITION_EDGE[2] : [POSITION_EDGE[2][1], POSITION_EDGE[2][0]];
+    // Implied odds: small pairs and suited connectors win whole stacks when they hit, which raw equity misses.
+    // Only with deep stacks behind (none at 4 pots, all of it from 8, where the buckets stop: a single-raised
+    // pot), so it favours flatting over re-raising.
+    const deep = Math.min(1, Math.max(0, (bucket - 4) / 4));
     for (let i = 0; i < N; i++) {
-      const ri = 1 + w * (mine + play[i]);
+      const ri = 1 + w * (mine + play[i]) + deep * implied[i];
       for (let j = 0; j < N; j++) {
         const e = equity[i][j];
-        const rj = 1 + w * (theirs + play[j]);
+        const rj = 1 + w * (theirs + play[j]) + deep * implied[j];
         const a = e ** gamma * ri;
         const b = (1 - e) ** gamma * rj;
         matrix[i * N + j] = K[i * N + j] * (a / (a + b));

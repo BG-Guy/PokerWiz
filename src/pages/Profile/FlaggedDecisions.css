@@ -1,0 +1,75 @@
+/* Flagged decisions panel (Profile): a short explanation, the list of flags, and the export / clear buttons. */
+
+.flagged-intro,
+.flagged-empty {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.flagged-empty {
+  margin-top: 10px;
+}
+
+/* One flag per row: cards, the spot and verdict, and a remove button */
+.flagged-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+  list-style: none;
+}
+.flagged-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+.flagged-cards {
+  display: inline-flex;
+  gap: 2px;
+}
+.flagged-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: 13px;
+}
+.flagged-text em {
+  overflow-wrap: anywhere;
+}
+.flagged-meta {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.flagged-remove {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.flagged-remove:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+/* Export and clear */
+.flagged-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.flagged-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  color: var(--negative);
+  font-size: 13px;
+}

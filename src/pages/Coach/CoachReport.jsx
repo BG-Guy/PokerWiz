@@ -1,5 +1,6 @@
 // The coach's report for one hand: the letter grade (A to F) and summary, the players, every decision graded
-// against GTO, and a short explanation of how the grades are made.
+// against GTO (or, for a player with a read, against the best play against them), and a short explanation of
+// how the grades are made.
 import { Link } from 'react-router-dom';
 import Money from '../../components/Money/Money.jsx';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
@@ -44,6 +45,17 @@ export default function CoachReport({ report, onNewHand, onSave, saveState, canS
         </div>
       </section>
 
+      {/* Graded against reads: say so, since the best play below is the best play against them */}
+      {report.villains.some((v) => v.label !== 'GTO') && (
+        <p className="coach-report-reads">
+          <Icon name="villain" size={18} />
+          <span>
+            <strong>Graded against your reads.</strong> {report.villains.filter((v) => v.label !== 'GTO').map((v) => `${v.position} is ${v.label}`).join(', ')}. The best play below is the
+            best play against them, not GTO.
+          </span>
+        </p>
+      )}
+
       {report.keyLesson && (
         <p className="coach-report-lesson">
           <Icon name="target" size={18} />
@@ -76,7 +88,7 @@ export default function CoachReport({ report, onNewHand, onSave, saveState, canS
             </span>
             <span className="coach-report-player-text">
               <strong>{villain.position}</strong>
-              <span>Plays GTO</span>
+              <span>{villain.label === 'GTO' ? 'Plays GTO' : `Read: ${villain.label}`}</span>
             </span>
             <span className="coach-report-player-cards">
               {villain.cards.length === 2
@@ -90,7 +102,7 @@ export default function CoachReport({ report, onNewHand, onSave, saveState, canS
       {/* Every decision */}
       <section className="coach-report-decisions">
         {report.decisions.map((decision, index) => (
-          <DecisionCard key={index} decision={decision} number={index + 1} bb={report.stakes?.bb} />
+          <DecisionCard key={index} decision={decision} number={index + 1} bb={report.stakes?.bb} flagContext={{ source: 'review', record: report.record, detail: 'full' }} drillable />
         ))}
       </section>
 
@@ -108,7 +120,7 @@ export default function CoachReport({ report, onNewHand, onSave, saveState, canS
             Each decision gets a letter from A to F (A from 85% accuracy, B from 70%, C from 55%, D from 40%). The hand's grade weighs bigger pots
             more. Your level sets how strict the grading is.
           </li>
-          <li>Everyone is assumed to play GTO; player reads aren't used yet. Solves use a few bet sizes and sampled runouts, so values are close estimates, not exact to the cent.</li>
+          <li>Everyone is assumed to play GTO unless you set a read on a player: then they play their tendency, and the best play (and your grade) is against that. Solves use a few bet sizes and sampled runouts, so values are close estimates, not exact to the cent.</li>
         </ul>
       </details>
 

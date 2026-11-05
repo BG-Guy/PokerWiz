@@ -319,3 +319,40 @@
     padding: 22px 24px;
   }
 }
+
+/* The flag for review and the drill link, under the coach's notes */
+.decision-card-flag {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.decision-card-drill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: var(--accent-soft);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent-text);
+  text-decoration: none;
+  transition: transform 0.12s ease;
+}
+.decision-card-drill:active {
+  transform: scale(0.96);
+}
+
+/* What kind of spot it was ("BB vs BTN open"), under the hand */
+.decision-card-spot {
+  margin-top: -8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-faint);
+}

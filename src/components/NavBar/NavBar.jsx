@@ -10,18 +10,21 @@ import AppVersion from '../AppVersion/AppVersion.jsx';
 import MoreSheet from './MoreSheet.jsx';
 import './NavBar.css';
 
-// The app's sections, in menu order. "phone: false" items live in the More sheet on phones.
+// The app's sections, in menu order. "phone: false" items live in the More sheet on phones, under their group
+// (Study: learn from your play; Track: your results and goals; You).
 const NAV_ITEMS = [
   { to: '/', label: 'Home', icon: 'home', end: true, phone: true },
   { to: '/hands', label: 'Hands', icon: 'cards', phone: true },
   { to: '/practice', label: 'Practice', icon: 'zap', phone: true, primary: true },
   { to: '/coach', label: 'Coach', icon: 'coach', phone: true },
-  { to: '/session', label: 'Log session', icon: 'log', phone: false },
-  { to: '/history', label: 'History', icon: 'clock', phone: false },
-  { to: '/insights', label: 'Insights', icon: 'chart', phone: false },
-  { to: '/goals', label: 'Goals', icon: 'target', phone: false },
-  { to: '/equity', label: 'Equity', icon: 'calculator', phone: false },
-  { to: '/profile', label: 'Profile', icon: 'hero', phone: false },
+  { to: '/leaks', label: 'Leaks', icon: 'drop', phone: false, group: 'Study' },
+  { to: '/ranges', label: 'Ranges', icon: 'grid', phone: false, group: 'Study' },
+  { to: '/equity', label: 'Equity', icon: 'calculator', phone: false, group: 'Study' },
+  { to: '/session', label: 'Log session', icon: 'log', phone: false, group: 'Track' },
+  { to: '/history', label: 'History', icon: 'clock', phone: false, group: 'Track' },
+  { to: '/insights', label: 'Insights', icon: 'chart', phone: false, group: 'Track' },
+  { to: '/goals', label: 'Goals', icon: 'target', phone: false, group: 'Track' },
+  { to: '/profile', label: 'Profile', icon: 'hero', phone: false, group: 'You' },
 ];
 
 const MORE_ITEMS = NAV_ITEMS.filter((item) => !item.phone);

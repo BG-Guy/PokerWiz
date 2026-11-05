@@ -4,46 +4,46 @@
     "stack": 20,
     "ante": 0,
     "iterations": 600,
-    "seconds": 148,
+    "seconds": 173,
     "decisions": 1982,
-    "kept": 1164,
-    "size": 93556,
+    "kept": 1138,
+    "size": 90339,
     "opens": {
       "UTG": {
-        "fold": 85.7,
-        "raise": 14.2,
+        "fold": 86.1,
+        "raise": 13.8,
         "allin": 0.1
       },
       "UTG+1": {
-        "fold": 83.9,
-        "raise": 16,
+        "fold": 85.1,
+        "raise": 14.8,
         "allin": 0.1
       },
       "LJ": {
-        "fold": 81.2,
-        "raise": 18.6,
+        "fold": 82.3,
+        "raise": 17.6,
         "allin": 0.2
       },
       "HJ": {
-        "fold": 78.3,
-        "raise": 21.6,
+        "fold": 78.7,
+        "raise": 21.1,
         "allin": 0.1
       },
       "CO": {
-        "fold": 73.4,
-        "raise": 26.4,
-        "allin": 0.1
-      },
-      "BTN": {
-        "fold": 65.9,
-        "raise": 34,
+        "fold": 73.7,
+        "raise": 26.1,
         "allin": 0.2
       },
+      "BTN": {
+        "fold": 64.9,
+        "raise": 34.9,
+        "allin": 0.3
+      },
       "SB": {
-        "fold": 28.3,
-        "call": 41.5,
-        "raise": 16.6,
-        "allin": 13.6
+        "fold": 24.7,
+        "call": 45.8,
+        "raise": 11.4,
+        "allin": 18.1
       }
     },
     "premiums": [
@@ -59,46 +59,46 @@
     "stack": 30,
     "ante": 0,
     "iterations": 600,
-    "seconds": 294,
+    "seconds": 353,
     "decisions": 3835,
-    "kept": 1408,
-    "size": 123292,
+    "kept": 1364,
+    "size": 114474,
     "opens": {
       "UTG": {
-        "fold": 85.2,
-        "raise": 14.7,
+        "fold": 85.4,
+        "raise": 14.5,
         "allin": 0.1
       },
       "UTG+1": {
-        "fold": 83,
-        "raise": 16.9,
+        "fold": 83.4,
+        "raise": 16.4,
         "allin": 0.1
       },
       "LJ": {
-        "fold": 79.7,
-        "raise": 20.2,
+        "fold": 80.4,
+        "raise": 19.5,
         "allin": 0.1
       },
       "HJ": {
-        "fold": 76,
-        "raise": 23.9,
+        "fold": 77.5,
+        "raise": 22.4,
         "allin": 0.1
       },
       "CO": {
-        "fold": 69.8,
-        "raise": 30.1,
+        "fold": 71.6,
+        "raise": 28.3,
         "allin": 0.1
       },
       "BTN": {
-        "fold": 62.4,
-        "raise": 37.5,
+        "fold": 61.2,
+        "raise": 38.7,
         "allin": 0.1
       },
       "SB": {
-        "fold": 30.1,
-        "call": 38.8,
-        "raise": 30.7,
-        "allin": 0.4
+        "fold": 26.1,
+        "call": 44.9,
+        "raise": 28.3,
+        "allin": 0.7
       }
     },
     "premiums": [
@@ -114,10 +114,10 @@
     "stack": 40,
     "ante": 0,
     "iterations": 600,
-    "seconds": 344,
+    "seconds": 395,
     "decisions": 4571,
-    "kept": 1633,
-    "size": 169271,
+    "kept": 1599,
+    "size": 158682,
     "opens": {
       "UTG": {
         "fold": 85.6,
@@ -125,8 +125,8 @@
         "allin": 0.1
       },
       "UTG+1": {
-        "fold": 83.6,
-        "raise": 16.3,
+        "fold": 84.2,
+        "raise": 15.7,
         "allin": 0.1
       },
       "LJ": {
@@ -135,24 +135,24 @@
         "allin": 0.1
       },
       "HJ": {
-        "fold": 76,
-        "raise": 23.9,
+        "fold": 76.4,
+        "raise": 23.5,
         "allin": 0.1
       },
       "CO": {
-        "fold": 69.1,
-        "raise": 30.8,
+        "fold": 70.9,
+        "raise": 29.1,
         "allin": 0.1
       },
       "BTN": {
-        "fold": 60.9,
-        "raise": 39.1,
+        "fold": 60.1,
+        "raise": 39.8,
         "allin": 0.1
       },
       "SB": {
-        "fold": 33,
-        "call": 33.9,
-        "raise": 33,
+        "fold": 29.7,
+        "call": 37.9,
+        "raise": 32.3,
         "allin": 0.1
       }
     },
@@ -169,39 +169,39 @@
     "stack": 60,
     "ante": 0,
     "iterations": 600,
-    "seconds": 297,
+    "seconds": 358,
     "decisions": 4260,
-    "kept": 1341,
-    "size": 170760,
+    "kept": 1478,
+    "size": 173433,
     "opens": {
       "UTG": {
-        "fold": 87.9,
-        "raise": 12.1
+        "fold": 87.1,
+        "raise": 12.9
       },
       "UTG+1": {
-        "fold": 86.3,
-        "raise": 13.7
+        "fold": 84.9,
+        "raise": 15.1
       },
       "LJ": {
-        "fold": 83.3,
-        "raise": 16.7
+        "fold": 82.3,
+        "raise": 17.7
       },
       "HJ": {
-        "fold": 79.2,
-        "raise": 20.8
+        "fold": 78.4,
+        "raise": 21.6
       },
       "CO": {
-        "fold": 72.1,
-        "raise": 27.9
+        "fold": 72.2,
+        "raise": 27.8
       },
       "BTN": {
-        "fold": 60,
-        "raise": 40
+        "fold": 61.1,
+        "raise": 38.9
       },
       "SB": {
-        "fold": 37.6,
-        "call": 33.9,
-        "raise": 28.5
+        "fold": 32.8,
+        "call": 36.9,
+        "raise": 30.3
       }
     },
     "premiums": [
@@ -217,39 +217,39 @@
     "stack": 100,
     "ante": 0,
     "iterations": 600,
-    "seconds": 415,
+    "seconds": 487,
     "decisions": 6446,
-    "kept": 1579,
-    "size": 218719,
+    "kept": 1640,
+    "size": 224415,
     "opens": {
       "UTG": {
-        "fold": 88,
-        "raise": 12
+        "fold": 87.7,
+        "raise": 12.3
       },
       "UTG+1": {
-        "fold": 86.5,
-        "raise": 13.5
+        "fold": 85.4,
+        "raise": 14.6
       },
       "LJ": {
-        "fold": 83.6,
-        "raise": 16.4
+        "fold": 82.5,
+        "raise": 17.5
       },
       "HJ": {
-        "fold": 79.4,
-        "raise": 20.6
+        "fold": 78.2,
+        "raise": 21.8
       },
       "CO": {
-        "fold": 72.3,
-        "raise": 27.7
+        "fold": 71.9,
+        "raise": 28.1
       },
       "BTN": {
-        "fold": 59.2,
-        "raise": 40.8
+        "fold": 59.6,
+        "raise": 40.4
       },
       "SB": {
-        "fold": 34.5,
-        "call": 42.1,
-        "raise": 23.4
+        "fold": 29.9,
+        "call": 46.2,
+        "raise": 23.9
       }
     },
     "premiums": [
@@ -265,39 +265,39 @@
     "stack": 150,
     "ante": 0,
     "iterations": 600,
-    "seconds": 417,
+    "seconds": 488,
     "decisions": 6446,
-    "kept": 1564,
-    "size": 188025,
+    "kept": 1721,
+    "size": 193992,
     "opens": {
       "UTG": {
-        "fold": 88,
-        "raise": 12
+        "fold": 87.1,
+        "raise": 12.9
       },
       "UTG+1": {
-        "fold": 86.3,
-        "raise": 13.7
+        "fold": 85,
+        "raise": 15
       },
       "LJ": {
-        "fold": 83.3,
-        "raise": 16.7
+        "fold": 82.5,
+        "raise": 17.5
       },
       "HJ": {
-        "fold": 78.9,
-        "raise": 21.1
+        "fold": 78.1,
+        "raise": 21.9
       },
       "CO": {
-        "fold": 72,
-        "raise": 28
+        "fold": 71.5,
+        "raise": 28.5
       },
       "BTN": {
-        "fold": 58,
-        "raise": 42
+        "fold": 58.7,
+        "raise": 41.3
       },
       "SB": {
-        "fold": 34.8,
-        "call": 43,
-        "raise": 22.2
+        "fold": 30.3,
+        "call": 46.3,
+        "raise": 23.4
       }
     },
     "premiums": [
@@ -313,39 +313,39 @@
     "stack": 200,
     "ante": 0,
     "iterations": 600,
-    "seconds": 420,
+    "seconds": 490,
     "decisions": 6446,
-    "kept": 1664,
-    "size": 185397,
+    "kept": 1743,
+    "size": 188819,
     "opens": {
       "UTG": {
-        "fold": 87.4,
-        "raise": 12.6
+        "fold": 86.9,
+        "raise": 13.1
       },
       "UTG+1": {
-        "fold": 85.9,
-        "raise": 14.1
+        "fold": 84.9,
+        "raise": 15.1
       },
       "LJ": {
-        "fold": 83,
-        "raise": 17
+        "fold": 82.2,
+        "raise": 17.8
       },
       "HJ": {
-        "fold": 79.1,
-        "raise": 20.9
+        "fold": 78.4,
+        "raise": 21.6
       },
       "CO": {
-        "fold": 71.7,
-        "raise": 28.3
+        "fold": 71.6,
+        "raise": 28.4
       },
       "BTN": {
-        "fold": 56.9,
-        "raise": 43.1
+        "fold": 58.2,
+        "raise": 41.8
       },
       "SB": {
-        "fold": 35.2,
-        "call": 42.4,
-        "raise": 22.4
+        "fold": 30.5,
+        "call": 45.4,
+        "raise": 24.1
       }
     },
     "premiums": [
@@ -361,10 +361,10 @@
     "stack": 10,
     "ante": 1,
     "iterations": 600,
-    "seconds": 70,
+    "seconds": 77,
     "decisions": 1103,
-    "kept": 386,
-    "size": 25028,
+    "kept": 387,
+    "size": 24942,
     "opens": {
       "UTG": {
         "fold": 82.7,
@@ -397,10 +397,10 @@
         "allin": 43
       },
       "SB": {
-        "fold": 19.1,
-        "call": 17.5,
+        "fold": 18.8,
+        "call": 18.5,
         "raise": 0,
-        "allin": 63.4
+        "allin": 62.7
       }
     },
     "premiums": [
@@ -416,46 +416,46 @@
     "stack": 15,
     "ante": 1,
     "iterations": 600,
-    "seconds": 104,
+    "seconds": 122,
     "decisions": 1403,
-    "kept": 1095,
-    "size": 83782,
+    "kept": 1062,
+    "size": 87525,
     "opens": {
       "UTG": {
         "fold": 85.9,
-        "raise": 8,
-        "allin": 6
+        "raise": 5.4,
+        "allin": 8.7
       },
       "UTG+1": {
-        "fold": 83.8,
-        "raise": 7.6,
-        "allin": 8.6
+        "fold": 83.9,
+        "raise": 5.1,
+        "allin": 11
       },
       "LJ": {
-        "fold": 80.5,
-        "raise": 8.2,
-        "allin": 11.3
+        "fold": 81,
+        "raise": 4.6,
+        "allin": 14.3
       },
       "HJ": {
-        "fold": 76.7,
-        "raise": 7.3,
-        "allin": 16
+        "fold": 77.3,
+        "raise": 2.9,
+        "allin": 19.8
       },
       "CO": {
-        "fold": 69.7,
-        "raise": 5.9,
-        "allin": 24.4
+        "fold": 70.1,
+        "raise": 2.7,
+        "allin": 27.2
       },
       "BTN": {
-        "fold": 61.7,
-        "raise": 7,
-        "allin": 31.3
+        "fold": 62.4,
+        "raise": 2.7,
+        "allin": 34.8
       },
       "SB": {
-        "fold": 16.1,
-        "call": 39.6,
+        "fold": 12.2,
+        "call": 44.9,
         "raise": 0,
-        "allin": 44.3
+        "allin": 42.9
       }
     },
     "premiums": [
@@ -471,46 +471,46 @@
     "stack": 20,
     "ante": 1,
     "iterations": 600,
-    "seconds": 137,
+    "seconds": 159,
     "decisions": 1982,
-    "kept": 1231,
-    "size": 105397,
+    "kept": 1289,
+    "size": 107794,
     "opens": {
       "UTG": {
-        "fold": 83.1,
-        "raise": 16.7,
+        "fold": 83,
+        "raise": 16.8,
         "allin": 0.2
       },
       "UTG+1": {
-        "fold": 81.1,
-        "raise": 18.7,
-        "allin": 0.2
+        "fold": 81.3,
+        "raise": 17.7,
+        "allin": 1
       },
       "LJ": {
-        "fold": 78.8,
-        "raise": 20.8,
-        "allin": 0.5
+        "fold": 78.5,
+        "raise": 19.6,
+        "allin": 1.8
       },
       "HJ": {
-        "fold": 76,
-        "raise": 21.6,
-        "allin": 2.4
+        "fold": 74.2,
+        "raise": 22.1,
+        "allin": 3.7
       },
       "CO": {
-        "fold": 68.6,
-        "raise": 26.5,
-        "allin": 4.9
+        "fold": 68.4,
+        "raise": 25.7,
+        "allin": 5.9
       },
       "BTN": {
-        "fold": 59.6,
-        "raise": 29.5,
-        "allin": 10.9
+        "fold": 60.1,
+        "raise": 23.7,
+        "allin": 16.3
       },
       "SB": {
-        "fold": 11.4,
-        "call": 59,
+        "fold": 6.6,
+        "call": 65.3,
         "raise": 0,
-        "allin": 29.5
+        "allin": 28
       }
     },
     "premiums": [
@@ -526,46 +526,46 @@
     "stack": 25,
     "ante": 1,
     "iterations": 600,
-    "seconds": 202,
+    "seconds": 226,
     "decisions": 2888,
-    "kept": 1426,
-    "size": 135676,
+    "kept": 1459,
+    "size": 136169,
     "opens": {
       "UTG": {
-        "fold": 82.1,
-        "raise": 17.8,
-        "allin": 0.1
+        "fold": 82.2,
+        "raise": 17.6,
+        "allin": 0.2
       },
       "UTG+1": {
-        "fold": 79.9,
-        "raise": 19.9,
-        "allin": 0.1
+        "fold": 80.2,
+        "raise": 19.7,
+        "allin": 0.2
       },
       "LJ": {
-        "fold": 77,
-        "raise": 22.9,
-        "allin": 0.1
+        "fold": 77.3,
+        "raise": 22.6,
+        "allin": 0.2
       },
       "HJ": {
-        "fold": 72.9,
-        "raise": 27,
-        "allin": 0.1
+        "fold": 73.1,
+        "raise": 26.7,
+        "allin": 0.2
       },
       "CO": {
-        "fold": 66.9,
-        "raise": 33,
-        "allin": 0.1
+        "fold": 66.1,
+        "raise": 33.3,
+        "allin": 0.6
       },
       "BTN": {
-        "fold": 57.9,
-        "raise": 39.5,
-        "allin": 2.6
+        "fold": 56.3,
+        "raise": 42.4,
+        "allin": 1.4
       },
       "SB": {
-        "fold": 9.4,
-        "call": 64,
-        "raise": 3.6,
-        "allin": 23
+        "fold": 4.5,
+        "call": 72.6,
+        "raise": 0.2,
+        "allin": 22.7
       }
     },
     "premiums": [
@@ -581,46 +581,46 @@
     "stack": 30,
     "ante": 1,
     "iterations": 600,
-    "seconds": 245,
+    "seconds": 275,
     "decisions": 3835,
-    "kept": 1563,
-    "size": 141427,
+    "kept": 1545,
+    "size": 137884,
     "opens": {
       "UTG": {
-        "fold": 81.4,
-        "raise": 18.5,
+        "fold": 81.7,
+        "raise": 18.2,
         "allin": 0.1
       },
       "UTG+1": {
-        "fold": 79,
-        "raise": 20.9,
+        "fold": 79.6,
+        "raise": 20.2,
         "allin": 0.1
       },
       "LJ": {
-        "fold": 75.2,
-        "raise": 24.7,
+        "fold": 76,
+        "raise": 23.8,
         "allin": 0.1
       },
       "HJ": {
-        "fold": 70.9,
-        "raise": 29,
+        "fold": 71.8,
+        "raise": 28,
         "allin": 0.1
       },
       "CO": {
-        "fold": 63.8,
-        "raise": 36.1,
+        "fold": 63.2,
+        "raise": 36.7,
         "allin": 0.1
       },
       "BTN": {
-        "fold": 55,
-        "raise": 44.8,
-        "allin": 0.1
+        "fold": 53.9,
+        "raise": 46,
+        "allin": 0.2
       },
       "SB": {
-        "fold": 11.7,
-        "call": 62.7,
-        "raise": 13,
-        "allin": 12.7
+        "fold": 4.5,
+        "call": 75.1,
+        "raise": 3.6,
+        "allin": 16.8
       }
     },
     "premiums": [
@@ -636,46 +636,46 @@
     "stack": 40,
     "ante": 1,
     "iterations": 600,
-    "seconds": 340,
+    "seconds": 398,
     "decisions": 4571,
-    "kept": 1797,
-    "size": 183603,
+    "kept": 1817,
+    "size": 188956,
     "opens": {
       "UTG": {
-        "fold": 81.9,
-        "raise": 18,
+        "fold": 81.8,
+        "raise": 18.1,
         "allin": 0.1
       },
       "UTG+1": {
-        "fold": 79.1,
-        "raise": 20.8,
+        "fold": 79.8,
+        "raise": 20.1,
         "allin": 0.1
       },
       "LJ": {
-        "fold": 75.3,
-        "raise": 24.6,
+        "fold": 75.5,
+        "raise": 24.4,
         "allin": 0.1
       },
       "HJ": {
-        "fold": 70.2,
-        "raise": 29.7,
+        "fold": 71.5,
+        "raise": 28.4,
         "allin": 0.1
       },
       "CO": {
-        "fold": 62.9,
-        "raise": 37,
+        "fold": 62.4,
+        "raise": 37.6,
         "allin": 0.1
       },
       "BTN": {
-        "fold": 51.9,
-        "raise": 48,
+        "fold": 50.6,
+        "raise": 49.3,
         "allin": 0.1
       },
       "SB": {
-        "fold": 12.3,
-        "call": 60.2,
-        "raise": 27.1,
-        "allin": 0.4
+        "fold": 5,
+        "call": 73.2,
+        "raise": 19.4,
+        "allin": 2.4
       }
     },
     "premiums": [
@@ -691,39 +691,39 @@
     "stack": 60,
     "ante": 1,
     "iterations": 600,
-    "seconds": 298,
+    "seconds": 343,
     "decisions": 4260,
-    "kept": 1830,
-    "size": 213737,
+    "kept": 1861,
+    "size": 188814,
     "opens": {
       "UTG": {
-        "fold": 84.7,
-        "raise": 15.3
+        "fold": 83.7,
+        "raise": 16.3
       },
       "UTG+1": {
-        "fold": 82.2,
-        "raise": 17.8
+        "fold": 81.5,
+        "raise": 18.5
       },
       "LJ": {
-        "fold": 79.2,
-        "raise": 20.8
+        "fold": 78.1,
+        "raise": 21.9
       },
       "HJ": {
-        "fold": 74.5,
-        "raise": 25.5
+        "fold": 72.9,
+        "raise": 27.1
       },
       "CO": {
-        "fold": 65.8,
-        "raise": 34.2
+        "fold": 64.5,
+        "raise": 35.5
       },
       "BTN": {
-        "fold": 48.3,
-        "raise": 51.7
+        "fold": 49.5,
+        "raise": 50.5
       },
       "SB": {
-        "fold": 16.6,
-        "call": 61.4,
-        "raise": 22
+        "fold": 8.1,
+        "call": 73.9,
+        "raise": 17.9
       }
     },
     "premiums": [

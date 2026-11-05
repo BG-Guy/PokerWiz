@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { createHand, getHand, updateHand } from '../../api/hands.js';
 import { prepareSavedHand } from '../../coach/savedHand.js';
+import { packDecisions } from '../../coach/leaks.js';
 import { getMoneyUnit } from '../../utils/format.js';
 import { letterGrade } from '../../utils/letterGrade.js';
 import EliteHeader from '../../components/EliteHeader/EliteHeader.jsx';
@@ -114,7 +115,9 @@ export default function Coach() {
   useEffect(() => {
     if (!report || !savedHand || !record) return;
     const reads = Object.fromEntries(record.players.filter((p) => p.profile).map((p) => [p.role === 'hero' ? 'hero' : p.position, p.profile]));
-    updateHand(savedHand.id, { coachAccuracy: report.accuracy, coachReads: reads })
+    // The leak report always compares you with GTO: a review graded against a read doesn't replace its decisions.
+    const againstReads = report.villains.some((v) => v.label !== 'GTO');
+    updateHand(savedHand.id, { coachAccuracy: report.accuracy, coachReads: reads, ...(againstReads ? {} : { coachDecisions: packDecisions(report, 'full') }) })
       .then(() => setStatus(report.accuracy == null ? 'Review saved to this hand.' : `Grade saved to this hand: ${letterGrade(report.accuracy).letter}.`))
       .catch(() => setStatus('Could not save the grade to the hand.'));
     // eslint-disable-next-line react-hooks/exhaustive-deps

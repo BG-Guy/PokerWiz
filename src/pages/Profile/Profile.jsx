@@ -16,6 +16,7 @@ import SettingsSection from './SettingsSection.jsx';
 import ExportData from './ExportData.jsx';
 import DataSafety from './DataSafety.jsx';
 import ImportData from './ImportData.jsx';
+import FlaggedDecisions from './FlaggedDecisions.jsx';
 import './Profile.css';
 
 const loadProfile = () => Promise.all([getSessions(), getSampleData(), getSettings()]);
@@ -67,6 +68,7 @@ export default function Profile() {
             <ExportData />
             <DataSafety />
             <ImportData samples={samples} importedCount={sessions.filter((s) => s.source === 'regroup').length} onChange={reload} />
+            <FlaggedDecisions />
           </SettingsSection>
         </div>
       </div>

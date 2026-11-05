@@ -1,0 +1,85 @@
+/* One leak's page (phone) or panel (wide screen): a column of cards. The drill button sticks above the tab bar on
+   a phone, where it stays under your thumb. */
+
+.leak-area {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.leak-area.is-page {
+  /* room for the sticky drill button */
+  padding-bottom: 8px;
+}
+
+/* The panel's own heading (on a page, PageHeader does this) */
+.leak-area-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+.leak-area-title {
+  font-size: 30px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.leak-area-subtitle {
+  margin-top: 2px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.leak-area-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.leak-area-panel .panel-header {
+  margin-bottom: 0;
+}
+.leak-area-hint {
+  font-size: 12.5px;
+  color: var(--text-faint);
+}
+.leak-area-filters {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.leak-area-empty {
+  padding: 18px 0;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.leak-area-groups,
+.leak-area-spots {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.leak-area-more {
+  align-self: center;
+}
+
+/* Drill button: pinned above the tab bar on a phone, hidden where the header already has one */
+.leak-area-drill {
+  position: sticky;
+  /* above the tab bar and the raised Practice button in it */
+  bottom: calc(104px + env(safe-area-inset-bottom));
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.leak-area-drill .btn {
+  pointer-events: auto;
+  min-height: 48px;
+  padding: 0 22px;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 40%, transparent), 0 0 0 4px var(--bg);
+}
+@media (min-width: 768px) {
+  .leak-area-drill {
+    display: none;
+  }
+}

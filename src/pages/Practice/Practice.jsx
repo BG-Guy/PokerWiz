@@ -12,6 +12,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { getHand } from '../../api/hands.js';
 import { replayStreets } from '../../practice/replaySpot.js';
 import { GAMES, seenCards, spotRecord } from '../../practice/generateSpot.js';
+import { focusFromParams, describeFocus } from '../../coach/spots.js';
 import { overallAccuracy } from '../../coach/grading.js';
 import { defaultProfile } from '../../coach/profiles.js';
 import { formatMoney, getMoneyUnit } from '../../utils/format.js';
@@ -98,11 +99,14 @@ function outcomeText(spot) {
 }
 
 export default function Practice() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const replayId = searchParams.get('hand');
-  const [setup, setSetup] = useState(loadSetup);
+  // /practice?drill=river-vs-bet&pos=BB...: a kind of spot to drill (from a leak, or a range chart): it is dealt
+  // right away, and every next hand is that kind of spot until you stop drilling.
+  const [drillAtOpen] = useState(() => (replayId ? null : focusFromParams(searchParams)));
+  const [setup, setSetup] = useState(() => (drillAtOpen ? { ...loadSetup(), focus: drillAtOpen } : loadSetup()));
   // setup | loading | replay | dealing | play | grading | result
-  const [phase, setPhase] = useState(replayId ? 'loading' : 'setup');
+  const [phase, setPhase] = useState(replayId ? 'loading' : drillAtOpen ? 'dealing' : 'setup');
   const [replayHand, setReplayHand] = useState(null);
   const [replayOptions, setReplayOptions] = useState(null);
   const [spot, setSpot] = useState(null);
@@ -122,7 +126,9 @@ export default function Practice() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(setup));
+      // A drill belongs to the visit that asked for it: it isn't remembered for the next one.
+      const { focus: _drill, ...remembered } = setup;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(remembered));
     } catch {
       // storage blocked: the setup just isn't remembered
     }
@@ -190,7 +196,7 @@ export default function Practice() {
       // Only your decisions from the spot on count (earlier streets were played for you).
       const decisions = report.decisions.slice(firstDecisionRef.current);
       const accuracy = overallAccuracy(decisions.filter((d) => d.graded), report.stakes.bb);
-      setReview({ accuracy, decisions });
+      setReview({ accuracy, decisions, record: report.record });
       setTally((t) => ({ hands: t.hands + 1, total: t.total + (accuracy ?? 0), netBB: t.netBB + report.result / report.stakes.bb }));
       setPhase('result');
     };
@@ -202,6 +208,19 @@ export default function Practice() {
       practiceRef.current = null;
     };
   }, [startPracticeWorker]);
+
+  // Opened to drill a kind of spot: deal the first one now (the workers are up by this point).
+  useEffect(() => {
+    if (drillAtOpen) send({ type: 'new', setup }, { restart: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Stop drilling: back to any spot, and the address forgets the drill (a refresh won't bring it back).
+  const clearDrill = () => setSetup(({ focus: _drill, ...rest }) => rest);
+  const stopDrilling = () => {
+    clearDrill();
+    setSearchParams({}, { replace: true });
+  };
 
   // Replay of a saved hand: load it and pick sensible defaults (the street from the link, the real runout).
   useEffect(() => {
@@ -308,7 +327,7 @@ export default function Practice() {
             <Icon name="alert" size={16} /> {error}
           </p>
         )}
-        <PracticeSetup setup={setup} onChange={setSetup} onStart={deal} />
+        <PracticeSetup setup={setup} onChange={setSetup} onStart={deal} onStopDrilling={stopDrilling} />
       </div>
     );
   }
@@ -377,7 +396,8 @@ export default function Practice() {
   const heroStackBB = Math.round((state.players.find((p) => p.seat === heroSeat).stack / bb) * 10) / 10;
   const lines = actionLines(state);
   const handLabel = `Hand ${handNumber}${spot.again ? ' · played again' : ''}`;
-  const subtitle = replay ? `${replay.title} · from the ${replay.street.toLowerCase()}` : `${handLabel} · ${spot.game.label}`;
+  const drilling = !replay && setup.focus ? describeFocus(setup.focus) : null;
+  const subtitle = replay ? `${replay.title} · from the ${replay.street.toLowerCase()}` : `${handLabel} · ${drilling ? `Drill: ${drilling}` : spot.game.label}`;
   // The running score (the average grade as a letter), short enough for the full-screen top bar.
   const averageAccuracy = tally.hands > 0 ? tally.total / tally.hands : null;
   const tallyText =
@@ -492,10 +512,17 @@ export default function Practice() {
       )}
     </section>
   );
-  const decisionCards = review?.decisions.map((decision, index) => <DecisionCard key={index} decision={decision} number={index + 1} bb={state.bb} />);
+  const flagContext = review ? { source: 'practice', record: review.record, detail: 'fast' } : null;
+  const decisionCards = review?.decisions.map((decision, index) => <DecisionCard key={index} decision={decision} number={index + 1} bb={state.bb} flagContext={flagContext} />);
   const backToHand = replay && (
     <Link to={`/hands/${replay.handId}`} className="btn btn-ghost">
       <Icon name="chevronLeft" size={16} /> Back to the hand
+    </Link>
+  );
+  // Drilling a leak: every next hand is the same kind of spot, and this ends it (and goes back to Leaks).
+  const backToLeaks = drilling && (
+    <Link to="/leaks" className="btn btn-ghost" onClick={clearDrill}>
+      <Icon name="chevronLeft" size={16} /> Leaks
     </Link>
   );
 
@@ -521,6 +548,7 @@ export default function Practice() {
                 </button>
               )}
               {backToHand}
+              {backToLeaks}
               <button type="button" className="btn practice-next-btn" onClick={deal}>
                 {nextLabel} <Icon name="chevronRight" size={16} />
               </button>
@@ -585,6 +613,7 @@ export default function Practice() {
           {phase === 'result' && (
             <div className="practice-next">
               {backToHand}
+              {backToLeaks}
               <button type="button" className="btn practice-next-btn" onClick={deal}>
                 {nextLabel} <Icon name="chevronRight" size={16} />
               </button>

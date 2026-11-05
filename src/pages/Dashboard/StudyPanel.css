@@ -1,0 +1,11 @@
+/* Home's Study panel: a short stack of big rows. */
+
+/* Beside the bankroll on a wide screen, the panel keeps its own height instead of stretching to it */
+.dashboard-study {
+  align-self: start;
+}
+.dashboard-study-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

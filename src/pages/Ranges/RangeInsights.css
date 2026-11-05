@@ -1,0 +1,27 @@
+/* The three TLDR boxes: two across on a phone with the last one the full width, three across when there is room.
+   The sentence in the "as text" box is a range, so it is kept to two lines. */
+
+.rg-insights {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.rg-insights > :last-child {
+  grid-column: 1 / -1;
+}
+.rg-insights .insight-card-sentence {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+@media (min-width: 900px) {
+  .rg-insights {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .rg-insights > :last-child {
+    grid-column: auto;
+  }
+}

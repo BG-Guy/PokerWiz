@@ -11,7 +11,7 @@
 //              tendency (wider or tighter, more calls or more raises), which also shapes the range they bring
 //              to the flop
 // No read (an unknown, average player) is no model: that player is GTO.
-import { modelParams } from '../../coach/profiles.js';
+import { modelParams, describeProfile } from '../../coach/profiles.js';
 import { PLAYER_READS } from '../config.js';
 import { PREFLOP_BY_CLASS } from '../../coach/preflopTable.js';
 import { CLASS_COUNT, CLASS_COMBOS } from '../cards.js';
@@ -35,6 +35,11 @@ export function modelFor(profile) {
     policy: (node, list) => postflopPolicy(params, node, list),
     preflop: (node, strategy) => preflopStrategy(params, weight, node, strategy),
   };
+}
+
+// How a player reads in words ("Calling station · Rec"), or null when they play GTO (no read, or reads are off).
+export function readLabel(profile) {
+  return PLAYER_READS && modelFor(profile) ? describeProfile(profile).label : null;
 }
 
 // Models for the opponents who have a read: { seat: model } (nothing while PLAYER_READS is off, so every seat

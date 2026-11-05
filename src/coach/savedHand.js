@@ -137,7 +137,7 @@ export function prepareSavedHand(hand) {
   if (derived) {
     assumptions.push({ id: 'players', text: 'Players were read from the action log. Anyone who never acted is treated as folded before the action.' });
   }
-  assumptions.push({ id: 'reads', text: 'No reads were set, so villains are treated as average regulars. Pick a player type below to see how the verdict changes.' });
+  assumptions.push({ id: 'reads', text: 'No reads were set, so villains are treated as average regulars. Tap a player to set a read and see how the verdict changes.' });
 
   // Last check: the log must replay cleanly with these stacks.
   try {

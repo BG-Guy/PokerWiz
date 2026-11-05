@@ -78,6 +78,27 @@
 .action-timeline-action.is-hero {
   background: var(--accent-soft);
 }
+/* The coach's grade for this decision, at the end of the row: a button that opens its sheet */
+.action-timeline-grade {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+  min-width: 44px;
+  min-height: 36px;
+  padding: 0 6px 0 10px;
+  border-radius: 999px;
+  color: var(--text-faint);
+  transition: background-color 0.15s ease, transform 0.12s ease;
+}
+.action-timeline-grade:active {
+  transform: scale(0.94);
+}
+@media (hover: hover) {
+  .action-timeline-grade:hover {
+    background: var(--accent-soft);
+  }
+}
 .action-timeline-actor {
   min-width: 44px;
   padding: 2px 8px;

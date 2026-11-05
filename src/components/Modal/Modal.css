@@ -1,5 +1,6 @@
 /* Modal: bottom sheet that slides up on phones, centered pop-in card from 640px. Closing plays the same
-   animations backwards (MODAL_CLOSE_MS in Modal.jsx matches the 0.3s here). */
+   animations backwards (MODAL_CLOSE_MS in Modal.jsx matches the 0.3s here). On phones the handle (grabber and
+   title bar) drags the sheet; a sheet that can expand goes full screen. */
 
 .modal-backdrop {
   position: fixed;
@@ -26,6 +27,39 @@
   animation: modal-sheet-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1);
 }
 
+/* The handle: the grabber and the title bar together. Dragging it moves the sheet, so the browser must not
+   scroll or pan from it. */
+.modal-handle {
+  flex-shrink: 0;
+  touch-action: none;
+}
+/* The dialog takes focus when it opens (so keyboards and screen readers land in it): no ring around the whole sheet */
+.modal:focus,
+.modal:focus-visible {
+  outline: none;
+}
+.modal.is-dragging {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Full screen on a phone (a sheet that expanded, or opened full): the whole screen, under the status bar */
+@media (max-width: 639px) {
+  .modal.is-expanded {
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    padding-top: env(safe-area-inset-top);
+    animation: modal-grow 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+}
+@keyframes modal-grow {
+  from {
+    transform: translateY(6%);
+    opacity: 0.92;
+  }
+}
+
 /* Drag-handle look at the top of the sheet */
 .modal-grabber {
   align-self: center;
@@ -33,7 +67,7 @@
   height: 5px;
   margin-top: 8px;
   border-radius: 999px;
-  background: var(--border);
+  background: color-mix(in srgb, var(--text-faint) 60%, transparent);
 }
 
 .modal-header {
@@ -44,7 +78,20 @@
   padding: 12px 20px 8px;
 }
 .modal-title {
+  flex: 1;
+  min-width: 0;
   font-size: 20px;
+}
+.modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* A larger screen shows a card, which has no full screen to expand to */
+@media (min-width: 640px) {
+  .modal-expand {
+    display: none;
+  }
 }
 .modal-close {
   display: grid;
@@ -58,6 +105,7 @@
 .modal-body {
   padding: 8px 20px 20px;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 @media (min-width: 640px) {

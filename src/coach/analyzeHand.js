@@ -19,9 +19,10 @@ import { equityVsHands, equityVsRanges } from './equity.js';
 import { overallAccuracy, accuracyLabel, GRADES, gradeOf, gradeAgainstGto } from './grading.js';
 import { explainDecision } from './explain.js';
 import { replayHand } from './replay.js';
+import { classifySpot } from './spots.js';
 import { createRandom, seedFromString } from './random.js';
 import { createGtoHand } from '../gto/hand.js';
-import { readModels } from '../gto/players/models.js';
+import { readModels, readLabel } from '../gto/players/models.js';
 import { toAppRange } from '../gto/cards.js';
 
 const round2 = (n) => Math.round(n * 100) / 100;
@@ -68,7 +69,7 @@ function readsAt(gto, state, villains) {
         .sort((a, b) => b.w - a.w || CLASS_COMBOS[a.cls] - CLASS_COMBOS[b.cls])
         .slice(0, 8)
         .map((x) => CLASS_NAMES[x.cls]);
-      return { seat: v.seat, name: v.name, position: v.position, label: 'GTO', width: round2(width), grid: grid.map(round2), top };
+      return { seat: v.seat, name: v.name, position: v.position, label: v.read ?? 'GTO', width: round2(width), grid: grid.map(round2), top };
     });
 }
 
@@ -88,7 +89,8 @@ function firstFolders(record, entries) {
 // rangesOnly: skip grading and return each villain's range after the log ({ ranges: [{ seat, weights }] }, the
 // coach's combo order), e.g. to deal them cards that fit how they played (Practice replays).
 // detail: 'full' (reviews) or 'fast'; onProgress(text) reports what's being solved.
-export async function analyzeHand(record, { rangesOnly = false, detail = 'full', onProgress = () => {} } = {}) {
+// preflopOnly: grade the preflop decisions only (instant: no street is solved), for a first look at many hands.
+export async function analyzeHand(record, { rangesOnly = false, detail = 'full', preflopOnly = false, onProgress = () => {} } = {}) {
   const seed = seedFromString(JSON.stringify([record.players.map((p) => [p.position, p.cards, p.stack]), record.streets, record.board]));
   const random = createRandom(seed);
   const heroRecord = record.players.find((p) => p.role === 'hero');
@@ -103,7 +105,8 @@ export async function analyzeHand(record, { rangesOnly = false, detail = 'full',
 
   const villains = record.players
     .filter((p) => p.role === 'villain')
-    .map((p) => ({ seat: p.seat, position: p.position, name: p.name ?? p.position, cards: (p.cards ?? []).map(codeToIndex) }));
+    // read: how they play when they have a read ("Calling station · Rec"), otherwise null (GTO)
+    .map((p) => ({ seat: p.seat, position: p.position, name: p.name ?? p.position, cards: (p.cards ?? []).map(codeToIndex), read: readLabel(p.profile) }));
   if (!entries.length) return rangesOnly ? { ranges: [] } : summarize([], { record, heroRecord, heroProfile, villains, chart: null, bb });
 
   // The depth that matters: your stack against the deepest opponent's.
@@ -128,6 +131,7 @@ export async function analyzeHand(record, { rangesOnly = false, detail = 'full',
   let strengths = null;
   for (const entry of entries) {
     const { state, action, street } = entry;
+    if (preflopOnly && street !== 'Preflop') break;
     // A new street: solve it once, with all of its real actions in the tree.
     if (street !== currentStreet) {
       currentStreet = street;
@@ -173,6 +177,7 @@ function gradeHeroDecision({ gto, state, action, street, heroCards, heroRecord, 
     potRef,
     heroHand: describeHeroHand(heroCards, board, strengths),
     heroClass: CLASS_NAMES[classOf(heroCards[0], heroCards[1])],
+    spot: classifySpot(state, heroRecord.seat), // what kind of spot this is (the leak report groups by it)
     reads: readsAt(gto, state, villains),
     players: state.players.filter((p) => !p.folded).length,
     // Preflop, the blinds alone aren't a bet to answer: pot odds only once someone has bet or raised.
@@ -221,7 +226,7 @@ function gradeHeroDecision({ gto, state, action, street, heroCards, heroRecord, 
     graded: true,
     source: advice.source,
     chart: advice.chart ?? null,
-    chartNote: advice.exact === false ? 'this exact line is rare, so the closest solved spot was used' : null,
+    chartNote: advice.note ?? (advice.exact === false ? 'this exact line is rare, so the closest solved spot was used' : null),
     solve: advice.iterations ? { iterations: advice.iterations, seconds: Math.round(advice.elapsed / 100) / 10 } : null,
     options: labeled,
     actual: matched,
@@ -248,7 +253,7 @@ function summarize(decisions, { record, heroRecord, heroProfile, villains, chart
   const worst = graded.reduce((a, d) => (!a || d.score < a.score ? d : a), null);
   const keyLesson =
     worst && worst.score < 80
-      ? { street: worst.street, text: `${worst.street}: ${worst.best.label.toLowerCase()} was the GTO play with ${worst.heroClass}, not ${worst.actual.label.toLowerCase()}.` }
+      ? { street: worst.street, text: `${worst.street}: ${worst.best.label.toLowerCase()} was the ${villains.some((v) => v.read) ? 'best' : 'GTO'} play with ${worst.heroClass}, not ${worst.actual.label.toLowerCase()}.` }
       : null;
 
   return {
@@ -268,12 +273,13 @@ function summarize(decisions, { record, heroRecord, heroProfile, villains, chart
       seat: v.seat,
       name: v.name,
       position: v.position,
-      label: 'GTO',
+      label: v.read ?? 'GTO',
       cards: record.players.find((p) => p.seat === v.seat)?.cards ?? [],
     })),
     decisions,
     result: record.result,
     pot: record.pot,
     stakes: record.stakes,
+    record, // the hand as reviewed, so a flagged decision can be replayed exactly
   };
 }

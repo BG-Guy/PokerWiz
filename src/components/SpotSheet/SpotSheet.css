@@ -1,0 +1,86 @@
+/* The sheet for one decision: cards, chips, the verdict with its bars, a few facts, and the places to go next. */
+
+.spot-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.spot-sheet-cards {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.spot-sheet-hand,
+.spot-sheet-board {
+  display: flex;
+  gap: 4px;
+}
+.spot-sheet-board {
+  padding-left: 14px;
+  border-left: 1px solid var(--border);
+}
+
+.spot-sheet-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.spot-sheet-chips li {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.spot-sheet-verdict {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.spot-sheet-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.spot-sheet-facts > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+.spot-sheet-facts dt {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.spot-sheet-facts dd {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  font-family: var(--font-display);
+}
+.spot-sheet-facts dd.is-negative {
+  color: var(--negative);
+}
+.spot-sheet-sub {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.spot-sheet-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

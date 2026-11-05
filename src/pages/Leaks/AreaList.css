@@ -1,0 +1,42 @@
+/* The list of leaks: street chips on top, then a stack of big rows, costliest first. */
+
+.area-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.area-list-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/* In the narrow list beside an open leak the chips wrap rather than scroll out of sight */
+@media (min-width: 1100px) {
+  .area-list .filter-chips {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+}
+.area-list-rows > li {
+  animation: area-list-rise 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+.area-list-rows > li:nth-child(2) {
+  animation-delay: 0.04s;
+}
+.area-list-rows > li:nth-child(3) {
+  animation-delay: 0.08s;
+}
+.area-list-rows > li:nth-child(n + 4) {
+  animation-delay: 0.12s;
+}
+@keyframes area-list-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .area-list-rows > li {
+    animation: none;
+  }
+}

@@ -16,6 +16,7 @@ import { TABLE_POSITIONS } from '../constants/poker.js';
 import { FULL_DECK, codeToIndex } from '../utils/cards.js';
 import { classOf } from '../coach/combos.js';
 import { PREFLOP_BY_CLASS } from '../coach/preflopTable.js';
+import { classifySpot, matchesFocus, normalizeFocus, areaById, potTypeOf, roleOf } from '../coach/spots.js';
 import { createGtoHand } from '../gto/hand.js';
 import { readModels } from '../gto/players/models.js';
 import { botAction } from './gtoBot.js';
@@ -119,9 +120,21 @@ const ATTEMPTS = { preflop: 40, hu: 300, '3way': 800 };
 // 3-bet pots are rarer (most hands see one raise or none), so more deals are tried. A deal that doesn't
 // become one is dropped before any postflop solve, so these are cheap.
 const ATTEMPTS_3BET = { preflop: 400, hu: 2000, '3way': 6000 };
+// A focus (setup.focus: a kind of spot to drill, see coach/spots.js) narrows the deals that count, so more are
+// tried. Preflop ones are cheap; a postflop deal that misses has already solved a street or two.
+const ATTEMPTS_FOCUS = { preflop: 3000, hu: 700, '3way': 1500 };
+
+// The spot format a setup deals: a focus on a preflop area is a preflop spot, on a postflop area a heads-up one
+// (or 3-way when that's what was picked), whatever the setup says.
+export function formatOf(setup) {
+  const area = areaById(setup.focus?.area);
+  if (!area) return setup.format;
+  return area.street === 'Preflop' ? 'preflop' : setup.format === '3way' ? '3way' : 'hu';
+}
 
 export async function generateSpot(setup, random = Math.random) {
-  const attempts = (setup.pot === '3bet' ? ATTEMPTS_3BET : ATTEMPTS)[setup.format] ?? 40;
+  const format = formatOf(setup);
+  const attempts = (setup.focus ? ATTEMPTS_FOCUS : setup.pot === '3bet' ? ATTEMPTS_3BET : ATTEMPTS)[format] ?? 40;
   for (let attempt = 0; attempt < attempts; attempt++) {
     const spot = await tryDeal(setup, random);
     if (spot) return spot;
@@ -167,10 +180,13 @@ export async function playAgain(spot, { sameRunout = true } = {}) {
 
 async function tryDeal(setup, random) {
   const game = GAMES.find((g) => g.id === setup.game) ?? GAMES[0];
-  const format = FORMATS.find((f) => f.id === setup.format) ?? FORMATS[1];
-  const threeBet = setup.pot === '3bet';
+  const format = FORMATS.find((f) => f.id === formatOf(setup)) ?? FORMATS[1];
   const positions = TABLE_POSITIONS[game.tableSize];
-  const heroSeat = Math.floor(random() * positions.length);
+  const focus = normalizeFocus(setup.focus, positions);
+  // 3-bet pots only (the setting, or a focus on one): the 3-bet pot rules below. With a focus on a preflop spot
+  // the focus itself says which decision is the spot, so the setting is ignored.
+  const threeBet = !(focus && format.id === 'preflop') && (setup.pot === '3bet' || focus?.potType === '3bet');
+  const heroSeat = focus?.position && positions.includes(focus.position) ? positions.indexOf(focus.position) : Math.floor(random() * positions.length);
   const villainStackBB = setup.villains?.[0]?.stackBB ?? game.defaultStackBB;
   const players = positions.map((position, seat) => {
     const isHero = seat === heroSeat;
@@ -208,7 +224,9 @@ async function tryDeal(setup, random) {
   let threeBetDecision = -1;
   while (state.phase === 'action') {
     const actor = currentPlayer(state);
-    if (format.id === 'preflop' && !threeBet && actor.seat === heroSeat) return finishSpot(state);
+    // A focus on a preflop spot: you play every decision GTO's way until the one that is the spot.
+    if (focus && format.id === 'preflop' && actor.seat === heroSeat && matchesFocus(classifySpot(state, heroSeat), focus)) return finishSpot(state);
+    if (format.id === 'preflop' && !focus && !threeBet && actor.seat === heroSeat) return finishSpot(state);
     const action = botAction(gto, state, cards[actor.seat], random);
     if (threeBet && actor.seat === heroSeat && threeBetDecision < 0) {
       const raises = preflopRaises(state);
@@ -222,17 +240,20 @@ async function tryDeal(setup, random) {
     if (format.players && state.players.some((p) => p.allIn)) return null; // all in preflop: no postflop spot
   }
   if (format.id === 'preflop') {
-    if (!threeBet || threeBetDecision < 0) return null;
+    if (focus || !threeBet || threeBetDecision < 0) return null; // a focus found its spot above, or didn't come up
     return rebuild(origin(script.slice(0, threeBetDecision)));
   }
   if (state.phase !== 'board') return null;
   if (threeBet && preflopRaises(state) !== 2) return null; // a single-raised (or 4-bet) pot: not this practice
+  // A focus on the kind of pot, or on which side of it you are, is known before any street is solved.
+  if (focus?.potType && potTypeOf(state) !== focus.potType) return null;
+  if (focus?.role && roleOf(state, heroSeat) !== focus.role) return null;
   const alive = state.players.filter((p) => !p.folded);
   if (alive.length !== format.players || !alive.some((p) => p.seat === heroSeat)) return null;
 
   // Postflop: play on (everyone GTO) until it's your turn on the chosen street (setup.street picks it, for
   // checks like scripts/gto/leakScan.mjs; otherwise it's random).
-  const target = setup.street ?? pickWeighted(TARGET_STREETS, random);
+  const target = setup.street ?? areaById(focus?.area)?.street ?? pickWeighted(TARGET_STREETS, random);
   while (true) {
     if (state.phase === 'result') return null;
     if (state.phase === 'board') {
@@ -241,7 +262,9 @@ async function tryDeal(setup, random) {
       continue;
     }
     const actor = currentPlayer(state);
-    if (actor.seat === heroSeat && state.street === target) return finishSpot(state);
+    // Your decision on the street is the spot, if it's the kind that was asked for (betting, facing a bet...). A
+    // decision that isn't plays out GTO's way: out of position you check first and may face a bet after it.
+    if (actor.seat === heroSeat && state.street === target && matchesFocus(classifySpot(state, heroSeat), focus)) return finishSpot(state);
     const action = botAction(gto, state, cards[actor.seat], random);
     if (actor.seat === heroSeat && action.type === 'fold') return null; // your autopilot gave up: not a spot
     play(action);
@@ -332,7 +355,8 @@ export function spotRecord(spot) {
     tableSize: game.tableSize,
     positions,
     heroSeat: spot.heroSeat,
-    players: spot.players.map((p) => ({ ...p, cards: spot.cards[p.seat] ?? [] })),
+    // The opponents' read (when Practice set one) goes with them, so the coach grades against how they played.
+    players: spot.players.map((p) => ({ ...p, cards: spot.cards[p.seat] ?? [], profile: p.role === 'villain' ? spot.setup.villains?.[0]?.profile ?? null : null })),
     streets: state.streets,
     board: state.board,
     winners: spot.winners ?? [],

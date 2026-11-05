@@ -15,20 +15,22 @@ export const TRAITS = [
 
 // Tendencies: how a player plays, whatever their skill. They set looseness and aggression; some add
 // behavior the meters can't express (mods, applied in modelParams). Stats are the VPIP/PFR they aim for.
+// `exploit` says in a sentence how to adjust against them (what the coach's advice shifts toward).
 export const TENDENCIES = [
-  { id: 'unknown', label: 'Unknown', traits: { looseness: 50, aggression: 50 }, description: 'No read yet. Plays like an average player (about 24/19).' },
-  { id: 'nit', label: 'Nit', traits: { looseness: 15, aggression: 35 }, description: 'Very few hands (about 14/11). Folds to pressure, bets mean strength.' },
-  { id: 'tag', label: 'TAG', traits: { looseness: 40, aggression: 65 }, description: 'Tight and aggressive (about 22/19).' },
-  { id: 'lag', label: 'LAG', traits: { looseness: 68, aggression: 82 }, description: 'Loose and aggressive (about 32/26). Lots of pressure and bluffs.' },
-  { id: 'fish', label: 'Loose passive', traits: { looseness: 75, aggression: 30 }, description: 'Plays lots of hands and calls with them (about 35/10). Rarely takes the lead.' },
-  { id: 'station', label: 'Calling station', traits: { looseness: 85, aggression: 15 }, description: 'Plays many hands, rarely raises (about 40/8). Hates folding.' },
-  { id: 'maniac', label: 'Maniac', traits: { looseness: 95, aggression: 95 }, description: 'Plays almost everything and bets it all (about 50/40).' },
+  { id: 'unknown', label: 'Unknown', traits: { looseness: 50, aggression: 50 }, description: 'No read yet. Plays like an average player (about 24/19).', exploit: 'No adjustments: GTO is the best guide against an unknown player.' },
+  { id: 'nit', label: 'Nit', traits: { looseness: 15, aggression: 35 }, description: 'Very few hands (about 14/11). Folds to pressure, bets mean strength.', exploit: 'Steal their blinds and bluff more, since they fold too much. When they bet or raise, believe them and let the middling hands go.' },
+  { id: 'tag', label: 'TAG', traits: { looseness: 40, aggression: 65 }, description: 'Tight and aggressive (about 22/19).', exploit: 'Respect their raises: they have it more often than not. They fold less than a nit, so keep your bluffs for good spots.' },
+  { id: 'lag', label: 'LAG', traits: { looseness: 68, aggression: 82 }, description: 'Loose and aggressive (about 32/26). Lots of pressure and bluffs.', exploit: 'Call down lighter and let them bluff. 3-bet them for value, and don’t fold your good hands to pressure.' },
+  { id: 'fish', label: 'Loose passive', traits: { looseness: 75, aggression: 30 }, description: 'Plays lots of hands and calls with them (about 35/10). Rarely takes the lead.', exploit: 'Value bet wide and bluff little: they call too often and rarely raise. Their raises are strong.' },
+  { id: 'station', label: 'Calling station', traits: { looseness: 85, aggression: 15 }, description: 'Plays many hands, rarely raises (about 40/8). Hates folding.', exploit: 'Bluff less, and value bet thinner and bigger. They call too much, so give them fewer chances to fold the hands you beat.' },
+  { id: 'maniac', label: 'Maniac', traits: { looseness: 95, aggression: 95 }, description: 'Plays almost everything and bets it all (about 50/40).', exploit: 'Let them do the betting: call lighter, trap with your strong hands and fold your weak ones early.' },
   {
     id: 'drunk',
     label: 'Drunk',
     traits: { looseness: 88, aggression: 70 },
     mods: { noise: 0.1, foldMult: 0.7, bluffMult: 1.3, bluffsAnySize: true },
     description: 'Plays almost any hand, calls too far and fires random bets of any size. Hard to bluff, easy to value bet.',
+    exploit: 'Value bet thin and never bluff. Their bets are mostly noise, so call down wider.',
   },
 ];
 

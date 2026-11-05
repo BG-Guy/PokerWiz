@@ -25,6 +25,7 @@ import DetailSheet from '../../components/DetailSheet/DetailSheet.jsx';
 import StatDetail from '../../components/StatDetail/StatDetail.jsx';
 import LiveSessionBanner from './LiveSessionBanner.jsx';
 import HighlightsPreview from './HighlightsPreview.jsx';
+import StudyPanel from './StudyPanel.jsx';
 import './Dashboard.css';
 
 const loadDashboard = () => Promise.all([getSessions(), getHands(), getGoals(), getLiveSession()]);
@@ -78,6 +79,9 @@ export default function Dashboard() {
       </div>
 
       <div className="dashboard-grid">
+        {/* Study: your biggest leak, a drill for it, and the range charts */}
+        <StudyPanel hands={hands} />
+
         {/* Bankroll curve */}
         <Panel
           title="Bankroll"

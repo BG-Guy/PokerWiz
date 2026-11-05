@@ -1,0 +1,46 @@
+/* Stacked colour bar of how a range splits between actions, with a dotted legend line under it. */
+
+.rg-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.rg-bar-track {
+  display: block;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--rg-dim);
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.rg-bar.is-lg .rg-bar-track {
+  height: 14px;
+}
+.rg-bar.is-sm .rg-bar-track {
+  height: 8px;
+}
+
+.rg-bar-text {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 11px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.rg-bar-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.rg-bar-item .num {
+  font-size: 15px;
+  color: var(--text);
+}
+.rg-bar-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+}

@@ -1,0 +1,53 @@
+/* Flag button on a graded decision: a quiet pill that turns crimson once flagged, with a note field beside it. */
+
+.flag-button {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The toggle */
+.flag-button-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+.flag-button-toggle:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+.flag-button.is-flagged .flag-button-toggle {
+  color: var(--crimson);
+  border-color: color-mix(in srgb, var(--crimson) 55%, transparent);
+  background: color-mix(in srgb, var(--crimson) 12%, transparent);
+}
+
+/* What looks wrong */
+.flag-button-note {
+  flex: 1 1 180px;
+  min-width: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  font-size: 16px; /* 16px keeps iPhone Safari from zooming into the field */
+}
+
+.flag-button-error {
+  width: 100%;
+  color: var(--negative);
+  font-size: 12px;
+}

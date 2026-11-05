@@ -1,0 +1,138 @@
+/* You against GTO: two stacked bars (one segment per play, sized by how often) and a legend of the numbers. */
+
+.you-vs-gto {
+  --kind-fold: #6b7280;
+  --kind-check: #0f9a8f;
+  --kind-call: #1f9d57;
+  --kind-raise: #d62839;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.you-vs-gto-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.you-vs-gto-who {
+  flex-shrink: 0;
+  width: 34px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.you-vs-gto-bar {
+  display: flex;
+  flex: 1;
+  height: 34px;
+  gap: 2px;
+  border-radius: 10px;
+  overflow: hidden;
+  transform-origin: left;
+  animation: you-vs-gto-grow 0.55s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+.you-vs-gto-line:nth-child(2) .you-vs-gto-bar {
+  animation-delay: 0.08s;
+}
+@keyframes you-vs-gto-grow {
+  from {
+    transform: scaleX(0.02);
+    opacity: 0.4;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .you-vs-gto-bar {
+    animation: none;
+  }
+}
+
+.you-vs-gto-seg {
+  display: grid;
+  place-items: center;
+  flex-basis: 0;
+  min-width: 4px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  transition: opacity 0.2s ease;
+}
+.you-vs-gto-seg.is-fold {
+  background: var(--kind-fold);
+}
+.you-vs-gto-seg.is-check {
+  background: var(--kind-check);
+}
+.you-vs-gto-seg.is-call {
+  background: var(--kind-call);
+}
+.you-vs-gto-seg.is-raise {
+  background: var(--kind-raise);
+}
+.you-vs-gto-seg.is-dim {
+  opacity: 0.25;
+}
+
+/* Legend: a dot, the play, and your share against GTO's. Buttons when picking one narrows the spots. */
+.you-vs-gto-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.you-vs-gto-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.you-vs-gto-key.is-button {
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.12s ease;
+}
+.you-vs-gto-key.is-button:hover {
+  border-color: var(--text-faint);
+}
+.you-vs-gto-key.is-button:active {
+  transform: scale(0.97);
+}
+.you-vs-gto-key.is-active {
+  background: var(--selected-bg);
+  border-color: var(--selected-bg);
+  color: var(--selected-text);
+}
+.you-vs-gto-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.you-vs-gto-dot.is-fold {
+  background: var(--kind-fold);
+}
+.you-vs-gto-dot.is-check {
+  background: var(--kind-check);
+}
+.you-vs-gto-dot.is-call {
+  background: var(--kind-call);
+}
+.you-vs-gto-dot.is-raise {
+  background: var(--kind-raise);
+}
+.you-vs-gto-numbers {
+  font-size: 15px;
+}
+.you-vs-gto-numbers small {
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-weight: 600;
+  opacity: 0.7;
+}

@@ -1,0 +1,50 @@
+/* A player's read as a tappable chip: seat, the read, and a chevron. A set read is lit; no read is quiet. */
+
+.read-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+.read-chip:active {
+  transform: scale(0.97);
+}
+@media (hover: hover) {
+  .read-chip:hover {
+    border-color: var(--text-faint);
+  }
+}
+.read-chip:disabled {
+  opacity: 0.6;
+}
+.read-chip-seat {
+  font-weight: 800;
+  color: var(--text);
+}
+.read-chip-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.read-chip.is-set {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  background: var(--accent-soft);
+}
+.read-chip.is-set .read-chip-label {
+  color: var(--text);
+  font-weight: 700;
+}
+.read-chip-chevron {
+  flex-shrink: 0;
+  color: var(--text-faint);
+}

@@ -1,6 +1,6 @@
 // Right pane of Hand Review: the table (board, your hand, villain hands), action replay, and your review
 // (verdict, star rating, tilt, notes). "Edit" opens the hand's edit sheet (details, the action, delete).
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { VERDICTS } from '../../constants/poker.js';
 import { bigBlindOf, formatLongDate, formatMoney } from '../../utils/format.js';
@@ -15,6 +15,8 @@ import Icon from '../../components/Icon/Icon.jsx';
 import { useClosingValue } from '../../hooks/useClosingValue.js';
 import ActionTimeline from './ActionTimeline.jsx';
 import EditHandSheet from './EditHandSheet.jsx';
+import SpotSheet from '../../components/SpotSheet/SpotSheet.jsx';
+import { collectRows } from '../../coach/leaks.js';
 import { coachSupport } from '../../coach/savedHand.js';
 import { replayStreets } from '../../practice/replaySpot.js';
 import './HandDetail.css';
@@ -50,6 +52,11 @@ export default function HandDetail({ hand, backTo, onUpdate, onSaved, onDeleted 
     navigate(`${location.pathname}${location.search}`, { replace: true, state: null });
   }, [location, navigate]);
   const [editSheet, editOpen] = useClosingValue(editing); // stays up while it slides closed
+  // The coach's grades for your decisions (kept on the hand by the leak scan or a review): each one is tappable
+  // in the action replay and opens that decision's sheet.
+  const grades = useMemo(() => new Map(collectRows([hand]).map((row) => [row.i, row])), [hand]);
+  const [gradeRow, setGradeRow] = useState(null);
+  const [gradeSheet, gradeOpen] = useClosingValue(gradeRow);
   const villains = villainsOf(hand);
   // Every Hold'em hand can be reviewed by the coach (missing details are rebuilt from the log).
   const coach = coachSupport(hand);
@@ -84,6 +91,7 @@ export default function HandDetail({ hand, backTo, onUpdate, onSaved, onDeleted 
       </header>
 
       {editSheet && <EditHandSheet hand={hand} open={editOpen} onClose={() => setEditing(false)} onSaved={onSaved} onDeleted={onDeleted} />}
+      <SpotSheet row={gradeSheet} open={gradeOpen} onClose={() => setGradeRow(null)} />
 
       {coach.ok ? (
         <Link to={`/coach?hand=${hand.id}`} className="btn hand-detail-coach">
@@ -167,7 +175,8 @@ export default function HandDetail({ hand, backTo, onUpdate, onSaved, onDeleted 
 
       <section className="hand-detail-section">
         <h3 className="hand-detail-section-title">Action</h3>
-        <ActionTimeline streets={hand.streets} board={hand.board} bb={bigBlindOf(hand.stakes)} replayLink={replayLink} />
+        <ActionTimeline streets={hand.streets} board={hand.board} bb={bigBlindOf(hand.stakes)} replayLink={replayLink} grades={grades.size > 0 ? grades : null} onGrade={setGradeRow} />
+        {grades.size > 0 && <p className="hand-detail-grades-hint">Tap a grade to see how the coach rated that decision.</p>}
       </section>
 
       {/* The user's own review: verdict, star rating, tilt and notes (each saved as it changes) */}

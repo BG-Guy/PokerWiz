@@ -1,0 +1,47 @@
+/* A range sheet: the share up top, the grid, a line about the hand you tapped, then the range as text. */
+
+.rg-range {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rg-range-lead {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rg-range-share {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+}
+.rg-range-caption {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.rg-range-pick {
+  min-height: 22px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.rg-range-title {
+  margin-top: 4px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+.rg-range-note {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text-faint);
+}
+
+/* In the wide panel of a desktop the grid stays a sensible size */
+.rg-range .rg-grid {
+  max-width: 540px;
+  margin-inline: auto;
+}

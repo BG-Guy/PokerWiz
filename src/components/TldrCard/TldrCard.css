@@ -1,0 +1,26 @@
+/* The explanation inside a TLDR sheet: plain paragraphs and a short list, for text that isn't a StatDetail. */
+
+.tldr-text {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+.tldr-text strong {
+  color: var(--text);
+}
+.tldr-text ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 18px;
+  list-style: disc;
+}
+.tldr-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}

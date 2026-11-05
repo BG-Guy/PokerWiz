@@ -111,16 +111,16 @@ export async function createGtoHand({ state, stackBB, known = {}, detail = 'full
       const actor = currentPlayer(s);
       const [a, b] = cards.map(cardId);
       if (s.street === 'Preflop') {
-        if (!walker.moveTo(actor.position)) return { unavailable: walker.lost ?? 'This seat is not part of the solved game.' };
+        if (!walker.moveTo(actor.position)) return { unavailable: walker.lost ?? walker.missing ?? 'This seat is not part of the solved game.' };
         const advice = walker.advice(classOfCards(a, b));
         if (!advice) return { unavailable: 'No solution for this spot.' };
         const base = Math.max(0, advice.actions.findIndex((x) => x.type === 'fold' || x.type === 'check'));
         const values = advice.loss.map((loss) => advice.loss[base] - loss);
-        return { source: 'chart', chart: chart.config, options: optionsFrom(advice.actions, advice.strategy, values), lossBB: advice.loss, exact: advice.exact };
+        return { source: 'chart', chart: chart.config, options: optionsFrom(advice.actions, advice.strategy, values), lossBB: advice.loss, exact: advice.exact, note: advice.note };
       }
       if (!street) return { unavailable: unavailable ?? 'The street has not started.' };
       const advice = street.advice(order.indexOf(actor.seat), handIndex(a, b));
-      return { source: 'solver', options: optionsFrom(advice.actions, advice.strategy, advice.values), exact: true, iterations: advice.iterations, elapsed: advice.elapsed };
+      return { source: 'solver', options: optionsFrom(advice.actions, advice.strategy, advice.values), exact: true, offLine: advice.offLine, iterations: advice.iterations, elapsed: advice.elapsed };
     },
     // Which advised option a real action is (preflop sizes map to the nearest size the charts have).
     optionIndex(s, action, advice) {

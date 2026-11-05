@@ -4,12 +4,16 @@ import { db, transaction } from '../db/database.js';
 import { addEvent, findById as findSession } from './sessions.js';
 
 // Fields that can change after a hand is saved: your review (verdict, notes, rating, tilt, tags), the coach's
-// score and the reads it used, and the hand itself (title, stakes, cards, board, amounts, and a re-recorded
-// action: streets and players). The date is a column of its own (see updateHand).
+// score, the reads it used and its compact list of graded decisions (what the leak report adds up), and the
+// hand itself (title, stakes, cards, board, amounts, and a re-recorded action: streets and players). The date
+// is a column of its own (see updateHand).
 const EDITABLE_FIELDS = [
-  'verdict', 'note', 'title', 'tags', 'rating', 'tilt', 'coachAccuracy', 'coachReads',
+  'verdict', 'note', 'title', 'tags', 'rating', 'tilt', 'coachAccuracy', 'coachReads', 'coachDecisions',
   'game', 'stakes', 'tableSize', 'heroPosition', 'holeCards', 'board', 'potSize', 'result', 'streets', 'players',
 ];
+
+// The fields that are the hand itself (what the coach grades), as against your review of it.
+const HAND_FIELDS = ['game', 'stakes', 'tableSize', 'heroPosition', 'holeCards', 'board', 'streets', 'players'];
 
 function toHand(row) {
   return { ...JSON.parse(row.data), id: row.id, sessionId: row.session_id, date: row.date };
@@ -50,6 +54,9 @@ export function updateHand(id, changes) {
   for (const field of EDITABLE_FIELDS) {
     if (changes[field] !== undefined) data[field] = changes[field];
   }
+  // The coach's graded decisions belong to the hand as it was: change the hand itself and they're dropped (the
+  // leak scan grades it again), unless this same change brings fresh ones.
+  if (changes.coachDecisions === undefined && HAND_FIELDS.some((field) => changes[field] !== undefined)) delete data.coachDecisions;
   transaction(() => {
     db.prepare('UPDATE hands SET data = ?, date = ? WHERE id = ?').run(JSON.stringify(data), changes.date ?? date, id);
     db.prepare('UPDATE session_events SET text = ?, amount = ? WHERE hand_id = ?').run(data.title ?? 'Hand', data.result ?? null, id);

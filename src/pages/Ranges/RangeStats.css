@@ -1,0 +1,59 @@
+/* Range size and mixed-hand count: two small tiles side by side; the second is a button. */
+
+.rg-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.rg-stat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-height: 72px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-align: left;
+}
+.rg-stat-label {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+.rg-stat-value {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.rg-stat-sub {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.rg-stat.is-button {
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.rg-stat.is-button:active {
+  transform: scale(0.98);
+}
+@media (hover: hover) {
+  .rg-stat.is-button:hover {
+    border-color: var(--text-faint);
+  }
+  .rg-stat.is-button:hover .rg-stat-chevron {
+    transform: translateX(3px);
+    color: var(--text);
+  }
+}
+.rg-stat-chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  margin-top: -8px;
+  color: var(--text-faint);
+  transition: transform 0.18s ease, color 0.18s ease;
+}

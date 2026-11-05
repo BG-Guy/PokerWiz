@@ -57,6 +57,23 @@ test('hands: edit the hand itself, reject bad edits, delete', async () => {
   assert.equal((await api(`/hands/${hand.id}`, 'DELETE')).status, 404);
 });
 
+test("hands: the coach's graded decisions stay with the hand, and go when the hand itself changes", async () => {
+  const [hand] = (await api('/hands')).data;
+  const decisions = { v: 1, at: '2026-11-04T10:00:00.000Z', detail: 'fast', accuracy: 82, decisions: [{ i: 0, area: 'open', loss: 0.2, score: 90 }] };
+  const saved = await api(`/hands/${hand.id}`, 'PATCH', { coachAccuracy: 82, coachDecisions: decisions });
+  assert.equal(saved.status, 200);
+  assert.deepEqual(saved.data.coachDecisions, decisions);
+  // Your review of the hand leaves them alone...
+  assert.deepEqual((await api(`/hands/${hand.id}`, 'PATCH', { verdict: 'good', rating: 4 })).data.coachDecisions, decisions);
+  // ...the hand itself doesn't: they were graded on the old one, so they go (the leak scan grades it again).
+  const changed = await api(`/hands/${hand.id}`, 'PATCH', { board: ['Kc', '7d', '2h'], holeCards: ['As', 'Ad'] });
+  assert.equal(changed.data.coachDecisions, undefined);
+  // New decisions that come with a change to the hand stay.
+  const both = await api(`/hands/${hand.id}`, 'PATCH', { holeCards: ['Ah', 'Ac'], coachDecisions: decisions });
+  assert.deepEqual(both.data.coachDecisions, decisions);
+  assert.equal((await api(`/hands/${hand.id}`, 'PATCH', { coachDecisions: 'nonsense' })).status, 400);
+});
+
 test('finished sessions: edit and delete (their hands stay)', async () => {
   const [session] = (await api('/sessions')).data;
   const edited = await api(`/sessions/${session.id}`, 'PATCH', { venue: 'Home game', cashOut: 500, durationMin: 240, hands: 120, notes: 'edited', rating: 4.5, tilt: 2 });

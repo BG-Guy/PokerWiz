@@ -20,6 +20,8 @@ const EditHand = lazy(() => import('./pages/EditHand/EditHand.jsx'));
 const Equity = lazy(() => import('./pages/Equity/Equity.jsx'));
 const Coach = lazy(() => import('./pages/Coach/Coach.jsx'));
 const Practice = lazy(() => import('./pages/Practice/Practice.jsx'));
+const Leaks = lazy(() => import('./pages/Leaks/Leaks.jsx'));
+const Ranges = lazy(() => import('./pages/Ranges/Ranges.jsx'));
 
 export default function App() {
   // Re-render every page when the BB/$ switch changes (amounts are formatted during render).
@@ -43,6 +45,9 @@ export default function App() {
         <Route path="equity" element={<Equity />} />
         <Route path="coach" element={<Coach />} />
         <Route path="practice" element={<Practice />} />
+        {/* Study: the leak report (and one leak's page) and the preflop range browser */}
+        <Route path="leaks/:areaId?" element={<Leaks />} />
+        <Route path="ranges" element={<Ranges />} />
         <Route path="profile" element={<Profile />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

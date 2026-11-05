@@ -23,6 +23,12 @@ import { createRandom } from '../../coach/random.js';
 const ALPHA = 1.5;
 const GAMMA = 2;
 
+// On the real line, the action a player really took keeps at least this share of each hand's reach (a tremble,
+// like the preflop solver's). When the solution would never take it (a bet it never makes), the answers to it
+// are still played against a range, the player's whole range, instead of against nobody, which would leave them
+// untrained. For an action a few percent of the range takes, it adds only a few percent of other hands.
+export const REAL_FLOOR = 0.001;
+
 // Per kind of solve: how many turn and river cards are sampled, how many streets have betting (counting the
 // one being solved; after that the hand is checked down), how many of the rivers each training pass visits
 // (riverDraw, rotating; 0 or left out = all), and how many iterations / ms it gets.
@@ -288,7 +294,8 @@ export function solvePostflop(input) {
     for (let a = 0; a < A; a++) {
       if (bestResponse) childReach[p] = myReach;
       else {
-        for (let h = 0; h < n; h++) row[h] = myReach[h] * play[a * n + h];
+        const floor = a === node.realIndex ? REAL_FLOOR : 0;
+        for (let h = 0; h < n; h++) row[h] = myReach[h] * (play[a * n + h] + floor);
         childReach[p] = row;
       }
       walk(node.children[a], childReach, depth + 1, mode, iteration, brPlayer);

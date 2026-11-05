@@ -9,6 +9,7 @@
 // reached and get sensible answers (what to do after an unusual limp, a 3-bet with the wrong hand...).
 import { buildPreflopTree, PLAYERS, POSTFLOP_ORDER } from '../../../src/gto/preflop/tree.js';
 import { CLASS_COUNT, CLASS_COMBOS, CLASS_NAMES } from '../../../src/gto/cards.js';
+import { PREMIUM_NAMES, FLAT_PAIR_NAMES } from '../../../src/gto/preflop/premiums.js';
 import { createPayoffs, classRanks } from './payoffs.mjs';
 
 const N = CLASS_COUNT;
@@ -17,7 +18,13 @@ const N = CLASS_COUNT;
 // flop model can't see how much more a bigger pot is worth to them): the solution drifted into flatting KK a
 // third of the time in some spots, and a recalibrated model flatted AK against an early-position open. To a
 // player, a flatted premium reads as a bug.
-const PREMIUM_LOCK = ['AA', 'KK', 'QQ', 'AKs', 'AKo'].map((name) => CLASS_NAMES.indexOf(name));
+const PREMIUM_LOCK = PREMIUM_NAMES.map((name) => CLASS_NAMES.indexOf(name));
+// Node-lock: the middle pairs (22-99) facing a single raise never re-raise: they call or fold. The flop model
+// values a 3-bet with a pair (fold equity, a pot share with no draw to it) above a call, so the solution
+// 3-bet 55 to 99 every time and called 44 and below; published solver charts call with all of them, hit a set
+// and win a stack, and 3-bet the top of the range and the bluffs instead. A player reads a 3-bet with 77 and a
+// fold of KJs as upside down. Only where a call exists (with two callers already in, the tree has none).
+const FLAT_PAIR_LOCK = FLAT_PAIR_NAMES.map((name) => CLASS_NAMES.indexOf(name));
 const ALPHA = 1.5;
 const GAMMA = 2;
 const TREMBLE = 0.001;
@@ -65,7 +72,10 @@ export function createPreflopSolver({ stack, ante = 0, table, model }) {
     node.childReach = Array.from({ length: A }, () => new Float64Array(N));
     // Facing exactly one raise: where the premium lock applies (its raise and all-in options).
     const raises = node.actions.map((a, k) => (a.type === 'raise' || a.type === 'allin' ? k : -1)).filter((k) => k >= 0);
-    if (node.level === 1 && raises.length) node.lockRaises = raises;
+    if (node.level === 1 && raises.length) {
+      node.lockRaises = raises;
+      node.lockFlat = node.actions.some((a) => a.type === 'call'); // the pairs' lock needs a call to flat with
+    }
   }
   for (const node of [...tree.decisions, ...tree.terminals]) node.cfv = Array.from({ length: PLAYERS }, () => new Float64Array(N));
 
@@ -199,6 +209,22 @@ export function createPreflopSolver({ stack, ante = 0, table, model }) {
       }
     }
     if (node.lockRaises) lockToRaises(node);
+    if (node.lockFlat) lockToFlat(node);
+  }
+
+  // The middle pairs facing a single raise only call or fold: the raises are taken away, and the solver still
+  // picks between calling and folding by their regrets.
+  function lockToFlat(node) {
+    const { sigma } = node;
+    const kept = node.actions.map((_, a) => a).filter((a) => !node.lockRaises.includes(a));
+    for (const i of FLAT_PAIR_LOCK) {
+      let total = 0;
+      for (const a of kept) total += sigma[a * N + i];
+      node.actions.forEach((_, a) => {
+        if (node.lockRaises.includes(a)) sigma[a * N + i] = 0;
+        else sigma[a * N + i] = total > 0 ? sigma[a * N + i] / total : 1 / kept.length;
+      });
+    }
   }
 
   // AA and KK facing a single raise only re-raise: fold and call are taken away, and the solver still picks

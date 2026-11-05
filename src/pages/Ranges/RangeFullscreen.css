@@ -1,0 +1,76 @@
+/* Full-screen grid. The board takes everything the strip and legend leave; the grid inside is as big as fits
+   (cells may be wider or taller than square, within reason). Sideways on a phone the strip and legend move to the
+   right so the grid gets the full height. */
+
+.rg-full {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  padding: 10px 8px 10px;
+}
+
+.rg-full-board {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-height: 0;
+  min-width: 0;
+  container-type: size;
+}
+.rg-full-board .rg-grid {
+  width: min(100cqw, calc(100cqh * 1.6));
+  height: min(100cqh, calc(100cqw * 1.45));
+}
+
+.rg-full-side {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 8px;
+}
+.rg-full-hint {
+  display: grid;
+  place-items: center;
+  min-height: 56px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.rg-full-action {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  transition: transform 0.15s ease;
+}
+.rg-full-action:active {
+  transform: scale(0.92);
+}
+
+/* Sideways on a phone: the grid on the left, the legend and the hand on the right */
+@media (orientation: landscape) and (max-height: 560px) {
+  .rg-full {
+    flex-direction: row;
+    gap: 12px;
+    padding: 8px 10px;
+  }
+  .rg-full-side {
+    flex: 0 0 min(320px, 38%);
+    justify-content: center;
+    overflow-y: auto;
+  }
+  .rg-full-side .rg-legend.is-chips {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+}

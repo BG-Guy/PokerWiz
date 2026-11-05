@@ -1,10 +1,14 @@
 // One graded decision in the coach report: what you did vs. the GTO play, how often GTO takes each option
 // with your hand and what each is worth, the numbers behind the spot (price, equity), the coach's notes, and
-// each villain's range at that point.
+// each villain's range at that point. Against a player with a read it says "best play" where it says "GTO".
+import { Link } from 'react-router-dom';
 import { formatMoney } from '../../utils/format.js';
+import { spotTitle, describeFocus, focusToParams } from '../../coach/spots.js';
+import { focusOfRow } from '../../coach/leaks.js';
 import PlayingCard from '../../components/PlayingCard/PlayingCard.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import GradeBadge from '../../components/GradeBadge/GradeBadge.jsx';
+import FlagButton from '../../components/FlagButton/FlagButton.jsx';
 import RangeGrid from './RangeGrid.jsx';
 import './DecisionCard.css';
 
@@ -14,13 +18,13 @@ const plain = (n, bb) => formatMoney(Math.round(n * 100) / 100, { sign: false, b
 const signed = (n, bb) => formatMoney(Math.round(n * 100) / 100, { bb });
 
 // Every option: how often GTO takes it with this hand (bar) and its value (relative to folding).
-function GtoOptions({ options, bb }) {
+function GtoOptions({ options, bb, vsRead }) {
   const hasValues = options.some((o) => o.ev !== null && o.ev !== undefined);
   return (
     <div className="decision-gto">
       <div className={`decision-gto-head ${hasValues ? '' : 'no-values'}`} aria-hidden="true">
         <span>Option</span>
-        <span>GTO plays it</span>
+        <span>{vsRead ? 'Best play mix' : 'GTO plays it'}</span>
         {hasValues && <span>Value</span>}
       </div>
       <ul className="decision-gto-list">
@@ -28,7 +32,7 @@ function GtoOptions({ options, bb }) {
           <li key={option.label} className={`decision-gto-row ${option.isBest ? 'is-best' : ''} ${option.isActual ? 'is-actual' : ''} ${hasValues ? '' : 'no-values'}`}>
             <span className="decision-ev-label">
               {option.label}
-              {option.isBest && <span className="decision-tag is-best">GTO</span>}
+              {option.isBest && <span className="decision-tag is-best">{vsRead ? 'Best' : 'GTO'}</span>}
               {option.isActual && <span className="decision-tag is-actual">You</span>}
             </span>
             <span className="decision-gto-frequency">
@@ -45,10 +49,15 @@ function GtoOptions({ options, bb }) {
   );
 }
 
-export default function DecisionCard({ decision, number, bb = null }) {
+// flagContext: { source, record, detail } to offer flagging this decision for review (utils/flags.js), or null.
+// drillable: offer to drill this kind of spot (it opens Practice dealing only spots like it, so not where leaving
+// would lose a hand being played).
+export default function DecisionCard({ decision, number, bb = null, flagContext = null, drillable = false }) {
   const d = decision;
   const needed = d.facingBet ? d.toCall / (d.pot + d.toCall) : null;
   const gradeId = d.graded ? d.grade.id : 'ungraded';
+  // Someone still in the hand has a read: the "GTO" play is the best play against them.
+  const vsRead = d.reads.some((r) => r.label !== 'GTO');
 
   return (
     // Cards come in one after another (--i staggers the entrance)
@@ -77,6 +86,8 @@ export default function DecisionCard({ decision, number, bb = null }) {
       </header>
 
       <p className="decision-card-hand">{d.heroHand.text}</p>
+      {/* What kind of spot it was (the same names the leak report uses) */}
+      {d.spot && <p className="decision-card-spot">{spotTitle(d.spot)}</p>}
 
       {d.graded && (
         <>
@@ -88,7 +99,7 @@ export default function DecisionCard({ decision, number, bb = null }) {
             </div>
             <Icon name="chevronRight" size={18} className="decision-compare-arrow" />
             <div className="decision-compare-item is-coach">
-              <span className="decision-compare-label">GTO</span>
+              <span className="decision-compare-label">{vsRead ? 'Best' : 'GTO'}</span>
               <span className="decision-compare-value">{d.best.label}</span>
             </div>
           </div>
@@ -131,7 +142,7 @@ export default function DecisionCard({ decision, number, bb = null }) {
             )}
           </dl>
 
-          <GtoOptions options={d.options} bb={bb} />
+          <GtoOptions options={d.options} bb={bb} vsRead={vsRead} />
         </>
       )}
 
@@ -144,13 +155,25 @@ export default function DecisionCard({ decision, number, bb = null }) {
         ))}
       </ul>
 
+      {/* Think the engine got this one wrong? Flag it (kept on this device, exported from Profile) */}
+      {(flagContext?.record || (drillable && d.spot && d.graded)) && (
+        <div className="decision-card-flag">
+          {flagContext?.record && <FlagButton context={flagContext} decision={d} />}
+          {drillable && d.spot && d.graded && (
+            <Link to={`/practice?${focusToParams(focusOfRow(d.spot))}`} className="decision-card-drill" title={describeFocus(focusOfRow(d.spot))}>
+              <Icon name="target" size={14} /> Drill spots like this
+            </Link>
+          )}
+        </div>
+      )}
+
       {/* Each villain's GTO range at this point */}
       {d.reads.map((read) => (
         <details key={read.seat} className="decision-read">
           <summary>
             <Icon name="villain" size={16} />
             <span>
-              {read.position} · GTO range · about {pct(read.width)} of hands
+              {read.position} · {read.label === 'GTO' ? 'GTO range' : `${read.label} range`} · about {pct(read.width)} of hands
             </span>
           </summary>
           {read.top.length > 0 && <p className="decision-read-top">Most likely: {read.top.join(', ')}</p>}

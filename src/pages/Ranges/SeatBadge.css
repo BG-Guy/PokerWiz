@@ -1,0 +1,24 @@
+/* Seat badge: the position's name in the display font on a rounded tile. */
+
+.rg-seat {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 5px;
+  border-radius: 11px;
+  background: var(--surface-2);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+.rg-seat.is-lg {
+  min-width: 46px;
+  height: 46px;
+  padding: 0 6px;
+  border-radius: 14px;
+  font-size: 18px;
+}

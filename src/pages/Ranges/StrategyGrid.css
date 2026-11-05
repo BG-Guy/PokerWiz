@@ -1,0 +1,101 @@
+/* The 13x13 range grid. Cells are colour bars (set inline from the strategy) with the hand name on top; the hand
+   name scales with the grid (container units), so it fits a 27px phone cell and a 45px desktop one. Cells press in
+   under a finger, the picked one wears a ring, and the grid ripples in from the top left when a spot loads. */
+
+.rg-grid {
+  display: grid;
+  grid-template-columns: repeat(13, minmax(0, 1fr));
+  gap: 2px;
+  width: 100%;
+  container-type: inline-size;
+  transition: opacity 0.2s ease;
+}
+.rg-grid[aria-busy='true'] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+/* Fills a box instead of staying square (full screen): the rows stretch too */
+.rg-grid.is-fill {
+  height: 100%;
+  grid-template-rows: repeat(13, minmax(0, 1fr));
+}
+
+.rg-cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-width: 0;
+  border-radius: 4px;
+  background: var(--rg-dim);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: clamp(9px, calc(100cqw / 13 * 0.43), 19px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  animation: rg-cell-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: calc(var(--d, 0) * 6ms);
+  transition: transform 0.12s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.12s ease, opacity 0.2s ease;
+}
+.rg-grid.is-fill .rg-cell {
+  aspect-ratio: auto;
+  border-radius: 5px;
+}
+@keyframes rg-cell-in {
+  from {
+    opacity: 0.2;
+    transform: scale(0.9);
+  }
+}
+
+.rg-cell:active {
+  transform: scale(0.88);
+  transition-duration: 0.05s;
+}
+@media (hover: hover) {
+  .rg-cell:hover {
+    z-index: 2;
+    box-shadow: 0 0 0 2px var(--text);
+  }
+}
+.rg-cell:focus-visible {
+  z-index: 4;
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+  border-radius: 4px;
+}
+
+/* The picked hand */
+.rg-cell.is-selected {
+  z-index: 3;
+  transform: scale(1.12);
+  box-shadow: 0 0 0 2px var(--text), 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+.rg-cell.is-selected:active {
+  transform: scale(0.98);
+}
+
+/* Not played with the highlighted action: plain, with a quiet name */
+.rg-cell.is-dim {
+  color: var(--text-faint);
+  text-shadow: none;
+  opacity: 0.7;
+}
+/* Played with the highlighted action only now and then: the name stays readable over the plain part */
+.rg-cell.is-part {
+  color: var(--text);
+  text-shadow: none;
+}
+/* A hand you would never hold here: hollow */
+.rg-cell.is-out {
+  color: var(--text-faint);
+  text-shadow: none;
+  opacity: 0.5;
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+.rg-cell.is-out.is-selected {
+  opacity: 0.9;
+}

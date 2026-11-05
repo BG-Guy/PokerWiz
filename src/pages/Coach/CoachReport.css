@@ -145,6 +145,22 @@
   color: var(--warning);
 }
 
+/* Graded against reads: the same box in the accent tone, so it isn't mistaken for a lesson */
+.coach-report-reads {
+  display: flex;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  font-weight: 600;
+}
+.coach-report-reads svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent-text);
+}
+
 .coach-report-players {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));

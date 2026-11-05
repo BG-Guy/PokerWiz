@@ -1,9 +1,11 @@
-// Practice options: 3-bet pots only, and playing a hand again from your spot (same runout or a new one).
+// Practice options: 3-bet pots only, drilling a kind of spot (a focus), and playing a hand again from your spot
+// (same runout or a new one).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { useDiskCharts } from '../gto/helpers.mjs';
-import { generateSpot, heroAct, dealStreet, playAgain } from '../../src/practice/generateSpot.js';
+import { generateSpot, heroAct, dealStreet, playAgain, formatOf } from '../../src/practice/generateSpot.js';
 import { preflopRaises } from '../../src/utils/handEngine.js';
+import { classifySpot } from '../../src/coach/spots.js';
 import { createRandom } from '../../src/coach/random.js';
 
 useDiskCharts();
@@ -37,6 +39,42 @@ test('3-bet pots only, preflop: you make the 3-bet (facing one raise) or face it
       assert.ok(spot.state.streets[0].actions.some((a) => a.actor === 'Hero'), `facing a 3-bet cold: ${line}`);
     }
   }
+});
+
+// A focus asks for one kind of spot: you take over at the first decision that is it.
+const drill = (focus, format = 'hu') => ({ game: 'cash', format, pot: 'any', villains: [{ stackBB: 100 }], hero: { stackBB: 100 }, boardMode: 'random', focus });
+
+test('drilling a preflop spot: you are in the seat, facing what was asked for', async () => {
+  const defend = await generateSpot(drill({ area: 'vs-open', position: 'BB' }), createRandom(31));
+  assert.ok(defend, 'a spot is dealt');
+  assert.equal(formatOf(drill({ area: 'vs-open' })), 'preflop', 'a preflop area is dealt as a preflop spot, whatever the setup said');
+  const spot = classifySpot(defend.state, defend.heroSeat);
+  assert.equal(spot.area, 'vs-open');
+  assert.equal(spot.position, 'BB');
+  assert.equal(defend.state.street, 'Preflop');
+
+  const open = await generateSpot(drill({ area: 'open', position: 'BTN' }), createRandom(32));
+  assert.equal(classifySpot(open.state, open.heroSeat).area, 'open');
+  assert.equal(open.state.players.find((p) => p.seat === open.heroSeat).position, 'BTN');
+
+  const answer = await generateSpot(drill({ area: 'vs-3bet' }), createRandom(33));
+  assert.equal(classifySpot(answer.state, answer.heroSeat).area, 'vs-3bet', 'you opened (GTO\'s way), and now face the 3-bet');
+});
+
+test('drilling a postflop spot: the street, facing a bet or not, in or out of position', async () => {
+  const facing = await generateSpot(drill({ area: 'flop-vs-bet', ip: false }), createRandom(41));
+  assert.ok(facing, 'a spot is dealt');
+  const spot = classifySpot(facing.state, facing.heroSeat);
+  assert.equal(spot.area, 'flop-vs-bet');
+  assert.equal(spot.ip, false);
+  assert.equal(facing.state.street, 'Flop');
+  assert.ok(facing.state.currentBet > 0);
+
+  const betting = await generateSpot(drill({ area: 'turn-bet', role: 'aggressor' }), createRandom(42));
+  const turn = classifySpot(betting.state, betting.heroSeat);
+  assert.equal(turn.area, 'turn-bet');
+  assert.equal(turn.role, 'aggressor');
+  assert.equal(betting.state.street, 'Turn');
 });
 
 test('play again: the same spot, and with the same runout the same cards come', async () => {

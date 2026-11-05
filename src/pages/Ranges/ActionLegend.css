@@ -1,0 +1,155 @@
+/* Action legend and filter: tiles with the action's colour as a swatch and a thin top edge. The chosen one fills
+   with its colour; the others step back. Three shapes: tiles (under the grid: name above, share and size below),
+   column (desktop side: one per line) and chips (full screen: a single line). */
+
+.rg-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(76px, 1fr));
+  gap: 8px;
+}
+
+.rg-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: 56px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-align: left;
+  transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease, transform 0.12s ease;
+}
+.rg-tile::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: -1px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: var(--tile);
+}
+.rg-tile:active {
+  transform: scale(0.96);
+}
+@media (hover: hover) {
+  .rg-tile:hover {
+    border-color: var(--text-faint);
+  }
+}
+
+.rg-tile-top {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+.rg-tile-swatch {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--tile);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+.rg-tile-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.rg-tile-bottom {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+.rg-tile-share {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--text);
+}
+.rg-tile-size {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+/* The size sits beside the share on the tiles under the grid (the names are short there), beside the name elsewhere */
+.rg-tile-size.is-inline {
+  display: none;
+}
+
+.rg-tile.is-on {
+  background: var(--tile);
+  border-color: var(--tile);
+}
+.rg-tile.is-on .rg-tile-name,
+.rg-tile.is-on .rg-tile-size,
+.rg-tile.is-on .rg-tile-share {
+  color: #fff;
+}
+.rg-tile.is-on .rg-tile-swatch {
+  background: #fff;
+}
+.rg-tile.is-off {
+  opacity: 0.55;
+}
+
+/* One per line: name and size on the left, the share on the right */
+.rg-legend.is-column {
+  grid-template-columns: 1fr;
+}
+.rg-legend.is-column .rg-tile,
+.rg-legend.is-chips .rg-tile {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+.rg-legend.is-column .rg-tile {
+  min-height: 48px;
+}
+.rg-legend.is-column .rg-tile-top {
+  flex: 1;
+}
+.rg-legend.is-column .rg-tile-share {
+  font-size: 20px;
+}
+.rg-legend.is-column .rg-tile-size.is-inline,
+.rg-legend.is-chips .rg-tile-size.is-inline {
+  display: inline;
+}
+.rg-legend.is-column .rg-tile-size.is-row,
+.rg-legend.is-chips .rg-tile-size.is-row {
+  display: none;
+}
+
+/* Full screen: a single line of small chips */
+.rg-legend.is-chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.rg-legend.is-chips::-webkit-scrollbar {
+  display: none;
+}
+.rg-legend.is-chips .rg-tile {
+  flex: 1 0 auto;
+  min-height: 44px;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+.rg-legend.is-chips .rg-tile::before {
+  display: none;
+}
+.rg-legend.is-chips .rg-tile-share {
+  font-size: 17px;
+}

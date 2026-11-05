@@ -40,11 +40,20 @@ face aces).
 Every action keeps a 0.1% probability during training. That way lines the solution avoids are still reached
 and get sensible answers: after an unusual limp, or a 3-bet with a hand GTO doesn't 3-bet.
 
-One node-lock: the premiums (AA, KK, QQ, AKs, AKo) facing a single raise always re-raise; the solver still
-picks between a 3-bet and a shove. Published charts play them that way almost always. The flop model below
-can't see how much more a big pot is worth to them, so without the lock the solution drifted into flatting KK
-against early opens a third of the time, and QQ flatted early opens at 20-40 bb. Everyone else's strategy is
-solved against the lock.
+Two node-locks, both for hands facing a single raise (`src/gto/preflop/premiums.js`, `cfr.mjs`):
+- **The premiums (AA, KK, QQ, AKs, AKo) always re-raise**; the solver still picks between a 3-bet and a shove.
+  Published charts play them that way almost always. The flop model below can't see how much more a big pot is
+  worth to them, so without the lock the solution drifted into flatting KK against early opens a third of the
+  time, and QQ flatted early opens at 20-40 bb.
+- **The middle pairs (22-99) only call or fold.** The model values a 3-bet with a pair (fold equity, and a pot
+  share with no draw to it) above a call, so the unlocked solution 3-bet 55 to 99 every time, from the big blind
+  and in position, and called 44 and below. Raising the pairs' implied-odds bonus didn't move it (three times
+  the bonus changed nothing). Published solver charts call with all of them, hit a set and win a stack, and
+  3-bet the top of the range and the bluffs instead. Where the tree has no call (two callers already in) the
+  lock doesn't apply.
+
+Everyone else's strategy is solved against the locks, and the coach shows what a lock rules out a little worse
+than the play it allows (`lockedLosses`), so the cost agrees with the strategy.
 
 When the betting ends, a hand is worth (`scripts/gto/preflop/payoffs.mjs`):
 
@@ -60,22 +69,32 @@ When the betting ends, a hand is worth (`scripts/gto/preflop/payoffs.mjs`):
     opponents, the hands that make the nuts (sets, straights, flushes) win the big pots and dominated offsuit
     hands make second-best ones. Without it the small blind flatted A9o and folded T9s into 3-way pots, and
     the big blind squeezed 44 instead of calling to hit a set.
+  - Heads-up, pairs up to 99, suited connectors and one-gappers, and suited wheel aces get an implied-odds
+    bonus while stacks are deep: they win whole stacks when they hit, which raw equity misses. It's gone by a
+    3-bet pot, so it makes flatting them better than re-raising (the big blind used to 3-bet small pairs more
+    than it called with them).
   - All of these fade as the stack-to-pot ratio drops, because with little behind a flop is close to all in.
 
   This is the one model in the engine (a full postflop solve at every preflop leaf is far too big). Its
-  settings were calibrated so the solution matches published solver behavior: premiums always raise and
-  re-raise, opening widths grow toward the button, and the big blind defends about half its hands against a
-  button open.
+  settings were calibrated against `scripts/gto/leakScan.mjs` so the solution matches published solver
+  behavior: premiums always raise and re-raise, opening widths grow toward the button, and the big blind
+  defends about 70% of its hands against a button open (no rake). They were retuned on 2026-11-02: the
+  earlier settings folded half the big blind's hands to a button open and 83% to an UTG open, and 3-bet small
+  pairs more than they called them. That left 55 to 99 still 3-bet every time (found on the Ranges page on
+  2026-11-04), which no setting of the model fixed, so the middle pairs are node-locked to flat (see above).
 
 ### Results (100 bb, cash)
 
 | | |
 | --- | --- |
-| Opens | UTG ~12%, HJ ~21%, CO ~28%, BTN ~42% |
-| Small blind, folded to | about 1/3 fold, 2/5 complete, 1/4 raise |
+| Opens | UTG ~12%, HJ ~22%, CO ~28%, BTN ~40% |
+| Small blind, folded to | about 3/10 fold, 46% complete, 1/4 raise |
 | AA, KK | Always opened, and always re-raised against a single raise |
-| QQ, AK | Always opened, re-raised against a single open almost always (QQ flats early opens at 30-40 bb) |
-| Big blind vs a button open | Defends about half: mostly calls, ~13% 3-bets |
+| QQ, AK | Always opened, and always re-raised against a single raise |
+| Pairs 22-99 | Called against a single raise, never 3-bet (node-locked) |
+| Big blind vs a button open | Defends ~71%: calls ~60%, 3-bets ~11% (TT+, A5s, KQs, KJs, JTs, AJo+, KQo) |
+| Big blind vs an UTG open | Defends ~29% |
+| Known edge | The button folds 54s, and 65s 42% of the time (0.05-0.2 bb decisions for this model) |
 
 Each chart's headline numbers are in `src/gto/preflop/charts/manifest.json`.
 
@@ -99,8 +118,20 @@ or ante), for the stack that matters: your stack against the deepest opponent's.
   - Shorter tables play as if the first seats folded: a 6-max UTG is the 8-max lojack.
   - On 9-handed tables, the earliest seat that folds is left out.
   - Players who aren't in a logged hand folded before acting.
-- **Sizes:** a real raise maps to the nearest raise the tree has, on a log scale. A limp where GTO only opens
-  or folds maps to the open for range purposes; the coach values it halfway between the two.
+- **Sizes:** a real raise maps to the nearest raise the tree has, on a log scale.
+- **Limps:** the tree has no limps except the small blind's, so a player who limps counts as folded in the
+  tree. That keeps every later raise at its real level: an iso-raise is an open, a re-raise over it a 3-bet.
+  - The limper's range is kept on the side: a typical live limper's, the opening range of the seat four places
+    later, with most premiums removed (they're usually raised).
+  - The tree's one limped pot, the small blind limping into the big blind, stands in for what limps lead to.
+    The limpers play its small blind (facing a raise: fold, call or re-raise), and a big blind facing only
+    limpers plays its big blind.
+  - While limpers are in and nobody has raised, raises keep only the top 22% of hands (4% less for each extra
+    limper): the limpers still act behind, and the big blind plays them out of position.
+  - Your own limp is graded halfway between folding and raising, and advice in limped pots is marked as
+    approximate.
+  - Before this, a limp read as an open, so an iso-raise read as a 3-bet and a 3-bet over it as a cold 4-bet:
+    a range of about AA-JJ and AK, against which QQ checked and folded on J85.
 - **Ranges:** each action multiplies the actor's range by how often each class takes it. An action the
   solution (almost) never takes doesn't wipe the range out: it keeps its shape.
 - **Spots not in the chart:** the closest stored spot stands in. That's the same player, betting level and
@@ -117,6 +148,10 @@ with (`solver.js`). This is "re-solving", as in Libratus. It runs Discounted CFR
 
 Every hand of every player is updated in each pass, and card removal is exact between each pair of players
 (`showdown.js`).
+
+The actions really taken in the hand keep at least 0.1% of each hand's reach (a tremble, as in the preflop
+solve). When a player makes a bet the solution never makes, which live players do, the answers to it are
+still worked out against their range instead of against nobody, where they would never be trained.
 
 What keeps it fast enough for a phone:
 
@@ -158,12 +193,36 @@ Checks against theory (`tests/gto/postflop.test.mjs`):
   the time.
 - **3-way:** strategies are proper mixes, and the nuts never folds.
 
+Range play from common spots (`tests/gto/ranges.test.mjs`), on the real charts:
+- **Ranges by seat and action:** the big blind defends a much wider range against a button open than against
+  an UTG open and flats small pairs; a limp keeps every later raise at its real level; a limper's range is
+  wide with few premiums.
+- **Range against range:** the button bets K72 far more than 765, where the big blind leads more instead;
+  against a range capped to high cards it bets 765 almost every time; an iso-raiser bets a king-high board
+  against the limper's range.
+- **Value against the worse hands in a range:** QQ isolates a limper and bets J85 when the 3-bettor checks.
+
+## Flagging decisions for review (`src/utils/flags.js`)
+
+Every graded decision (hand reviews and Practice) has a **Flag** button with an optional note on what looks
+wrong. Flags stay on the device (localStorage, with the whole hand as it was graded) until they're exported
+from Profile > Flagged decisions as one JSON file (on iPhone through the share sheet: AirDrop). To review an
+exported file against the current engine:
+
+```bash
+node scripts/reviewFlags.mjs pokerwiz-flags-2026-11-02.json    # each spot, the note, the verdict then and now
+```
+
 ## Grading (`src/coach/analyzeHand.js`, `grading.js`)
 
 For each of your decisions the coach shows every option, how often GTO takes it with your hand, and what it's
 worth:
 - **Preflop:** the stored loss against the best option.
-- **Postflop:** the solve's value for your exact hand, relative to folding.
+- **Postflop:** the solve's value for your exact hand, relative to folding. When your hand (almost) never
+  reaches the spot under the solution (under 2% of the time, because it would have played differently earlier
+  on the street), how often GTO takes each option is its best response: the option worth the most. The
+  solution's average strategy for such a hand comes from early, unconverged iterations and can contradict its
+  values.
 
 Everyone is graded the same way, against GTO, whatever level they're set to:
 - The score comes from the value given up, as a share of the pot and in big blinds. Only half a percent of
@@ -215,12 +274,43 @@ solve doesn't have, the street is re-solved with it.
 Everything runs in a web worker (`practice.worker.js`). "Next hand" while the opponents are thinking restarts
 it at once. When the hand is over, the coach grades it (with the "fast" budget).
 
+## Leaks and drills (`src/coach/spots.js`, `leaks.js`, `leakScan.js`, `leakDetails.js`)
+
+The coach grades one hand at a time; the leak report adds the decisions up.
+
+- **Spots.** Every graded decision is labelled with the kind of spot it was (`classifySpot`, read from the hand
+  engine's state when you act): one of eleven *areas* (opening, limped pots, facing an open, a 3-bet or a 4-bet,
+  and betting or facing a bet on the flop, turn and river), plus your seat, the pot type (limped, single-raised,
+  3-bet, 4-bet), whether you were the preflop raiser, whether you were in position and how many players were in.
+- **Kept on the hand.** `hand.coachDecisions` holds one small row per graded decision (`packDecisions`): the
+  spot, the starting hand and how strong it was on the board, what you did, how often GTO folds, checks, calls
+  and raises with that hand, the EV given up (in bb), the pot and the score. The server drops it when the hand
+  itself is edited (cards, board, action, stakes, players) so it never describes a different hand; `LEAK_VERSION`
+  retires old rows when the labelling changes.
+- **The scan.** Opening Leaks grades the hands that have no record yet, one at a time in the coach's worker
+  (`leakScan.js`). A hand with decisions after the flop first gets an instant preflop-only pass
+  (`analyzeHand(..., { preflopOnly: true })`), then the whole hand with the "fast" budget, biggest pots first.
+  Reads set on a hand's players are ignored, so the report always compares you with GTO. A full Coach review
+  also saves its decisions (unless it was graded against a read).
+- **Adding up.** Per area, and per split of it (seat, kind of hand, hand strength, pot, position, role): how many
+  spots, the EV given up, the average score, and *which way you lean*: the play where your share and GTO's share
+  (over the hands you actually held) differ the most, when there are at least 5 spots and the gap is 10 points
+  or more ("You fold 62% of these; GTO folds 41%"). Under 5 spots is an early read; 12 or more is solid.
+- **Drills.** A leak's "Drill it" opens `/practice?drill=river-vs-bet&pos=BB&...`. Practice then deals only that
+  kind of spot (`setup.focus`, matched with the same `classifySpot`): preflop, everyone (you too) plays GTO's way
+  until your first decision of that kind; postflop, the street is played on, so an out-of-position check can lead
+  to facing a bet. A drill isn't remembered for the next visit.
+
 ## Player models (`src/gto/players/`)
 
 The engine can play against players who don't play GTO. A read (a tendency like Nit, Calling station, Maniac or
 Drunk, plus a skill level; `coach/profiles.js`) becomes a **model** (`modelFor(profile)`), passed per seat to
-`createGtoHand({ models })`. Seats without a read are GTO. The pickers are still hidden behind `PLAYER_READS`
-in `src/gto/config.js`; the engine side is ready.
+`createGtoHand({ models })`. Seats without a read are GTO. Reads are set in the app (`PLAYER_READS` in
+`src/gto/config.js` switches them on): a chip per villain on a saved hand's coach review (it opens the read
+sheet: player types with their usual numbers, a line on how to adjust, and a skill level), the Coach's recorder
+(a Reads step) and, for all opponents at once, in Practice's setup. With a read set, the best play and the grade
+are against that player, and every label says so (the report's "Graded against your reads" box, "Best" for "GTO");
+the leak report ignores reads and always compares you with GTO.
 
 - **Preflop:** the seat plays the charts bent toward its tendency (`players/models.js`): it plays more or fewer
   hands by its width (strongest first), and more calls or more raises by its raise ratio, mixed with the chart
@@ -256,21 +346,19 @@ following the engine gives up against TexasSolver's best play.
 
 ## Known limits
 
-- The preflop solution rests on the realization model above, not on postflop solves, and the model underrates
-  calling. Measured against TexasSolver (below), the 100 bb chart is tight where it calls: the big blind folds
-  about half the time to a button open (no-rake solves fold well under 40%) and 84% to an UTG open (solves:
-  roughly 70%), 3-bets small pairs more than it calls them, and the button flats a cutoff open only about 5% of
-  the time.
-  `scripts/gto-reference/realization.mjs` measures, with TexasSolver, what every hand earns after the flop.
-  Fitting the flop model to that (per hand, or from hand features) fixed the button spots but brought worse
-  oddities (opening 75o under the gun, folding A2s on the button, defending three quarters of hands against
-  the button). A hand-against-hand model can't express what drives it: implied odds (small pairs and suited
-  connectors win stacks from overpairs) and a capped range (a hand the big blind rarely flats does unusually
-  well when it does). So the charts keep the hand-written model until the flop model can. `scripts/gto/
-  leakScan.mjs` checks every chart for the plays that would look wrong to a player. Other differences from
-  published charts:
+- The preflop solution rests on the realization model above, not on postflop solves. It was calibrated to
+  published solver behavior and checked against TexasSolver, but a hand-against-hand model can't express
+  everything that drives what a hand earns after the flop: implied odds (small pairs and suited connectors win
+  stacks from overpairs, which the implied-odds bonus covers) and a capped range (a hand the big blind rarely
+  flats does unusually well when it does). `scripts/gto-reference/realization.mjs` measures, with TexasSolver,
+  what every hand earns after the flop; fitting the model to that per hand brought worse oddities (opening
+  75o under the gun, folding A2s on the button), so the charts keep the hand-written model.
+  `scripts/gto/leakScan.mjs` checks every chart for the plays that would look wrong to a player. Remaining
+  differences from published charts:
   - Early-position opens are a little tighter (UTG ~12% against ~15% in no-rake solves).
+  - The button folds 65s and 54s, and 76s a tenth of the time.
   - With antes, the small blind completes very wide at short stacks.
+  - Limped pots aren't solved: the walker plays them off the nearest solved spot (see above).
 - No rake and no ICM: chips are chips.
 - Multiway postflop solves bet on one street and check the rest down, and side pots in multiway all-ins aren't
   modeled.

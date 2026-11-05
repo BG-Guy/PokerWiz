@@ -1,7 +1,10 @@
-// The detailed view of one stat or insight (built by statDetail in utils/insightDetails.js): the lead number and
-// a caption, then its sections: facts, month bars, breakdowns, a small curve, lists and plain-word notes.
-// Sections rise in one after another as the view opens.
+// The detailed view of one stat or insight (built by statDetail in utils/insightDetails.js, or the leak report's
+// in coach/leakDetails.js): the lead number and a caption, then its sections: facts, month bars, breakdowns, a
+// small curve, lists, plain-word notes and buttons that go somewhere (an `actions` section of { label, to,
+// icon, primary } links). Sections rise in one after another as the view opens.
+import { Link } from 'react-router-dom';
 import { amountFormatters, formatDate } from '../../utils/format.js';
+import Icon from '../Icon/Icon.jsx';
 import LineChart from '../LineChart/LineChart.jsx';
 import DetailBars from './DetailBars.jsx';
 import DetailBreakdown from './DetailBreakdown.jsx';
@@ -43,8 +46,8 @@ export default function StatDetail({ detail }) {
 
           {section.type === 'list' && (
             <ul className="stat-detail-list">
-              {section.items.map((item) => (
-                <li key={item.label}>
+              {section.items.map((item, k) => (
+                <li key={`${item.label}${k}`}>
                   <span className="stat-detail-list-main">
                     <span className="stat-detail-list-label">{item.label}</span>
                     {item.hint && <span className="stat-detail-hint">{item.hint}</span>}
@@ -56,6 +59,17 @@ export default function StatDetail({ detail }) {
           )}
 
           {section.type === 'text' && section.paragraphs.map((text) => <p key={text} className="stat-detail-text">{text}</p>)}
+
+          {section.type === 'actions' && (
+            <div className="stat-detail-actions">
+              {section.items.map((item) => (
+                <Link key={item.label} to={item.to} className={`btn ${item.primary ? '' : 'btn-secondary'}`}>
+                  {item.icon && <Icon name={item.icon} size={16} />}
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          )}
         </section>
       ))}
     </div>
