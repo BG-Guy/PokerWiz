@@ -1,17 +1,15 @@
-// Drag a bottom sheet by its handle (the grabber and the title bar): pull down to dismiss it, up to open it to
-// full screen, and from full screen down to bring it back. A short pull springs back. Returns the inline style
-// for the sheet and the pointer handlers for the handle; wire them in Modal.
+// Drag a bottom sheet by its handle (the grabber and the title bar): pull down to dismiss it. A short pull, or a
+// pull up, springs back. Returns the inline style for the sheet and the pointer handlers for the handle; wire
+// them in Modal.
 import { useRef, useState } from 'react';
 
 const DISMISS_PX = 110; // pulled this far down: it closes
 const FLING = 0.6; // px per ms: a quick flick closes it from a shorter pull
-const EXPAND_PX = 50; // pulled this far up: full screen
-const COLLAPSE_PX = 70; // from full screen, pulled this far down: back to a sheet
 
 const INTERACTIVE = 'button, a, input, select, textarea, label';
 
-// enabled: only on phones, where the dialog is a sheet. expanded/canExpand: the full-screen state.
-export function useSheetDrag({ enabled, expanded = false, canExpand = false, onDismiss, onExpand, onCollapse }) {
+// enabled: only on phones, where the dialog is a sheet.
+export function useSheetDrag({ enabled, onDismiss }) {
   const [offset, setOffset] = useState(0);
   const [mode, setMode] = useState('idle'); // idle | dragging | settling | dismissed
   const start = useRef(null);
@@ -32,8 +30,8 @@ export function useSheetDrag({ enabled, expanded = false, canExpand = false, onD
   const onPointerMove = (event) => {
     if (!start.current) return;
     const dy = event.clientY - start.current.y;
-    // Pulling up is resisted: there's a little give when it can open to full screen, almost none otherwise.
-    setOffset(dy >= 0 ? dy : Math.max(dy, -80) * (canExpand && !expanded ? 0.5 : 0.12));
+    // Pulling up is resisted: the sheet gives a few pixels and no more.
+    setOffset(dy >= 0 ? dy : Math.max(dy, -80) * 0.12);
   };
 
   const finish = (event, cancelled = false) => {
@@ -42,14 +40,6 @@ export function useSheetDrag({ enabled, expanded = false, canExpand = false, onD
     const velocity = dy / Math.max(performance.now() - start.current.t, 1);
     start.current = null;
     if (cancelled) return settle();
-    if (dy < -EXPAND_PX && canExpand && !expanded) {
-      onExpand?.();
-      return settle();
-    }
-    if (dy > 0 && expanded && dy > COLLAPSE_PX && velocity < 1.2) {
-      onCollapse?.();
-      return settle();
-    }
     if (dy > DISMISS_PX || (velocity > FLING && dy > 30)) {
       // Stay where the finger left it: the closing animation carries on from there.
       setMode('dismissed');

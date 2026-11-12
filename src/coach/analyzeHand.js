@@ -90,7 +90,9 @@ function firstFolders(record, entries) {
 // coach's combo order), e.g. to deal them cards that fit how they played (Practice replays).
 // detail: 'full' (reviews) or 'fast'; onProgress(text) reports what's being solved.
 // preflopOnly: grade the preflop decisions only (instant: no street is solved), for a first look at many hands.
-export async function analyzeHand(record, { rangesOnly = false, detail = 'full', preflopOnly = false, onProgress = () => {} } = {}) {
+// steady: solve with a fixed number of iterations instead of a time limit, so the report is the same on every
+// run and machine (comparisons and tests).
+export async function analyzeHand(record, { rangesOnly = false, detail = 'full', preflopOnly = false, steady = false, onProgress = () => {} } = {}) {
   const seed = seedFromString(JSON.stringify([record.players.map((p) => [p.position, p.cards, p.stack]), record.streets, record.board]));
   const random = createRandom(seed);
   const heroRecord = record.players.find((p) => p.role === 'hero');
@@ -120,6 +122,7 @@ export async function analyzeHand(record, { rangesOnly = false, detail = 'full',
     stackBB,
     known: { [heroRecord.seat]: heroRecord.cards },
     detail,
+    steady,
     seed,
     folders: firstFolders(record, entries),
     models: readModels(record.players), // villains with a read (when reads are on): graded against their tendency

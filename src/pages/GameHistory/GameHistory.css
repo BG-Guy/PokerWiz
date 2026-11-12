@@ -1,4 +1,4 @@
-/* Game History page layout. */
+/* Game History page layout. The summary boxes and each month's total are buttons that open their story. */
 
 .game-history-filters {
   display: flex;
@@ -34,14 +34,37 @@
 }
 .game-history-month-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  width: 100%;
+  min-height: 44px;
+  margin-bottom: 6px;
   padding: 0 4px;
+  text-align: left;
+  font: inherit;
+  color: inherit;
 }
 .game-history-month-head h2 {
   font-size: 20px;
+}
+/* The month's total, with the cue that it opens the month */
+.game-history-month-total {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+.game-history-month-total svg {
+  color: var(--text-faint);
+}
+button.game-history-month-head:active {
+  opacity: 0.6;
+}
+
+/* Why the totals are in dollars (only when the BB/$ switch is overruled) */
+.game-history-note {
+  margin: -18px 4px 26px;
 }
 
 .game-history-list {

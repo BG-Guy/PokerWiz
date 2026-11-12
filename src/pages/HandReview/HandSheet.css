@@ -1,0 +1,43 @@
+/* The hand sheet: the cards on a strip of felt, then the hand's short story (StatDetail). */
+
+.hand-sheet .modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.hand-sheet-table {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  background: var(--felt);
+}
+.hand-sheet-cards {
+  display: flex;
+  gap: 6px;
+}
+.hand-sheet-cards.is-board {
+  gap: 4px;
+}
+
+/* The way on stays in reach at the foot of the sheet: the full hand takes the room, the coach sits beside it */
+.hand-sheet .stat-detail-section.is-actions {
+  position: sticky;
+  bottom: -20px;
+  margin: 0 -20px -20px;
+  padding: 14px 20px 16px;
+  background: linear-gradient(to top, var(--surface) 72%, transparent);
+}
+.hand-sheet .stat-detail-actions {
+  flex-wrap: nowrap;
+}
+.hand-sheet .stat-detail-actions .btn {
+  min-height: 46px;
+  white-space: nowrap;
+}
+.hand-sheet .stat-detail-actions .btn:first-child {
+  flex: 1;
+}

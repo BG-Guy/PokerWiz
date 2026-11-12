@@ -2,15 +2,22 @@
 // played) with its own letter, a bar, what it's based on and how much it counts.
 import ProgressBar from '../../components/ProgressBar/ProgressBar.jsx';
 import GradeBadge from '../../components/GradeBadge/GradeBadge.jsx';
+import Icon from '../../components/Icon/Icon.jsx';
 import { letterGrade } from '../../utils/letterGrade.js';
 import './SessionGradeCard.css';
 
 // The bar's color follows the part's letter: A-C in the accent, D amber, F red.
 const BAR_TONES = { good: 'accent', neutral: 'accent', warning: 'warning', bad: 'negative' };
 
-export default function SessionGradeCard({ grade }) {
+// onOpen: makes the card open the grade's story (how each part is scored). ref: the card, where that view grows from.
+export default function SessionGradeCard({ grade, onOpen, ref }) {
   return (
-    <section className={`session-grade is-${grade.letter.toLowerCase()}`} aria-label={`Session grade ${grade.letter}, ${grade.label}`}>
+    <section
+      className={`session-grade is-${grade.letter.toLowerCase()} ${onOpen ? 'is-clickable' : ''}`}
+      aria-label={`Session grade ${grade.letter}, ${grade.label}`}
+      onClick={onOpen}
+      ref={ref}
+    >
       <div className="session-grade-head">
         <GradeBadge score={grade.score} size="lg" reveal />
         <span className="session-grade-title">
@@ -31,6 +38,12 @@ export default function SessionGradeCard({ grade }) {
         ))}
       </ul>
       {grade.note && <p className="session-grade-note">{grade.note}</p>}
+      {/* The card itself opens on a tap; this is the same way in for a keyboard */}
+      {onOpen && (
+        <button type="button" className="session-grade-more" aria-haspopup="dialog">
+          How it's worked out <Icon name="chevronRight" size={14} />
+        </button>
+      )}
     </section>
   );
 }

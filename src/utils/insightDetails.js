@@ -1,9 +1,9 @@
 // The detailed view behind each stat and insight card (tap on phones, click on desktop): a lead number, a few
 // facts, and sections such as month-by-month bars, breakdowns by stakes / venue / game, a small curve or a
-// list. Pure: builds plain data that the StatDetail component draws. Sessions come in as cash games converted
-// for display.
+// list. Pure: builds plain data that the StatDetail component draws. Sessions come in as cash games in the unit
+// they're shown in (moneyScope in format.js), with the formatters for it.
 import { summarize, sessionProfit } from './stats.js';
-import { amountFormatters, formatDate } from './format.js';
+import { formatDate, formatDuration, mixedStakesNote } from './format.js';
 import {
   bankrollSeries,
   breakdown,
@@ -77,7 +77,8 @@ function netDetail(sessions, money) {
           { label: 'Average loss', value: money.full(averageLoss), tone: tone(averageLoss) },
         ],
       },
-      points.length > 2 && { type: 'curve', title: 'Your bankroll', data: points.map((p) => ({ label: p.date ?? '', value: p.bankroll })), tone: 'neutral' },
+      // The small curve; `chart` is what its full-screen button opens (the same sessions, a dot for each).
+      points.length > 2 && { type: 'curve', title: 'Your bankroll', data: points.map((p) => ({ label: p.date ?? '', value: p.bankroll })), tone: 'neutral', chart: { sessions } },
       monthsSection('Month by month', sessions, (m) => m.net, (v) => money.full(v)),
       breakdownSection('Where it comes from', sessions, (r) => ({ label: r.label, value: r.net, display: money.full(r.net), hint: `${sessionsText(r.count)} · ${money.full(r.hourly)}/h` })),
     ],
@@ -197,6 +198,7 @@ function downswingDetail(sessions, money) {
           title: 'Since your peak',
           data: points.slice(status.peakIndex).map((p) => ({ label: p.date ?? '', value: p.bankroll - status.peak })),
           tone: 'negative',
+          chart: { sessions, downswings: true },
         },
       biggest.length > 0 && {
         type: 'list',
@@ -289,7 +291,7 @@ function hoursDetail(sessions, money) {
 }
 
 function normalDetail(sessions, money) {
-  const check = varianceCheck(sessions);
+  const check = varianceCheck(sessions, { money });
   if (check.status === 'not-enough') {
     return {
       lead: { value: check.label, caption: 'not enough sessions yet' },
@@ -339,6 +341,51 @@ function methodSection() {
   };
 }
 
+// One month (what a month's total opens in Game History): how it went, how it compares with the month before,
+// and every session in it, each leading to its page. scope: moneyScope() of the sessions on screen.
+export function monthDetail(month, scope) {
+  const { money } = scope;
+  const sessions = scope.sessions.filter((s) => s.date.startsWith(month));
+  if (!sessions.length) return null;
+  const s = summarize(sessions);
+  const all = monthlyResults(scope.sessions);
+  const before = all[all.findIndex((m) => m.month === month) - 1] ?? null;
+  const sorted = [...sessions].sort((a, b) => sessionProfit(b) - sessionProfit(a));
+  const best = sorted[0];
+  const worst = sorted.at(-1);
+  return {
+    title: longMonth(month),
+    money,
+    note: mixedStakesNote(scope),
+    lead: { value: money.full(s.net), tone: tone(s.net), caption: `${sessionsText(s.count)}, ${hoursText(s.hours)} at the tables` },
+    sections: [
+      {
+        type: 'facts',
+        items: [
+          { label: 'Hourly', value: `${money.full(s.hourly)}/h`, tone: tone(s.hourly) },
+          { label: 'Winning sessions', value: `${s.winning} of ${s.count}` },
+          { label: 'Best session', value: money.full(sessionProfit(best)), tone: tone(sessionProfit(best)), hint: formatDate(best.date) },
+          s.count > 1 && { label: 'Worst session', value: money.full(sessionProfit(worst)), tone: tone(sessionProfit(worst)), hint: formatDate(worst.date) },
+          before && { label: `Against ${shortMonth(before.month)}`, value: money.full(s.net - before.net), tone: tone(s.net - before.net), hint: `${shortMonth(before.month)} was ${money.full(before.net)}` },
+        ].filter(Boolean),
+      },
+      {
+        type: 'list',
+        title: 'Every session',
+        items: chronological(sessions)
+          .reverse()
+          .map((x) => ({
+            label: `${formatDate(x.date)} · ${x.game} ${x.stakes}`,
+            hint: `${x.venue} · ${formatDuration(x.durationMin)}`,
+            value: money.full(sessionProfit(x)),
+            tone: tone(sessionProfit(x)),
+            to: `/history/${x.id}`,
+          })),
+      },
+    ],
+  };
+}
+
 const BUILDERS = {
   net: ['Net profit', netDetail],
   hourly: ['Hourly', hourlyDetail],
@@ -351,10 +398,13 @@ const BUILDERS = {
   normal: ['Is it normal?', normalDetail],
 };
 
-// The detail for one card: { title, lead: { value, tone, caption }, sections: [...] }, or null without sessions.
-export function statDetail(kind, sessions) {
+// The detail for one card: { title, lead: { value, tone, caption }, sections: [...], money, note }, or null
+// without sessions. scope: moneyScope(cash sessions), which carries the sessions in the unit they can be shown
+// in and the formatters for it; `note` says why a total is in dollars while the switch is on big blinds.
+export function statDetail(kind, scope) {
+  const { sessions, money } = scope;
   if (!sessions.length || !BUILDERS[kind]) return null;
   const [title, build] = BUILDERS[kind];
-  const detail = build(sessions, amountFormatters());
-  return { title, ...detail, sections: detail.sections.filter(Boolean) };
+  const detail = build(sessions, money);
+  return { title, money, note: mixedStakesNote(scope), ...detail, sections: detail.sections.filter(Boolean) };
 }

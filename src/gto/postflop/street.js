@@ -3,7 +3,7 @@
 // doesn't contain (a bet size it didn't have), the street is solved again with that action in it.
 // When the whole street is known in advance (reviewing a finished hand), it's solved once with every real
 // action in it (setPlan), which also gives the exact value of each of them.
-import { solvePostflop, REAL_FLOOR } from './solver.js';
+import { solvePostflop } from './solver.js';
 import { DECISION } from './tree.js';
 
 const close = (a, b, pot) => Math.abs(a - b) <= Math.max(0.05, 0.015 * pot);
@@ -11,8 +11,8 @@ const close = (a, b, pot) => Math.abs(a - b) <= Math.max(0.05, 0.015 * pot);
 // A hand the solution (almost) never brings to a spot (it reaches it less than this share of the time, having
 // played differently earlier on the street) has an average strategy there built from early, unconverged
 // iterations, and it can disagree with the hand's own action values. Its answer is the best response: the
-// action worth the most.
-const OFF_LINE = 0.02;
+// action worth the most. (A hand that only gets there on the real action's tremble, at most 2%, counts.)
+const OFF_LINE = 0.03;
 
 // Follow a path of real actions down a solved tree. Returns the node reached and the action index taken at
 // each step, or null if the tree doesn't contain the path.
@@ -48,17 +48,16 @@ export function createStreet(spec) {
     return solution;
   }
 
-  // Range weights after the path, from the start ranges and the solve's strategy at each step (a real action
-  // keeps at least REAL_FLOOR of each hand, as in the solve).
+  // Range weights after the path, from the start ranges and how often each hand takes each step in the solve
+  // (its strategy plus the real action's tremble).
   function rangesAfter(sol, steps) {
     const ranges = spec.ranges.map((r) => Float32Array.from(r));
     for (const { node, index } of steps) {
       const p = node.player;
-      const strategy = sol.strategy(node);
+      const taken = sol.taken(node, index);
       const list = sol.lists[p];
-      const n = list.count;
       const inSolve = new Float32Array(1326);
-      for (let k = 0; k < n; k++) inSolve[list.hands[k]] = strategy[index * n + k] + REAL_FLOOR;
+      for (let k = 0; k < list.count; k++) inSolve[list.hands[k]] = taken[k];
       const out = ranges[p];
       for (let h = 0; h < 1326; h++) out[h] *= inSolve[h];
     }
@@ -90,7 +89,8 @@ export function createStreet(spec) {
       const values = node.actionValues ? sol.actionValues(node, h) : null;
       // How often the solution brings this hand here, from the start of the street.
       const reached = node.reachHere ? node.reachHere[p][h] / sol.lists[p].weights[h] : 1;
-      const offLine = Boolean(values) && reached < OFF_LINE;
+      // (Not for a modelled player: their strategy here is their model's, whatever they did before.)
+      const offLine = Boolean(values) && reached < OFF_LINE && !sol.modelled(node);
       if (offLine) {
         const best = Math.max(...values);
         const top = values.map((v) => (v >= best - 1e-9 ? 1 : 0));

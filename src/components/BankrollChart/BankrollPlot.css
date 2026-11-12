@@ -191,3 +191,78 @@
 .bankroll-tooltip .is-loss {
   color: var(--negative);
 }
+
+/* Full screen: the chart takes every drag (turned sideways, a drag along it runs down the screen), and the card
+   is a small story about the session, with a way to it and a way out */
+.bankroll-plot.is-detailed svg {
+  touch-action: none;
+}
+/* The crosshair and the card already show where you are: no ring around the whole chart */
+.bankroll-plot.is-detailed svg:focus,
+.bankroll-plot.is-detailed svg:focus-visible {
+  outline: none;
+}
+.bankroll-tooltip.is-detailed {
+  width: 232px;
+  gap: 3px;
+  padding: 12px 14px;
+  pointer-events: auto;
+  background: var(--surface);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
+}
+.bankroll-tooltip.is-detailed .bankroll-tooltip-title {
+  padding-right: 26px;
+  line-height: 1.25;
+}
+.bankroll-tooltip-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  background: var(--surface-2);
+}
+.bankroll-tooltip-result {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text);
+}
+.bankroll-tooltip-facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+  margin: 4px 0 2px;
+}
+.bankroll-tooltip-facts div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.bankroll-tooltip-facts dt {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+.bankroll-tooltip-facts dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+.bankroll-tooltip-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 36px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--selected-bg);
+  color: var(--selected-text);
+  font-weight: 800;
+}

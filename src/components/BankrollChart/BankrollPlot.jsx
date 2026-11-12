@@ -1,17 +1,23 @@
 // The bankroll curve itself: labelled axes, gridlines, a zero line and a dot per session, against hours played,
 // session count or the calendar. Optional extras: shaded downswings and peak / low markers. Hover (mouse),
 // tap or drag (touch), or the arrow keys read a point: a crosshair, axis badges and a details card.
+// `detailed` (the full-screen chart) makes that card the session's story: what it was, how it went, where the
+// bankroll stood after it, and a link to the session. A click pins it so the pointer can reach the link.
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { formatDate } from '../../utils/format.js';
-import { sessionProfit } from '../../utils/stats.js';
+import { Link } from 'react-router-dom';
+import { formatDate, formatDuration, formatWeekday } from '../../utils/format.js';
+import { isTournament, sessionProfit } from '../../utils/stats.js';
 import { downswings } from '../../utils/bankroll.js';
+import Icon from '../Icon/Icon.jsx';
 import './BankrollPlot.css';
 
 const MARGIN = { top: 30, right: 18, bottom: 40, left: 62 };
 const DAY = 86400000;
 const AXIS_TITLES = { hours: 'Hours played', sessions: 'Sessions', date: 'Date' };
-// Above this many sessions the dots turn into clutter; the line says enough.
+// Above this many sessions the dots turn into clutter on the small chart; the line says enough. (The full-screen
+// chart always draws them, smaller as they get crowded: there the dots are what you tap.)
 const MAX_DOTS = 160;
+const dotRadius = (count) => (count <= 60 ? 4 : count <= MAX_DOTS ? 3.5 : count <= 400 ? 2.5 : 2);
 
 // "Nice" tick step (1, 2, 2.5, 5 x 10^n) for a range split into about `count` parts.
 function niceStep(range, count) {
@@ -81,12 +87,17 @@ function useSize(ref) {
 }
 
 // points: bankrollSeries(). money: amountFormatters(). height: fixed pixels, or omitted to fill the container.
-export default function BankrollPlot({ points, money, xMode = 'hours', height: fixedHeight, showDownswings = false, showMarkers = false }) {
+// detailed: the full-screen chart (a dot for every session, and a card that tells the session's story).
+// rotated: the chart is drawn turned a quarter clockwise (full screen on an upright phone), so a pointer's
+// position along the chart is its distance down the screen.
+export default function BankrollPlot({ points, money, xMode = 'hours', height: fixedHeight, showDownswings = false, showMarkers = false, detailed = false, rotated = false }) {
   const wrapRef = useRef(null);
   const size = useSize(wrapRef);
   const width = size.width;
   const height = fixedHeight ?? Math.max(200, size.height);
   const [activeIndex, setActiveIndex] = useState(null);
+  // Pinned (a mouse click on the full-screen chart): the card stays put while the pointer travels to it.
+  const [pinned, setPinned] = useState(false);
   const compactX = width < 520;
 
   // Where each point sits along the x axis, in the chosen unit.
@@ -133,14 +144,29 @@ export default function BankrollPlot({ points, money, xMode = 'hours', height: f
   const low = points.reduce((worst, p) => (p.bankroll < worst.bankroll ? p : worst), points[0]);
 
   // Nearest point to the pointer, along the x axis.
-  const pick = (event) => {
+  const nearest = (event) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    const target = xAxis.min + ((event.clientX - rect.left - MARGIN.left) / innerWidth) * (xAxis.max - xAxis.min);
+    const along = rotated ? event.clientY - rect.top : event.clientX - rect.left;
+    const target = xAxis.min + ((along - MARGIN.left) / innerWidth) * (xAxis.max - xAxis.min);
     let best = 0;
     points.forEach((p, i) => {
       if (Math.abs(xValue(p) - target) < Math.abs(xValue(points[best]) - target)) best = i;
     });
-    setActiveIndex(best);
+    return best;
+  };
+  const clear = () => {
+    setActiveIndex(null);
+    setPinned(false);
+  };
+  const onPointerMove = (event) => {
+    if (pinned && event.pointerType === 'mouse') return;
+    setActiveIndex(nearest(event));
+  };
+  const onPointerDown = (event) => {
+    const index = nearest(event);
+    // A click pins the session's card; a click on the same dot lets it go again.
+    if (detailed && event.pointerType === 'mouse') setPinned(!(pinned && index === activeIndex));
+    setActiveIndex(index);
   };
 
   // Arrow keys step through the sessions when the chart has keyboard focus.
@@ -149,7 +175,7 @@ export default function BankrollPlot({ points, money, xMode = 'hours', height: f
     if (step === undefined) {
       if (event.key === 'Escape' && activeIndex !== null) {
         event.stopPropagation();
-        setActiveIndex(null);
+        clear();
       }
       return;
     }
@@ -165,14 +191,20 @@ export default function BankrollPlot({ points, money, xMode = 'hours', height: f
   const last = values[values.length - 1];
 
   // The details card sits beside the point, on whichever side has room; on narrow screens, along the top.
-  const tipSide = activeX + 200 <= width ? 'right' : activeX >= 200 ? 'left' : 'top';
+  // The full-screen card is bigger, so it needs more room on its side and stays clear of the top and bottom.
+  const tipWidth = detailed ? 250 : 200;
+  const tipHalf = detailed ? Math.min(112, height / 2) : 70;
+  const tipSide = activeX + tipWidth <= width ? 'right' : activeX >= tipWidth ? 'left' : 'top';
   const tipStyle =
     tipSide === 'top'
-      ? { left: Math.min(Math.max(activeX, 96), width - 96), top: 4 }
-      : { left: activeX, top: Math.min(Math.max(activeY, 70), height - 70) };
+      ? { left: Math.min(Math.max(activeX, tipWidth / 2 - 4), width - tipWidth / 2 + 4), top: 4 }
+      : { left: activeX, top: Math.min(Math.max(activeY, tipHalf), height - tipHalf) };
+  const radius = dotRadius(points.length);
+  const session = active?.session ?? null;
+  const profit = session ? sessionProfit(session) : 0;
 
   return (
-    <div className={`bankroll-plot ${fixedHeight ? '' : 'is-fill'}`} ref={wrapRef}>
+    <div className={`bankroll-plot ${fixedHeight ? '' : 'is-fill'} ${detailed ? 'is-detailed' : ''}`} ref={wrapRef}>
       <svg
         width={width}
         height={height}
@@ -180,11 +212,11 @@ export default function BankrollPlot({ points, money, xMode = 'hours', height: f
         role="img"
         tabIndex={0}
         aria-label={`Bankroll over ${points.length - 1} sessions, now ${money.full(last)}. Use the arrow keys to read each session.`}
-        onPointerMove={pick}
-        onPointerDown={pick}
-        onPointerLeave={(event) => event.pointerType === 'mouse' && setActiveIndex(null)}
+        onPointerMove={onPointerMove}
+        onPointerDown={onPointerDown}
+        onPointerLeave={(event) => event.pointerType === 'mouse' && !pinned && setActiveIndex(null)}
         onKeyDown={onKeyDown}
-        onBlur={() => setActiveIndex(null)}
+        onBlur={(event) => !wrapRef.current?.contains(event.relatedTarget) && clear()}
       >
         <defs>
           <linearGradient id="bankroll-fill" x1="0" y1="0" x2="0" y2="1">
@@ -238,14 +270,14 @@ export default function BankrollPlot({ points, money, xMode = 'hours', height: f
           <path className="bankroll-area" d={area} fill="url(#bankroll-fill)" />
           <path className="bankroll-line" d={line} pathLength={1} />
         </g>
-        {points.length <= MAX_DOTS &&
+        {(detailed || points.length <= MAX_DOTS) &&
           points.slice(1).map((p) => (
             <circle
               key={p.session.id}
               className={`bankroll-dot ${sessionProfit(p.session) >= 0 ? 'is-win' : 'is-loss'}`}
               cx={px(p)}
               cy={y(p.bankroll)}
-              r={active === p ? 6 : 3.5}
+              r={active === p ? radius + 2.5 : radius}
             />
           ))}
 
@@ -284,8 +316,59 @@ export default function BankrollPlot({ points, money, xMode = 'hours', height: f
         )}
       </svg>
 
+      {/* Full screen: the session's story, with the way to it */}
+      {active && detailed && (
+        <div className={`bankroll-tooltip is-detailed is-${tipSide}`} style={tipStyle}>
+          <button type="button" className="bankroll-tooltip-close" onClick={clear} aria-label="Close this card">
+            <Icon name="close" size={14} />
+          </button>
+          {session ? (
+            <>
+              <span className="bankroll-tooltip-title">
+                {formatWeekday(session.date)}, {formatDate(session.date)} · {isTournament(session) ? `Tournament ${session.game}` : `${session.game} ${session.stakes}`}
+              </span>
+              <span className="bankroll-tooltip-meta">
+                {session.venue} · {formatDuration(session.durationMin)}
+                {session.hands > 0 && ` · ${session.hands.toLocaleString('en-US')} hands`}
+              </span>
+              <span className={`bankroll-tooltip-result num ${profit >= 0 ? 'is-win' : 'is-loss'}`}>{money.full(profit)}</span>
+              <dl className="bankroll-tooltip-facts">
+                <div>
+                  <dt>Bankroll after</dt>
+                  <dd className="num">{money.full(active.bankroll)}</dd>
+                </div>
+                <div>
+                  <dt>An hour</dt>
+                  <dd className="num">{money.full(profit / Math.max(session.durationMin / 60, 0.25))}/h</dd>
+                </div>
+                <div>
+                  <dt>Session</dt>
+                  <dd className="num">
+                    {active.index} of {points.length - 1}
+                  </dd>
+                </div>
+                {fromPeak > 0 && (
+                  <div>
+                    <dt>From peak</dt>
+                    <dd className="num is-loss">{money.full(-fromPeak)}</dd>
+                  </div>
+                )}
+              </dl>
+              <Link to={`/history/${session.id}`} className="bankroll-tooltip-link">
+                Open session <Icon name="chevronRight" size={14} />
+              </Link>
+            </>
+          ) : (
+            <>
+              <span className="bankroll-tooltip-title">Where it starts</span>
+              <span className="bankroll-tooltip-meta">Before your first session here: {money.full(0, { sign: false })}</span>
+            </>
+          )}
+        </div>
+      )}
+
       {/* Details card, flipped to the left near the right edge */}
-      {active && (
+      {active && !detailed && (
         <div className={`bankroll-tooltip is-${tipSide}`} style={tipStyle}>
           <span className="bankroll-tooltip-title">
             {active.session ? `${formatDate(active.session.date)} · ${active.session.game} ${active.session.stakes}` : 'Start'}

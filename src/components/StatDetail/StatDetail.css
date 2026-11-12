@@ -1,4 +1,5 @@
-/* Detailed stat view: a big lead number, then sections that rise in one after another (--i is the order). */
+/* Detailed stat view: a big lead number, then sections that rise in one after another (--i is the order). A
+   curve can open full screen; lists of sessions and hands lead to them. */
 
 .stat-detail {
   display: flex;
@@ -41,15 +42,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-}
-.btn-secondary {
-  background: var(--surface-2);
-  color: var(--text);
-  border: 1px solid var(--border);
-}
-.btn-secondary:hover {
-  box-shadow: none;
-  border-color: var(--text-faint);
 }
 
 .stat-detail-title {
@@ -120,26 +112,87 @@
   color: var(--text-faint);
 }
 
-/* Lists: label and hint on the left, value on the right */
+/* Lists: label and hint on the left, value on the right. A row that leads somewhere (a session, a hand) is a
+   link with a chevron; a hand's row starts with its cards. */
 .stat-detail-list {
   display: flex;
   flex-direction: column;
 }
 .stat-detail-list li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 0;
   border-bottom: 1px solid var(--border);
 }
 .stat-detail-list li:last-child {
   border-bottom: 0;
 }
+.stat-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 0;
+  color: inherit;
+}
+a.stat-detail-row {
+  transition: opacity 0.15s ease;
+}
+a.stat-detail-row:active {
+  opacity: 0.6;
+}
+.stat-detail-chevron {
+  flex-shrink: 0;
+  margin-left: -6px;
+  color: var(--text-faint);
+}
+.stat-detail-cards {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
 .stat-detail-list-main {
   display: flex;
+  flex: 1;
   flex-direction: column;
   min-width: 0;
+}
+
+/* A line under the lead: why the numbers are in dollars, or what they leave out */
+.stat-detail-note {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--text-faint);
+}
+
+/* A curve's heading, with the button that opens the graph full screen */
+.stat-detail-curve-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 36px;
+}
+.stat-detail-fullscreen {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.stat-detail-fullscreen:hover {
+  border-color: var(--text-faint);
+}
+.stat-detail-fullscreen:active {
+  transform: scale(0.96);
 }
 .stat-detail-list-label {
   font-weight: 700;

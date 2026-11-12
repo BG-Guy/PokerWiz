@@ -1,0 +1,23 @@
+/* The line under totals that are in dollars while the BB/$ switch is on big blinds. */
+
+.unit-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--text-faint);
+}
+.unit-note-mark {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 800;
+}

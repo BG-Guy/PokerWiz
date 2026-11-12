@@ -1,10 +1,16 @@
 // Profile (/profile): you and the app, laid out like a phone's settings screen. Who you are at the table (with
 // your record in three numbers), the app's settings, your data in and out (backup, automatic backups, import),
 // and what version of PokerWiz this is. Sessions themselves live in History.
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { getSessions, getSampleData } from '../../api/sessions.js';
 import { getSettings, updateSettings } from '../../api/settings.js';
 import { useApi } from '../../hooks/useApi.js';
+import { useDetailView } from '../../hooks/useDetailView.js';
+import { useUnit } from '../../theme/UnitContext.jsx';
+import { statDetail } from '../../utils/insightDetails.js';
+import { moneyScope } from '../../utils/format.js';
+import DetailSheet from '../../components/DetailSheet/DetailSheet.jsx';
+import StatDetail from '../../components/StatDetail/StatDetail.jsx';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import ProfileCard from './ProfileCard.jsx';
@@ -25,6 +31,11 @@ export default function Profile() {
   const { data, error, reload, setData } = useApi(loadProfile);
   const [editing, setEditing] = useState({ open: false, key: 0 });
   const [saveError, setSaveError] = useState(null);
+  const detail = useDetailView();
+  const { unit } = useUnit();
+  // Your sessions in the unit they add up in, and the story behind the record number that's open.
+  const scope = useMemo(() => data && moneyScope(data[0]), [data, unit]);
+  const shownDetail = useMemo(() => (scope && detail.shownKey ? statDetail(detail.shownKey, scope) : null), [scope, detail.shownKey]);
   if (!data) return <LoadState error={error} onRetry={reload} />;
 
   const [sessions, samples, settings] = data;
@@ -51,7 +62,7 @@ export default function Profile() {
       <div className="profile-columns">
         {/* You and the app */}
         <div className="profile-column">
-          <ProfileCard settings={settings} sessions={sessions} onEdit={openEditor} />
+          <ProfileCard settings={settings} scope={scope} onEdit={openEditor} onOpen={detail.open} cardRef={detail.cardRef} />
           <UserInfo settings={settings} onEdit={openEditor} order={1} />
           <AppSettings buyInDepth={settings.buyInDepth} onDepth={saveDepth} order={2} />
           {saveError && (
@@ -74,6 +85,11 @@ export default function Profile() {
       </div>
 
       <EditProfileSheet key={editing.key} open={editing.open} onClose={() => setEditing((current) => ({ ...current, open: false }))} settings={settings} onSaved={setSettings} />
+
+      {/* The story behind a number of your record */}
+      <DetailSheet open={detail.openKey !== null} onClose={detail.close} title={shownDetail?.title ?? ''} originRef={detail.originRef}>
+        {shownDetail && <StatDetail detail={shownDetail} />}
+      </DetailSheet>
     </div>
   );
 }

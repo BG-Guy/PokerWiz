@@ -12,7 +12,7 @@ export function getMoneyUnit() {
 
 // An amount in the current unit. bb = the big blind it's measured against: "+12.5 bb" in BB mode,
 // "+$25" in dollar mode. Without a bb (nothing to measure against) it stays in dollars.
-// Values that are already converted for display (see sessionsForDisplay / handsForDisplay) use bb: 1.
+// Values that are already converted for display (see moneyScope / handsForDisplay) use bb: 1.
 // Pass { sign: false } for a plain amount.
 export function formatMoney(amount, { sign = true, bb = null } = {}) {
   if (moneyUnit === 'bb' && bb > 0) return withSign(amount, formatBB(Math.abs(amount) / bb), sign);
@@ -45,40 +45,89 @@ export function bigBlindOf(stakesLabel) {
   return parsed ? Number(parsed[2]) : null;
 }
 
-// Sessions for totals and charts: in BB mode every money field is converted to big blinds (by that
-// session's own big blind), so totals across different stakes add up correctly. Tournaments have no big
-// blind and stay in dollars (big-blind totals leave them out: see cashGames in stats.js). Display only;
-// never save these.
-export function sessionsForDisplay(sessions) {
-  if (moneyUnit !== 'bb') return sessions;
-  return sessions.map((s) => {
-    if (!(s.bigBlind > 0)) return s;
-    const bb = s.bigBlind;
-    return {
-      ...s,
-      bigBlind: 1,
-      buyIn: s.buyIn / bb,
-      expenses: (s.expenses ?? 0) / bb,
-      cashOut: s.cashOut == null ? s.cashOut : s.cashOut / bb,
-      events: s.events?.map((e) => ({ ...e, amount: e.amount == null ? e.amount : e.amount / bb })),
-    };
-  });
+// The one big blind a list of them shares, or null when they differ (or one is missing, as for a tournament).
+export function sharedBigBlind(bigBlinds) {
+  let shared = null;
+  for (const bb of bigBlinds) {
+    if (!(bb > 0) || (shared !== null && bb !== shared)) return null;
+    shared = bb;
+  }
+  return shared;
 }
 
-// Hands for summaries (insights, highlights): the same conversion by each hand's stakes. Display only.
+// One session with every money field in big blinds (its own). Display only; never save these.
+function sessionInBigBlinds(s) {
+  const bb = s.bigBlind;
+  return {
+    ...s,
+    bigBlind: 1,
+    buyIn: s.buyIn / bb,
+    expenses: (s.expenses ?? 0) / bb,
+    cashOut: s.cashOut == null ? s.cashOut : s.cashOut / bb,
+    events: s.events?.map((e) => ({ ...e, amount: e.amount == null ? e.amount : e.amount / bb })),
+  };
+}
+
+// One hand with every amount in big blinds (by its stakes). Display only.
+function handInBigBlinds(h) {
+  const bb = bigBlindOf(h.stakes) ?? 1;
+  const conv = (v) => (v == null ? v : v / bb);
+  return {
+    ...h,
+    result: conv(h.result),
+    potSize: conv(h.potSize),
+    streets: h.streets?.map((st) => ({ ...st, pot: conv(st.pot), actions: st.actions.map((a) => ({ ...a, amount: conv(a.amount) })) })),
+    players: h.players?.map((p) => ({ ...p, stack: conv(p.stack) })),
+  };
+}
+
+// What a total, an average or a curve over several sessions or hands is shown in. Big blinds only add up when
+// they are the same size (+300 bb at $1/$2 and -100 bb at $5/$10 is a $400 loss, not "+200 bb"), so a group
+// is in big blinds only when the BB/$ switch says so and everything in it was played at one big blind;
+// otherwise it's in dollars, and `mixed` says the switch was overruled (UnitNote explains it on screen).
+//   inBB    the group is shown in big blinds
+//   mixed   the switch asks for big blinds, but these were played at different ones
+//   money   amountFormatters() for the group's unit
+//   bb      for <Money bb>: 1 when the amounts are already in big blinds, null for dollars
+//   stakes  the stakes in the group, most played first
+function scopeOf(bigBlinds, stakes) {
+  const inBB = moneyUnit === 'bb' && bigBlinds.length > 0 && sharedBigBlind(bigBlinds) !== null;
+  const counts = new Map();
+  for (const label of stakes) if (label) counts.set(label, (counts.get(label) ?? 0) + 1);
+  return {
+    inBB,
+    mixed: moneyUnit === 'bb' && !inBB && new Set(bigBlinds.filter((bb) => bb > 0)).size > 1,
+    money: amountFormatters({ dollars: !inBB }),
+    bb: inBB ? 1 : null,
+    stakes: [...counts].sort((a, b) => b[1] - a[1]).map(([label]) => label),
+  };
+}
+
+// Why a group is in dollars although the BB/$ switch is on big blinds, in a sentence; null when it isn't overruled.
+// tip: what to do about it there ("Pick one stake to see big blinds."), which replaces the explanation.
+export function mixedStakesNote(scope, tip = null) {
+  if (!scope?.mixed) return null;
+  if (tip) return `In dollars: these mix different blinds. ${tip}`;
+  const stakes = scope.stakes.slice(0, 3).join(', ') + (scope.stakes.length > 3 ? ' and more' : '');
+  return `In dollars, because these were played at different blinds (${stakes}): big blinds of different sizes don't add up.`;
+}
+
+// Sessions for totals and charts: { sessions, ...scope }, the sessions converted to big blinds when the group
+// can be shown in them (see scopeOf). A row about one session doesn't need this: format it by its own big blind.
+export function moneyScope(sessions) {
+  const scope = scopeOf(sessions.map((s) => s.bigBlind), sessions.map((s) => s.stakes));
+  return { ...scope, sessions: scope.inBB ? sessions.map(sessionInBigBlinds) : sessions };
+}
+
+// Hands for totals (hand insights): { hands, ...scope }, by the same rule.
+export function handScope(hands) {
+  const scope = scopeOf(hands.map((h) => bigBlindOf(h.stakes)), hands.map((h) => h.stakes));
+  return { ...scope, hands: scope.inBB ? hands.map(handInBigBlinds) : hands };
+}
+
+// Hands for lines about one hand each (highlights): every hand converted by its own stakes. Display only.
 export function handsForDisplay(hands) {
-  if (moneyUnit !== 'bb') return hands;
-  return hands.map((h) => {
-    const bb = bigBlindOf(h.stakes) ?? 1;
-    const conv = (v) => (v == null ? v : v / bb);
-    return {
-      ...h,
-      result: conv(h.result),
-      potSize: conv(h.potSize),
-      streets: h.streets?.map((st) => ({ ...st, pot: conv(st.pot), actions: st.actions.map((a) => ({ ...a, amount: conv(a.amount) })) })),
-      players: h.players?.map((p) => ({ ...p, stack: conv(p.stack) })),
-    };
-  });
+  return moneyUnit === 'bb' ? hands.map(handInBigBlinds) : hands;
 }
 
 // Parse a YYYY-MM-DD string as a local calendar date (avoids timezone shifts).
@@ -158,7 +207,9 @@ export function amountFormatters({ dollars = false } = {}) {
   const compact = (value) => {
     const minus = value < 0 ? '-' : '';
     if (Math.abs(value) < 1000) return `${minus}${full(Math.abs(value), { sign: false })}`;
-    const k = `${Math.round(Math.abs(value) / 100) / 10}k`;
+    // 1,250 is "1.25k" (an axis tick must not read as 1.3k); bigger numbers need fewer decimals.
+    const thousands = Math.abs(value) / 1000;
+    const k = `${Number(thousands.toFixed(thousands >= 100 ? 0 : thousands >= 10 ? 1 : 2))}k`;
     return inBB ? `${minus}${k} bb` : `${minus}$${k}`;
   };
   return { full, compact, unit: inBB ? 'bb' : '$' };

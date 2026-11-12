@@ -16,7 +16,7 @@ export default function UnitToggle({ showLabel = false }) {
           type="button"
           className={`unit-toggle-option ${unit === value ? 'is-active' : ''}`}
           aria-pressed={unit === value}
-          title={value === 'bb' ? 'Show amounts in big blinds' : 'Show amounts in dollars'}
+          title={value === 'bb' ? 'Show amounts in big blinds (totals across different blinds stay in dollars)' : 'Show amounts in dollars'}
           onClick={() => setUnit(value)}
         >
           {label}

@@ -111,6 +111,8 @@ export function createPreflopWalker(chart, seatOf, models = new Map()) {
   let current = null; // the node the last moveTo landed on: the tree's, or a stand-in
   let currentSeat = -1; // whose decision that is (tree seat; a stand-in's node belongs to another seat)
   let lost = null; // why the hand can't be followed any more (e.g. four players in the pot)
+  let crowded = false; // ... because one caller too many came in (see extraCaller)
+  let lastCall = null; // the last call taken in the tree: { node, index }
   let missing = null; // why the last moveTo found no node
   const reach = Array.from({ length: 8 }, () => new Float32Array(N).fill(1));
   const limpers = new Map(); // position -> Float32Array(169): players still in after limping (off the tree)
@@ -186,7 +188,23 @@ export function createPreflopWalker(chart, seatOf, models = new Map()) {
   // Take tree action `index` at the current node.
   function take(index) {
     narrow(reach[node.player], node, index, node.player);
+    if (node.actions[index].type === 'call') lastCall = { node, index };
     node = node.children[index];
+  }
+
+  // One caller more than the tree has room for (it plays pots of up to three players): their range is the one
+  // they'd call with had the caller before them folded, so as the third player in. The hand is still lost for
+  // advice (from here on nobody's decision is one the charts solved), but that player comes to the flop with a
+  // calling range instead of every hand, and so does each caller after them, the same way.
+  function extraCaller(seat) {
+    if (!lastCall) return;
+    const foldAt = (at) => at.children[at.actions.findIndex((a) => a.type === 'fold')];
+    let at = foldAt(lastCall.node);
+    while (at?.kind === 'decision' && at.player !== seat) at = foldAt(at);
+    const call = at?.kind === 'decision' ? at.actions.findIndex((a) => a.type === 'call') : -1;
+    if (call < 0) return;
+    narrow(reach[seat], at, call, seat);
+    lastCall = { node: at, index: call };
   }
 
   // Tree players who come before `seat` but didn't act in the real hand folded.
@@ -214,12 +232,14 @@ export function createPreflopWalker(chart, seatOf, models = new Map()) {
     return at;
   }
 
-  // A limper's range: the opening range of a seat further on, with fewer premiums.
+  // A limper's range: the opening range of a seat further on, with fewer premiums. A limper with a read plays
+  // that seat as wide as their model does (a loose player limps many more hands, a nit fewer).
   function limpRange(seat) {
     const at = unopened(Math.min(BUTTON, Math.max(0, seat) + LIMP_WIDER_BY));
     const data = chart.dataAt(at);
     const raiseAt = at.actions.map((a, k) => (isRaise(a.type) ? k : -1)).filter((k) => k >= 0);
-    return Float32Array.from({ length: N }, (_, c) => limpKeep(c) * raiseAt.reduce((sum, k) => sum + data.strategy[k * N + c], 0));
+    const played = models.get(seat)?.played?.(at, data.strategy);
+    return Float32Array.from({ length: N }, (_, c) => limpKeep(c) * (played ? played[c] : raiseAt.reduce((sum, k) => sum + data.strategy[k * N + c], 0)));
   }
 
   // A limper facing more than one raise: keep the band of their range (strongest first) that takes `type`.
@@ -304,8 +324,12 @@ export function createPreflopWalker(chart, seatOf, models = new Map()) {
     moveTo,
     // A real action by `position`. real: { type, to (bb) }. Returns { real, note } or null if it couldn't be followed.
     apply(position, real) {
-      if (lost) return null;
       const seat = seatOf.get(position);
+      if (lost) {
+        // More callers after the tree ran out of room for them still get a calling range.
+        if (crowded && real.type === 'call' && seat >= 0 && !limpers.has(position)) extraCaller(seat);
+        return null;
+      }
       // A limp (the small blind's is in the tree): off the tree from here on.
       if (raises === 0 && real.type === 'call' && seat !== SB && seat !== BB && !limpers.has(position)) {
         if (seat >= 0) {
@@ -330,6 +354,8 @@ export function createPreflopWalker(chart, seatOf, models = new Map()) {
       const inTree = current === node;
       if (inTree) {
         if (match.note === 'call') {
+          extraCaller(seat);
+          crowded = true;
           lost = 'More players called than the solved game allows (it covers pots of up to three players).';
           return null;
         }

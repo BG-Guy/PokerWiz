@@ -1,0 +1,3704 @@
+{
+ "kind": "pokerwiz-youtube-spots",
+ "version": 1,
+ "source": "Hungry Horse Poker (YouTube), 24 most-viewed videos, auto-captions",
+ "extracted": "2026-11-11",
+ "spots": [
+  {
+   "id": "hh-01",
+   "theme": "big-fold",
+   "title": "Nut flush facing a jam on a double-paired river",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "LRdXnYB4kP8",
+    "video": "These Hands Are INSANE (I'm Not on Drugs!) | Ep 2",
+    "views": 180000,
+    "timestamp": "09:50",
+    "url": "https://youtu.be/LRdXnYB4kP8?t=590",
+    "hand": 214
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1500,
+    "SB": 1060
+   },
+   "hero": {
+    "position": "HJ",
+    "cards": [
+     "Ad",
+     "9d"
+    ]
+   },
+   "shown": {
+    "SB": [
+     "As",
+     "Tc"
+    ]
+   },
+   "reads": {
+    "SB": {
+     "preset": "lag",
+     "level": "regular"
+    }
+   },
+   "villains": {
+    "SB": "aggressive villain battled all day",
+    "BTN": "called pre",
+    "LJ": "folds to check-raise"
+   },
+   "board": [
+    "5s",
+    "2d",
+    "5d",
+    "Td",
+    "Th"
+   ],
+   "actions": [
+    [
+     "LJ",
+     "call"
+    ],
+    [
+     "HJ",
+     "raise",
+     45
+    ],
+    [
+     "BTN",
+     "call"
+    ],
+    [
+     "SB",
+     "call"
+    ],
+    [
+     "LJ",
+     "call"
+    ],
+    [
+     "SB",
+     "check"
+    ],
+    [
+     "LJ",
+     "check"
+    ],
+    [
+     "HJ",
+     "bet",
+     60
+    ],
+    [
+     "BTN",
+     "fold"
+    ],
+    [
+     "SB",
+     "raise",
+     185
+    ],
+    [
+     "LJ",
+     "fold"
+    ],
+    [
+     "HJ",
+     "call"
+    ],
+    [
+     "SB",
+     "bet",
+     300
+    ],
+    [
+     "HJ",
+     "call"
+    ],
+    [
+     "SB",
+     "allin"
+    ],
+    [
+     "HJ",
+     "fold"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "fold",
+      "why": "On a double-paired board the jam is a full house far too often; people don't bluff here."
+     },
+     "heroDid": "fold"
+    }
+   ],
+   "lesson": "With only one player behind he bets the nut flush draw rather than check-raise. Facing a turn bet he flats since a 5 gets all-in anyway and a bluff can keep bluffing. On the double-paired river the jam is a 5 at a very high frequency; people don't run bluffs there and would slow down with a flush. Under-bluffed spots mean folding every bluff catcher.",
+   "result": "Hero folded; SB showed ATo (rivered tens full).",
+   "assumptions": [
+    "LJ limped (the video says hero isolated).",
+    "Hero's stack is $1,500 (covers); SB starts with $1,060 so $530 is left for the river, as said.",
+    "Suits chosen to fit: two diamonds on the flop."
+   ]
+  },
+  {
+   "id": "hh-02",
+   "theme": "big-fold",
+   "title": "Rivered set of queens, check-jammed by a limper",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "mr9I9mlfFCI",
+    "video": "I Made My Poker Table FURIOUS\u2026.and I Don\u2019t Regret It! | Ep 5",
+    "views": 199000,
+    "timestamp": "26:50",
+    "url": "https://youtu.be/mr9I9mlfFCI?t=1610",
+    "hand": 240
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1500,
+    "UTG": 1000
+   },
+   "hero": {
+    "position": "UTG+1",
+    "cards": [
+     "Qh",
+     "Qd"
+    ]
+   },
+   "shown": {},
+   "reads": {
+    "UTG": {
+     "preset": "fish",
+     "level": "rec"
+    },
+    "CO": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "UTG": "same player just stacked with trip kings",
+    "CO": "folds turn"
+   },
+   "board": [
+    "Kh",
+    "3c",
+    "6s",
+    "Ah",
+    "Qc"
+   ],
+   "actions": [
+    [
+     "UTG",
+     "call"
+    ],
+    [
+     "UTG+1",
+     "raise",
+     30
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "UTG",
+     "call"
+    ],
+    [
+     "UTG",
+     "check"
+    ],
+    [
+     "UTG+1",
+     "check"
+    ],
+    [
+     "CO",
+     "check"
+    ],
+    [
+     "UTG",
+     "bet",
+     30
+    ],
+    [
+     "UTG+1",
+     "call"
+    ],
+    [
+     "CO",
+     "fold"
+    ],
+    [
+     "UTG",
+     "check"
+    ],
+    [
+     "UTG+1",
+     "bet",
+     150
+    ],
+    [
+     "UTG",
+     "allin"
+    ],
+    [
+     "UTG+1",
+     "fold"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "fold",
+      "why": "A check-jam over a pot-size bet on A-K-Q is massively under-bluffed; a bluffer would just bet."
+     },
+     "heroDid": "fold"
+    }
+   ],
+   "lesson": "Normally a snap fold: a check-jam vs a pot-sized bet on these A-high, triple-Broadway boards is massively under-bluffed, and hero holds the Q of hearts so few bluffs exist. A bluffer would just bet himself. The 'oh sweet' then silence live read also says he wants a call.",
+   "result": "Hero folded; villain did not show.",
+   "assumptions": [
+    "Villain's stack is $1,000 (not said).",
+    "Suits chosen: one heart on the flop, the A of hearts on the turn, hero holds the Q of hearts."
+   ]
+  },
+  {
+   "id": "hh-03",
+   "theme": "big-fold",
+   "title": "Bottom set facing a big river donk when every draw gets there",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "TKA83V4UBFo",
+    "video": "$100/hr at LOW STAKES Poker?! | Ep 1",
+    "views": 353000,
+    "timestamp": "02:44",
+    "url": "https://youtu.be/TKA83V4UBFo?t=164",
+    "hand": 244
+   },
+   "stakes": {
+    "label": "$5/$5 + $10 straddle",
+    "sb": 5,
+    "bb": 10
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1000
+   },
+   "hero": {
+    "position": "UTG",
+    "cards": [
+     "5s",
+     "5d"
+    ]
+   },
+   "shown": {},
+   "reads": {
+    "SB": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "SB": "unknown player, never played with him"
+   },
+   "board": [
+    "Jh",
+    "6h",
+    "5c",
+    "9d",
+    "3h"
+   ],
+   "actions": [
+    [
+     "UTG",
+     "raise",
+     40
+    ],
+    [
+     "SB",
+     "call"
+    ],
+    [
+     "BB",
+     "fold"
+    ],
+    [
+     "SB",
+     "check"
+    ],
+    [
+     "UTG",
+     "bet",
+     50
+    ],
+    [
+     "SB",
+     "call"
+    ],
+    [
+     "SB",
+     "check"
+    ],
+    [
+     "UTG",
+     "bet",
+     150
+    ],
+    [
+     "SB",
+     "call"
+    ],
+    [
+     "SB",
+     "bet",
+     350
+    ],
+    [
+     "UTG",
+     "fold"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "fold",
+      "why": "Check-call, check-call, then a big lead is under-bluffed, and he has no missed draws to bluff with."
+     },
+     "heroDid": "fold"
+    }
+   ],
+   "lesson": "He runs his bluff-catching checklist: he doesn't beat value (AJ/KJ would never lead like this), check-call, check-call then a big donk lead is an under-bluffed line, he gave no rope (raised, bet, overbet), the size is big, and the villain has no natural bluffs since every draw got there. So just fold. His one mistake was the turn size: he should have bet a bit bigger, about $250, to set up an SPR under 1.",
+   "result": "Hero folded the set.",
+   "assumptions": [
+    "The app has no straddle, so the $10 straddle is played as the big blind ($5/$10 blinds).",
+    "Turn bet is $150 (not given; he said about $250 would have been better).",
+    "Stacks $1,000."
+   ]
+  },
+  {
+   "id": "hh-04",
+   "theme": "big-fold",
+   "title": "Low straight facing a turn jam on K-Q-J",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "TKA83V4UBFo",
+    "video": "$100/hr at LOW STAKES Poker?! | Ep 1",
+    "views": 353000,
+    "timestamp": "07:13",
+    "url": "https://youtu.be/TKA83V4UBFo?t=433",
+    "hand": 246
+   },
+   "stakes": {
+    "label": "$5/$5 + $10 straddle",
+    "sb": 5,
+    "bb": 10
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1500,
+    "BB": 965
+   },
+   "hero": {
+    "position": "SB",
+    "cards": [
+     "Td",
+     "9d"
+    ]
+   },
+   "shown": {
+    "BB": [
+     "Ac",
+     "Th"
+    ]
+   },
+   "reads": {
+    "BB": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "Straddle": "unknown player"
+   },
+   "board": [
+    "Qs",
+    "Kh",
+    "Jc",
+    "5s",
+    "Qd"
+   ],
+   "actions": [
+    [
+     "SB",
+     "raise",
+     40
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "SB",
+     "check"
+    ],
+    [
+     "BB",
+     "bet",
+     25
+    ],
+    [
+     "SB",
+     "raise",
+     175
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "SB",
+     "bet",
+     275
+    ],
+    [
+     "BB",
+     "allin"
+    ],
+    [
+     "SB",
+     "call"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "fold",
+      "why": "After a check-raise and a turn barrel, the jam is never a bluff: AT always, KQ sometimes."
+     },
+     "heroDid": "call"
+    }
+   ],
+   "lesson": "He says it's an easy fold he got wrong from rust: he showed nothing but strength (6x check-raise, turn barrel on a triple-Broadway board), so the villain's jam is never a bluff 'in 8 million years'. AT plays this way 100% of the time and KQ maybe half the time, so even at a great price it's a really bad call.",
+   "result": "Hero called; villain had AT (nut straight). River Q, hero lost.",
+   "assumptions": [
+    "The app has no straddle, so the $10 straddle is played as the big blind ($5/$10 blinds).",
+    "Villain's jam is $750 on the turn, so he started with $965."
+   ]
+  },
+  {
+   "id": "hh-05",
+   "theme": "big-fold",
+   "title": "Top pair facing a turn overbet on a three-Broadway board",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "FVLzAlXr7b0",
+    "video": "$100/hr at Low Stakes: The Final Episode",
+    "views": 261000,
+    "timestamp": "08:14",
+    "url": "https://youtu.be/FVLzAlXr7b0?t=494",
+    "hand": 257
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1000
+   },
+   "hero": {
+    "position": "HJ",
+    "cards": [
+     "Kc",
+     "Qh"
+    ]
+   },
+   "shown": {},
+   "reads": {
+    "CO": {
+     "preset": "fish",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "CO": "recreational caller"
+   },
+   "board": [
+    "Kd",
+    "Th",
+    "2c",
+    "Js"
+   ],
+   "actions": [
+    [
+     "HJ",
+     "raise",
+     25
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "HJ",
+     "bet",
+     35
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "HJ",
+     "check"
+    ],
+    [
+     "CO",
+     "bet",
+     140
+    ],
+    [
+     "HJ",
+     "fold"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "fold",
+      "why": "Recreational players don't overbet as a bluff on this board; exploit fold."
+     },
+     "heroDid": "fold"
+    }
+   ],
+   "lesson": "Recreational players don't use overbet sizes as bluffs; after calling a big flop bet he would have to turn something like QJ into a bluff, which won't happen. Triple-Broadway boards and this sizing are massively under-bluffed, so the bluff catcher folds.",
+   "result": "Hero folded (exploitative fold).",
+   "assumptions": [
+    "Stacks $1,000 ($1k cap game).",
+    "Suits chosen; hero has no flush draw."
+   ]
+  },
+  {
+   "id": "hh-06",
+   "theme": "big-fold",
+   "title": "Second-nut flush facing a river check-raise all in",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "4fOKT0pRl18",
+    "video": "What High Stakes Pros See That Low Stakes Players Miss",
+    "views": 182000,
+    "timestamp": "22:34",
+    "url": "https://youtu.be/4fOKT0pRl18?t=1354",
+    "hand": 287
+   },
+   "stakes": {
+    "label": "$5/$10",
+    "sb": 5,
+    "bb": 10
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1500
+   },
+   "hero": {
+    "position": "LJ",
+    "cards": [
+     "Ks",
+     "Qs"
+    ]
+   },
+   "shown": {
+    "BB": [
+     "As",
+     "8s"
+    ]
+   },
+   "reads": {
+    "BB": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "BB": "try-hard recreational player"
+   },
+   "board": [
+    "Ts",
+    "4s",
+    "2s",
+    "7d",
+    "9c"
+   ],
+   "actions": [
+    [
+     "LJ",
+     "raise",
+     30
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "LJ",
+     "bet",
+     40
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "LJ",
+     "bet",
+     225
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "LJ",
+     "bet",
+     550
+    ],
+    [
+     "BB",
+     "allin"
+    ],
+    [
+     "LJ",
+     "fold"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "fold",
+      "why": "Recs slowplay big flushes on monotone boards and don't check-raise all in with small ones or bluffs."
+     },
+     "heroDid": "fold"
+    }
+   ],
+   "lesson": "Recreational players slowplay big flushes and fast-play small ones on monotone boards because they don't want a four-flush to appear. A check-raise for stacks after an overbet is not done with a jack-high flush and recs don't bluff enough, so the second nuts can fold. Both small and overbet turn sizes are fine; the medium size is the one he dislikes.",
+   "result": "BB had As8s, the nut flush. Alex folded and lost 85bb; Abby got stacked.",
+   "assumptions": [
+    "Open to $30 (not given). Alex's line from the video."
+   ]
+  },
+  {
+   "id": "hh-07",
+   "theme": "big-fold",
+   "title": "Queen-high flush facing a turn check-raise multiway",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "S7eq8103TDg",
+    "video": "I Gave a Weekend Warrior and a Full Time Pro the Same 5 Hands",
+    "views": 162000,
+    "timestamp": "03:13",
+    "url": "https://youtu.be/S7eq8103TDg?t=193",
+    "hand": 316
+   },
+   "stakes": {
+    "label": "$2/$5",
+    "sb": 2,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1000,
+    "HJ": 900
+   },
+   "hero": {
+    "position": "HJ",
+    "cards": [
+     "Qd",
+     "Jd"
+    ]
+   },
+   "shown": {
+    "BB": [
+     "Kd",
+     "Td"
+    ]
+   },
+   "reads": {
+    "BB": {
+     "preset": "unknown",
+     "level": "rec"
+    },
+    "SB": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "BB": "check-raiser (had KdTd)",
+    "SB": "caller"
+   },
+   "board": [
+    "Ts",
+    "8d",
+    "5d",
+    "4d",
+    "9c"
+   ],
+   "actions": [
+    [
+     "HJ",
+     "raise",
+     15
+    ],
+    [
+     "BTN",
+     "call"
+    ],
+    [
+     "SB",
+     "call"
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "SB",
+     "check"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "HJ",
+     "bet",
+     60
+    ],
+    [
+     "BTN",
+     "fold"
+    ],
+    [
+     "SB",
+     "call"
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "SB",
+     "check"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "HJ",
+     "bet",
+     180
+    ],
+    [
+     "SB",
+     "fold"
+    ],
+    [
+     "BB",
+     "raise",
+     540
+    ],
+    [
+     "HJ",
+     "fold"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "fold",
+      "why": "Smaller flushes don't check-raise a big turn bet, so this is only the nut or second-nut flush."
+     },
+     "heroDid": "fold"
+    }
+   ],
+   "lesson": "A check-raise closing the action multiway is almost always strong (two pair, sets, big combos), so there's no fold equity and Chloe's flop call is good. He defaults to smaller sizes multiway so strong hands still raise. Tommy's big turn bet targets ATd/KTd and straights, and smaller flushes won't check-raise a big bet, so the check-raise is only the nuts or second nuts. That's a clean laydown.",
+   "result": "Both folded the third-nut flush; BB had KdTd (second-nut flush). Tommy lost $260, Chloe $365.",
+   "assumptions": [
+    "Open to $15 (not given). Tommy's line from the video (Chloe's went to the river)."
+   ]
+  },
+  {
+   "id": "hh-08",
+   "theme": "big-fold",
+   "title": "Overpair facing a turn raise all in, in a 3-bet pot",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "ddSfMpSy838",
+    "video": "I'm The KING of Low Stakes Poker | Ep 13",
+    "views": 157000,
+    "timestamp": "03:56",
+    "url": "https://youtu.be/ddSfMpSy838?t=236",
+    "hand": 329
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1200,
+    "CO": 1150
+   },
+   "hero": {
+    "position": "BB",
+    "cards": [
+     "Qh",
+     "Qd"
+    ]
+   },
+   "shown": {
+    "CO": [
+     "Jc",
+     "Js"
+    ]
+   },
+   "reads": {
+    "CO": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "CO": "isolator, called quickly (had JJ)"
+   },
+   "board": [
+    "Jd",
+    "4s",
+    "2h",
+    "9c"
+   ],
+   "actions": [
+    [
+     "LJ",
+     "call"
+    ],
+    [
+     "CO",
+     "raise",
+     25
+    ],
+    [
+     "SB",
+     "call"
+    ],
+    [
+     "BB",
+     "raise",
+     150
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "BB",
+     "bet",
+     120
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "BB",
+     "bet",
+     250
+    ],
+    [
+     "CO",
+     "allin"
+    ],
+    [
+     "BB",
+     "call"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "fold",
+      "why": "Nobody bluff-raises the turn in a 3-bet pot after you bet every street; just fold every time."
+     },
+     "heroDid": "call"
+    }
+   ],
+   "lesson": "A big blunder that breaks his own rules. Nobody bluff-raises a turn in a 3-bet pot after you've been aggressive preflop, flop and turn. The CO reps only JJ/J9s, and even big combo draws mostly just call. Just fold every time to turn raises in 3-bet pots.",
+   "result": "Hero called and lost to a set of jacks.",
+   "assumptions": [
+    "Hero's stack $1,200; CO $1,150 as said."
+   ]
+  },
+  {
+   "id": "hh-09",
+   "theme": "big-fold",
+   "title": "Top pair facing a river raise at a huge price ($1/$2)",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "vsSFecrDrb0",
+    "video": "I Ranked 10 Poker Creators. Most of Them Won't Like It.",
+    "views": 167000,
+    "timestamp": "75:41",
+    "url": "https://youtu.be/vsSFecrDrb0?t=4541",
+    "hand": 20
+   },
+   "stakes": {
+    "label": "$1/$2 + $4 straddle",
+    "sb": 2,
+    "bb": 4
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 300,
+    "BTN": 150
+   },
+   "hero": {
+    "position": "BB",
+    "cards": [
+     "As",
+     "Qd"
+    ]
+   },
+   "shown": {
+    "BTN": [
+     "3c",
+     "3d"
+    ]
+   },
+   "reads": {
+    "BTN": {
+     "preset": "unknown",
+     "level": "rec"
+    },
+    "UTG": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "BTN": "caller"
+   },
+   "board": [
+    "Ac",
+    "9s",
+    "4h",
+    "9d",
+    "3h"
+   ],
+   "actions": [
+    [
+     "UTG",
+     "call"
+    ],
+    [
+     "HJ",
+     "call"
+    ],
+    [
+     "BTN",
+     "call"
+    ],
+    [
+     "BB",
+     "raise",
+     25
+    ],
+    [
+     "UTG",
+     "call"
+    ],
+    [
+     "HJ",
+     "fold"
+    ],
+    [
+     "BTN",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "UTG",
+     "check"
+    ],
+    [
+     "BTN",
+     "check"
+    ],
+    [
+     "BB",
+     "bet",
+     20
+    ],
+    [
+     "UTG",
+     "fold"
+    ],
+    [
+     "BTN",
+     "call"
+    ],
+    [
+     "BB",
+     "bet",
+     55
+    ],
+    [
+     "BTN",
+     "allin"
+    ],
+    [
+     "BB",
+     "fold"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "fold",
+      "why": "Turn and river raises at low stakes are almost never bluffs, even at a great price."
+     },
+     "heroDid": "fold"
+    }
+   ],
+   "lesson": "Shallow SPR: just bet-bet-bet and stack an ace; this is the board recs overstab least, so checking is cute. But the river fold is very good: turn/river raises are almost never bluffs, a checked-back trap like A9/44/33.",
+   "result": "Hero folded; BTN had 33 (rivered full house). Rated 4/7.",
+   "assumptions": [
+    "The app has no straddle, so the $4 straddle (hero) is played as the big blind ($2/$4 blinds).",
+    "Hero's stack $300; the button has $105 left on the river, as said."
+   ]
+  },
+  {
+   "id": "hh-10",
+   "theme": "big-fold",
+   "title": "Bottom-end straight facing a turn overbet donk in a 3-bet pot",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "Ax9t7eNYsOI",
+    "video": "$100/hr at LOW STAKES? Brad Owen Weighs In! | Ep 3",
+    "views": 205000,
+    "timestamp": "26:01",
+    "url": "https://youtu.be/Ax9t7eNYsOI?t=1561",
+    "hand": 43
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1000
+   },
+   "hero": {
+    "position": "MP",
+    "cards": [
+     "Kd",
+     "5d"
+    ]
+   },
+   "shown": {},
+   "reads": {
+    "UTG+1": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "UTG+1": "rec opening wide offsuit broadways"
+   },
+   "board": [
+    "9h",
+    "8c",
+    "7s",
+    "6c"
+   ],
+   "actions": [
+    [
+     "UTG+1",
+     "raise",
+     25
+    ],
+    [
+     "MP",
+     "raise",
+     70
+    ],
+    [
+     "UTG+1",
+     "call"
+    ],
+    [
+     "UTG+1",
+     "check"
+    ],
+    [
+     "MP",
+     "bet",
+     60
+    ],
+    [
+     "UTG+1",
+     "call"
+    ],
+    [
+     "UTG+1",
+     "bet",
+     300
+    ],
+    [
+     "MP",
+     "fold"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "fold",
+      "why": "He won't donk two pair or a set this way, and we gave no rope, so it's a ten almost every time."
+     },
+     "heroDid": "fold"
+    }
+   ],
+   "lesson": "Bluff-catching checklist: worse value? No, he won't donk two pair or a set. Did we give rope? No, we 3-bet and bet. So it's a ten almost always and we are nearly drawing dead.",
+   "result": "Hero laid it down.",
+   "assumptions": [
+    "Hero's seat is MP (the video says 'behind the +1').",
+    "3-bet to $70 (not given; it fits the $265 pot)."
+   ]
+  },
+  {
+   "id": "hh-11",
+   "theme": "bluff-catch",
+   "title": "Pair of sevens facing a river bet after checking back the turn",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "Ax9t7eNYsOI",
+    "video": "$100/hr at LOW STAKES? Brad Owen Weighs In! | Ep 3",
+    "views": 205000,
+    "timestamp": "03:52",
+    "url": "https://youtu.be/Ax9t7eNYsOI?t=232",
+    "hand": 31
+   },
+   "stakes": {
+    "label": "$5/$5 + $10 straddle",
+    "sb": 5,
+    "bb": 10
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1000
+   },
+   "hero": {
+    "position": "HJ",
+    "cards": [
+     "9s",
+     "7s"
+    ]
+   },
+   "shown": {
+    "UTG+1": [
+     "Kh",
+     "Tc"
+    ]
+   },
+   "reads": {
+    "UTG+1": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "UTG+1": "well-known retired pro athlete ('nemesis'), recreational"
+   },
+   "board": [
+    "5h",
+    "8d",
+    "7c",
+    "2s",
+    "2d"
+   ],
+   "actions": [
+    [
+     "UTG+1",
+     "call"
+    ],
+    [
+     "HJ",
+     "raise",
+     50
+    ],
+    [
+     "UTG+1",
+     "call"
+    ],
+    [
+     "UTG+1",
+     "check"
+    ],
+    [
+     "HJ",
+     "bet",
+     50
+    ],
+    [
+     "UTG+1",
+     "call"
+    ],
+    [
+     "UTG+1",
+     "check"
+    ],
+    [
+     "HJ",
+     "check"
+    ],
+    [
+     "UTG+1",
+     "bet",
+     150
+    ],
+    [
+     "HJ",
+     "fold"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "call",
+      "why": "He calls his own fold pretty bad: after the turn check-back his pair is a fine bluff catcher on a clean river."
+     },
+     "heroDid": "fold"
+    }
+   ],
+   "lesson": "A pretty bad fold. His favorite live line is c-bet flop, check back showdown value, bluff-catch the river, and he over-leaned on the heuristic that big river sizes are under-bluffed. With a clean river after already telling villain his hand, it was an easy call.",
+   "result": "Hero folded; villain showed KTo (a bluff).",
+   "assumptions": [
+    "The app has no straddle, so the $10 straddle is played as the big blind ($5/$10 blinds).",
+    "Stacks $1,000."
+   ]
+  },
+  {
+   "id": "hh-12",
+   "theme": "bluff-catch",
+   "title": "Second pair calls a half-pot river bet",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "IyjYJUCAWPM",
+    "video": "Is Charlie Carrel REALLY That Good? (I Watched Every Hand)",
+    "views": 192000,
+    "timestamp": "33:17",
+    "url": "https://youtu.be/IyjYJUCAWPM?t=1997",
+    "hand": 169
+   },
+   "stakes": {
+    "label": "\u00a32/\u00a35",
+    "sb": 2,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 500
+   },
+   "hero": {
+    "position": "UTG",
+    "cards": [
+     "8h",
+     "7h"
+    ]
+   },
+   "shown": {
+    "BB": [
+     "Kc",
+     "Tc"
+    ]
+   },
+   "reads": {
+    "BB": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "BB": "recreational player"
+   },
+   "board": [
+    "9c",
+    "8s",
+    "2d",
+    "Qc",
+    "2h"
+   ],
+   "actions": [
+    [
+     "UTG",
+     "raise",
+     15
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "UTG",
+     "bet",
+     10
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "UTG",
+     "check"
+    ],
+    [
+     "BB",
+     "bet",
+     25
+    ],
+    [
+     "UTG",
+     "call"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "call",
+      "why": "Recs reach the river too wide; half pot is their bluff size, value would bet bigger."
+     },
+     "heroDid": "call"
+    }
+   ],
+   "lesson": "Mark's favorite live line: c-bet small, check back the turn with showdown value, bluff-catch the river. Recs call too wide preflop and reach the river too wide and weak; half pot is the size they bluff with, while Qx/two pair would size bigger. Quibble: c-bet a bit bigger (15-20). 5/5.",
+   "result": "BB showed KT suited (missed backdoor); hero won.",
+   "assumptions": [
+    "Stacks \u00a3500 (not said).",
+    "Suits chosen so the villain's missed draw (KcTc) fits."
+   ]
+  },
+  {
+   "id": "hh-13",
+   "theme": "bluff-catch",
+   "title": "Top pair calls a small river bet from the late stabber",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "TKA83V4UBFo",
+    "video": "$100/hr at LOW STAKES Poker?! | Ep 1",
+    "views": 353000,
+    "timestamp": "16:06",
+    "url": "https://youtu.be/TKA83V4UBFo?t=966",
+    "hand": 250
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1000
+   },
+   "hero": {
+    "position": "LJ",
+    "cards": [
+     "Qd",
+     "Js"
+    ]
+   },
+   "shown": {
+    "CO": [
+     "Ah",
+     "8s"
+    ]
+   },
+   "reads": {
+    "CO": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "CO": "unknown player",
+    "HJ": "folds flop",
+    "SB": "folds flop"
+   },
+   "board": [
+    "Qs",
+    "7d",
+    "6h",
+    "5c",
+    "2c"
+   ],
+   "actions": [
+    [
+     "LJ",
+     "raise",
+     25
+    ],
+    [
+     "HJ",
+     "call"
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "SB",
+     "call"
+    ],
+    [
+     "BB",
+     "fold"
+    ],
+    [
+     "SB",
+     "check"
+    ],
+    [
+     "LJ",
+     "check"
+    ],
+    [
+     "HJ",
+     "check"
+    ],
+    [
+     "CO",
+     "bet",
+     60
+    ],
+    [
+     "SB",
+     "fold"
+    ],
+    [
+     "LJ",
+     "call"
+    ],
+    [
+     "HJ",
+     "fold"
+    ],
+    [
+     "LJ",
+     "check"
+    ],
+    [
+     "CO",
+     "bet",
+     80
+    ],
+    [
+     "LJ",
+     "call"
+    ],
+    [
+     "LJ",
+     "check"
+    ],
+    [
+     "CO",
+     "bet",
+     125
+    ],
+    [
+     "LJ",
+     "call"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "call",
+      "why": "The CO stabbed last to act, so his range is wide; small size, good price, we gave rope."
+     },
+     "heroDid": "call"
+    }
+   ],
+   "lesson": "With multiple players in position he checks to see what they do, since they over-stab and telegraph with sizing. A small in-position river bet is usually thin value (AQ/KQ), but his checklist says they are capable, he gave them rope, the size is small and the price is good. The key is the CO stabbed last to act when it checked to him, so he can be wide; if the HJ had bet with CO still to act it would be much stronger.",
+   "result": "Hero called; CO showed A8o and hero won.",
+   "assumptions": [
+    "Stacks $1,000.",
+    "Suits chosen; QJ offsuit."
+   ]
+  },
+  {
+   "id": "hh-14",
+   "theme": "bluff-catch",
+   "title": "Top pair facing a 62% river bet on a straightening river",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "FVLzAlXr7b0",
+    "video": "$100/hr at Low Stakes: The Final Episode",
+    "views": 261000,
+    "timestamp": "27:23",
+    "url": "https://youtu.be/FVLzAlXr7b0?t=1643",
+    "hand": 266
+   },
+   "stakes": {
+    "label": "$5/$5 + $10 straddle",
+    "sb": 5,
+    "bb": 10
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1000
+   },
+   "hero": {
+    "position": "SB",
+    "cards": [
+     "Kd",
+     "Th"
+    ]
+   },
+   "shown": {
+    "BB": [
+     "As",
+     "8c"
+    ]
+   },
+   "reads": {
+    "BB": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "Straddle": "unknown"
+   },
+   "board": [
+    "9h",
+    "7d",
+    "5s",
+    "Kc",
+    "6c"
+   ],
+   "actions": [
+    [
+     "SB",
+     "raise",
+     50
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "SB",
+     "check"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "SB",
+     "bet",
+     100
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "SB",
+     "check"
+    ],
+    [
+     "BB",
+     "bet",
+     185
+    ],
+    [
+     "SB",
+     "call"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "fold",
+      "why": "When low-stakes players pick more than 60% pot on the river they just always have it."
+     },
+     "heroDid": "call"
+    }
+   ],
+   "lesson": "He'd snap call half pot, but $185 gave him pause; after the flop check-back it's a straight or nothing. His takeaway: when they choose bigger than 60% pot on the river they just always have it.",
+   "result": "Hero called; villain had A8o for a straight.",
+   "assumptions": [
+    "The app has no straddle, so the $10 straddle is played as the big blind ($5/$10 blinds).",
+    "Stacks $1,000."
+   ]
+  },
+  {
+   "id": "hh-15",
+   "theme": "bluff-catch",
+   "title": "Top pair top kicker facing a rec's triple-barrel jam in a 3-bet pot",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "9xSyYuvqhKQ",
+    "video": "4 Amateur Poker Players vs 1 Secret Pro",
+    "views": 216000,
+    "timestamp": "19:21",
+    "url": "https://youtu.be/9xSyYuvqhKQ?t=1161",
+    "hand": 206
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1000
+   },
+   "hero": {
+    "position": "CO",
+    "cards": [
+     "Ad",
+     "Qd"
+    ]
+   },
+   "shown": {
+    "SB": [
+     "2c",
+     "2h"
+    ]
+   },
+   "reads": {
+    "SB": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "SB": "scripted recreational 3-bettor"
+   },
+   "board": [
+    "Qc",
+    "5h",
+    "2d",
+    "8s",
+    "6s"
+   ],
+   "actions": [
+    [
+     "CO",
+     "raise",
+     25
+    ],
+    [
+     "SB",
+     "raise",
+     100
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "SB",
+     "bet",
+     70
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "SB",
+     "bet",
+     230
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "SB",
+     "allin"
+    ],
+    [
+     "CO",
+     "call"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "fold",
+      "why": "A rec who 3-bets the small blind and fires three times is under-bluffed; calling the turn doesn't commit you."
+     },
+     "heroDid": "call"
+    }
+   ],
+   "lesson": "Ricky correctly saw blind 3-bets from recs are under-bluffed, but 'if I call the turn I have to call the river' is false: the river jam is new information. A rec who 3-bets the SB and triple barrels all-in is even more under-bluffed than c-bet plus double barrel. Unblocking AK is a minor factor; blockers are about the 58th most important thing.",
+   "result": "Hero called and lost to a set of deuces.",
+   "assumptions": [
+    "Staged teaching hand from the video."
+   ]
+  },
+  {
+   "id": "hh-16",
+   "theme": "value",
+   "title": "Thin value: small river bet with top pair",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "Ax9t7eNYsOI",
+    "video": "$100/hr at LOW STAKES? Brad Owen Weighs In! | Ep 3",
+    "views": 205000,
+    "timestamp": "22:01",
+    "url": "https://youtu.be/Ax9t7eNYsOI?t=1321",
+    "hand": 40
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1000
+   },
+   "hero": {
+    "position": "HJ",
+    "cards": [
+     "Kc",
+     "Qs"
+    ]
+   },
+   "shown": {},
+   "reads": {
+    "UTG": {
+     "preset": "fish",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "UTG": "limper"
+   },
+   "board": [
+    "8h",
+    "4h",
+    "9c",
+    "Kd",
+    "7s"
+   ],
+   "actions": [
+    [
+     "UTG",
+     "call"
+    ],
+    [
+     "HJ",
+     "raise",
+     35
+    ],
+    [
+     "UTG",
+     "call"
+    ],
+    [
+     "UTG",
+     "check"
+    ],
+    [
+     "HJ",
+     "bet",
+     40
+    ],
+    [
+     "UTG",
+     "call"
+    ],
+    [
+     "UTG",
+     "check"
+    ],
+    [
+     "HJ",
+     "bet",
+     125
+    ],
+    [
+     "UTG",
+     "call"
+    ],
+    [
+     "UTG",
+     "check"
+    ],
+    [
+     "HJ",
+     "bet",
+     100
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "Draws missed and won't call anything, so bet small to get called by 8x and 9x.",
+      "size": {
+       "maxPot": 0.4
+      }
+     },
+     "heroDid": "bet $100 (24% pot)"
+    }
+   ],
+   "lesson": "Recs put you on AK when the king comes, so choose a turn size that 9x/8x can stick with. On the river draws won't call anything, so target 8x/9x with a tiny bet instead of a big one just because you have top pair.",
+   "result": "Villain begrudgingly called; hero won.",
+   "assumptions": [
+    "Stacks $1,000."
+   ]
+  },
+  {
+   "id": "hh-17",
+   "theme": "value",
+   "title": "Backdoor flush vs a sticky player: how big?",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "XLIRtwpICjY",
+    "video": "$100/hr at LOW STAKES? Mariano weighs in | Ep 6",
+    "views": 164000,
+    "timestamp": "31:43",
+    "url": "https://youtu.be/XLIRtwpICjY?t=1903",
+    "hand": 197
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1000,
+    "HJ": 800
+   },
+   "hero": {
+    "position": "CO",
+    "cards": [
+     "Jh",
+     "Th"
+    ]
+   },
+   "shown": {},
+   "reads": {
+    "HJ": {
+     "preset": "station",
+     "level": "regular"
+    }
+   },
+   "villains": {
+    "HJ": "semi-passive, trappy, sticky regular",
+    "BB": "folds flop"
+   },
+   "board": [
+    "9h",
+    "Kc",
+    "3d",
+    "2h",
+    "4h"
+   ],
+   "actions": [
+    [
+     "HJ",
+     "call"
+    ],
+    [
+     "CO",
+     "raise",
+     50
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "HJ",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "HJ",
+     "check"
+    ],
+    [
+     "CO",
+     "bet",
+     60
+    ],
+    [
+     "BB",
+     "fold"
+    ],
+    [
+     "HJ",
+     "call"
+    ],
+    [
+     "HJ",
+     "check"
+    ],
+    [
+     "CO",
+     "bet",
+     125
+    ],
+    [
+     "HJ",
+     "call"
+    ],
+    [
+     "HJ",
+     "check"
+    ],
+    [
+     "CO",
+     "bet",
+     350
+    ],
+    [
+     "HJ",
+     "call"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "bet",
+      "why": "This player never folds a king, so bet big on the turn to get value from Kx and draws.",
+      "size": {
+       "minPot": 0.75
+      }
+     },
+     "heroDid": "bet $125 (45% pot)"
+    },
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "Against a sticky player who never folds a king, just jam.",
+      "size": "allin"
+     },
+     "heroDid": "bet $350 (67% pot)"
+    }
+   ],
+   "lesson": "He hated the $125 turn: this player never folds a king for 80bb, so he should go massive on the turn to get calls from flush draws and Kx, rather than plan a river bluff. On the river even $450 is a mistake; vs a sticky player who never folds a king, just jam.",
+   "result": "Hero won but called it a big blunder in sizing on both turn and river.",
+   "assumptions": [
+    "Hero's stack $1,000."
+   ]
+  },
+  {
+   "id": "hh-18",
+   "theme": "value",
+   "title": "Top pair top kicker on a dry ace-high board: river size",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "9xSyYuvqhKQ",
+    "video": "4 Amateur Poker Players vs 1 Secret Pro",
+    "views": 216000,
+    "timestamp": "03:11",
+    "url": "https://youtu.be/9xSyYuvqhKQ?t=191",
+    "hand": 204
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1000
+   },
+   "hero": {
+    "position": "BTN",
+    "cards": [
+     "Ah",
+     "Kd"
+    ]
+   },
+   "shown": {
+    "BB": [
+     "As",
+     "Qc"
+    ]
+   },
+   "reads": {
+    "BB": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "BB": "scripted defender"
+   },
+   "board": [
+    "Ac",
+    "7d",
+    "3h",
+    "2s",
+    "Tc"
+   ],
+   "actions": [
+    [
+     "BTN",
+     "raise",
+     25
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "BTN",
+     "bet",
+     25
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "BTN",
+     "bet",
+     110
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "BTN",
+     "bet",
+     85
+    ],
+    [
+     "BB",
+     "call"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "Ask how much it takes to fold an ace: egregiously large. $85 was far too small.",
+      "size": {
+       "minPot": 1.0
+      }
+     },
+     "heroDid": "bet $85 (26% pot)"
+    }
+   ],
+   "lesson": "Mark liked three streets of value but there was little ranging. On dry static boards he plays an overbet-or-check strategy, not a range c-bet: Ax never folds and KJ never pays anyway, so go really big flop and overbet the turn. On the river ask the inverse: how much would I bet to fold an ace? Egregiously large, so $85 was too small.",
+   "result": "Hero got three streets; BB called with AQ.",
+   "assumptions": [
+    "Staged teaching hand. Flop bet $25 (about half pot)."
+   ]
+  },
+  {
+   "id": "hh-19",
+   "theme": "value",
+   "title": "Kings in a 4-bet pot at low SPR: jam the turn or bet small?",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "FVLzAlXr7b0",
+    "video": "$100/hr at Low Stakes: The Final Episode",
+    "views": 261000,
+    "timestamp": "09:40",
+    "url": "https://youtu.be/FVLzAlXr7b0?t=580",
+    "hand": 258
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1500
+   },
+   "hero": {
+    "position": "SB",
+    "cards": [
+     "Kh",
+     "Ks"
+    ]
+   },
+   "shown": {
+    "CO": [
+     "Qc",
+     "Qd"
+    ]
+   },
+   "reads": {
+    "CO": {
+     "preset": "lag",
+     "level": "strong"
+    }
+   },
+   "villains": {
+    "CO": "good pro, squeezer"
+   },
+   "board": [
+    "8c",
+    "6d",
+    "2s",
+    "8h",
+    "Ad"
+   ],
+   "actions": [
+    [
+     "LJ",
+     "raise",
+     20
+    ],
+    [
+     "HJ",
+     "call"
+    ],
+    [
+     "CO",
+     "raise",
+     75
+    ],
+    [
+     "SB",
+     "raise",
+     250
+    ],
+    [
+     "LJ",
+     "fold"
+    ],
+    [
+     "HJ",
+     "fold"
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "SB",
+     "bet",
+     300
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "SB",
+     "bet",
+     300
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "SB",
+     "check"
+    ],
+    [
+     "CO",
+     "check"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "bet",
+      "why": "Out of position at low SPR, minimise streets and jam: QQ, JJ and TT can't fold.",
+      "size": "allin"
+     },
+     "heroDid": "bet $300 (26% pot)"
+    },
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "A small or thin value bet on the ace was better than checking.",
+      "size": {
+       "maxPot": 0.5
+      }
+     },
+     "heroDid": "check"
+    }
+   ],
+   "lesson": "He calls this his biggest blunder of the session. Out of position at low SPR you want to minimise streets and just jam the turn, since QQ/JJ/TT can't fold; small block or thin value on the ace river was also better than checking.",
+   "result": "Hero bet small on the turn, checked the river; villain showed QQ. Hero won but estimates missing ~$900-950 of value.",
+   "assumptions": [
+    "Stacks about $1,500 as said."
+   ]
+  },
+  {
+   "id": "hh-20",
+   "theme": "value",
+   "title": "Turned trips: lead into a fish who checks back overpairs",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "ixRKpRQfayY",
+    "video": "What High Stakes Pros Know That Low Stakes Players Don\u2019t (Round 2)",
+    "views": 301000,
+    "timestamp": "14:08",
+    "url": "https://youtu.be/ixRKpRQfayY?t=848",
+    "hand": 56
+   },
+   "stakes": {
+    "label": "$20/$40",
+    "sb": 20,
+    "bb": 40
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 6000
+   },
+   "hero": {
+    "position": "BB",
+    "cards": [
+     "Ac",
+     "Qc"
+    ]
+   },
+   "shown": {
+    "BTN": [
+     "Kd",
+     "Kh"
+    ]
+   },
+   "reads": {
+    "BTN": {
+     "preset": "fish",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "BTN": "typical live fish: transparent sizing, passive, under-bluffs, calls too much, fast-plays value"
+   },
+   "board": [
+    "Qs",
+    "8d",
+    "4c",
+    "Qh",
+    "2s"
+   ],
+   "actions": [
+    [
+     "BTN",
+     "raise",
+     350
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "BTN",
+     "bet",
+     600
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "bet",
+     1200
+    ],
+    [
+     "BTN",
+     "call"
+    ],
+    [
+     "BB",
+     "allin"
+    ],
+    [
+     "BTN",
+     "call"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "bet",
+      "why": "A fish won't double-barrel his overpairs, so lead a size he calls with them."
+     },
+     "heroDid": "bet $1,200 (62% pot)"
+    },
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "Set up by the turn lead: jam the river.",
+      "size": "allin"
+     },
+     "heroDid": "all in"
+    }
+   ],
+   "lesson": "Folding preflop vs a 9x fish open is fine (fold AQo). Once you call, top pair plus backdoors must call flop, raising is a punt. On the turn, a fish won't double-barrel AA/KK/JJ/TT, so lead a size he calls with overpairs, set up an all-in river, and act natural (look nervous without overdoing it) when you shove.",
+   "result": "Both leads got called and both jams got called by KK; hero won the stack.",
+   "assumptions": [
+    "Stacks $6,000 (about 150 bb, from the amount won)."
+   ]
+  },
+  {
+   "id": "hh-21",
+   "theme": "value",
+   "title": "Bottom set facing a turn jam in a 3-way pot",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "cfEIj3k0-ck",
+    "video": "I Gave an Amateur, Pro and Millionaire the Same 5 Hands",
+    "views": 181000,
+    "timestamp": "17:32",
+    "url": "https://youtu.be/cfEIj3k0-ck?t=1052",
+    "hand": 96
+   },
+   "stakes": {
+    "label": "$5/$10",
+    "sb": 5,
+    "bb": 10
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 2000
+   },
+   "hero": {
+    "position": "BB",
+    "cards": [
+     "2s",
+     "2c"
+    ]
+   },
+   "shown": {
+    "CO": [
+     "4s",
+     "3s"
+    ],
+    "LJ": [
+     "As",
+     "Qs"
+    ]
+   },
+   "reads": {},
+   "villains": {
+    "LJ": "unknown, original raiser",
+    "CO": "unknown",
+    "BTN": "unknown"
+   },
+   "board": [
+    "Ad",
+    "5c",
+    "2h",
+    "9d",
+    "4h"
+   ],
+   "actions": [
+    [
+     "LJ",
+     "raise",
+     35
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "BTN",
+     "call"
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "LJ",
+     "bet",
+     50
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "BTN",
+     "fold"
+    ],
+    [
+     "BB",
+     "raise",
+     300
+    ],
+    [
+     "LJ",
+     "call"
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "BB",
+     "bet",
+     600
+    ],
+    [
+     "LJ",
+     "call"
+    ],
+    [
+     "CO",
+     "allin"
+    ],
+    [
+     "BB",
+     "call"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "call",
+      "why": "A9 and A5 play this way too; you need about 30% and have 10 outs against two pair."
+     },
+     "heroDid": "call"
+    }
+   ],
+   "lesson": "Mark doesn't like the flop donk here because the preflop raiser is next to act and two players behind him are incentivized to stab. Gethin and Mark both think the call is right: A9 and A5 play this way, the price needs only ~30% equity, and you have 10 outs vs two pair; only 55 has you crushed. Josiah's fold was called 'quite a big mistake' and results-oriented; process over results.",
+   "result": "Todd donked $50, LJ raised to $150, CO called, Todd called; turn 9d he checked, LJ bet $300, CO raised to $700, Todd folded. Josiah checked, LJ bet $50, CO called, he check-raised $325, both called; turn he bet $650, LJ called, CO jammed, Josiah folded. Gethin check-raised $300 (both called), bet $600 on the turn, LJ called, CO jammed, Gethin called, LJ called; river 4 and CO showed 43s (wheel). LJ had AQ of spades.",
+   "assumptions": [
+    "Quiz hand (Gethin's line). Players are unknown, so no reads."
+   ]
+  },
+  {
+   "id": "hh-22",
+   "theme": "value",
+   "title": "Middle set: donk into two fish, plan the turn, jam the river",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "cfEIj3k0-ck",
+    "video": "I Gave an Amateur, Pro and Millionaire the Same 5 Hands",
+    "views": 181000,
+    "timestamp": "34:13",
+    "url": "https://youtu.be/cfEIj3k0-ck?t=2053",
+    "hand": 97
+   },
+   "stakes": {
+    "label": "$5/$10",
+    "sb": 5,
+    "bb": 10
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 2000
+   },
+   "hero": {
+    "position": "BB",
+    "cards": [
+     "7h",
+     "7c"
+    ]
+   },
+   "shown": {
+    "LJ": [
+     "Kc",
+     "Jh"
+    ],
+    "CO": [
+     "Ad",
+     "2d"
+    ],
+    "BTN": [
+     "Ts",
+     "Th"
+    ]
+   },
+   "reads": {
+    "LJ": {
+     "preset": "fish",
+     "level": "rec"
+    },
+    "CO": {
+     "preset": "fish",
+     "level": "rec"
+    },
+    "BTN": {
+     "preset": "tag",
+     "level": "regular"
+    }
+   },
+   "villains": {
+    "LJ": "limper, fish",
+    "CO": "limper, fish",
+    "BTN": "reg, preflop raiser"
+   },
+   "board": [
+    "Jd",
+    "7d",
+    "6c",
+    "4s",
+    "6d"
+   ],
+   "actions": [
+    [
+     "LJ",
+     "call"
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "BTN",
+     "raise",
+     60
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "LJ",
+     "call"
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "BB",
+     "bet",
+     225
+    ],
+    [
+     "LJ",
+     "call"
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "BTN",
+     "fold"
+    ],
+    [
+     "BB",
+     "bet",
+     750
+    ],
+    [
+     "LJ",
+     "call"
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "BB",
+     "allin"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "Flop",
+     "youtube": {
+      "play": "bet",
+      "why": "With two fish between you and the reg raiser, donk: the reg won't stab 4-way, so target the fish."
+     },
+     "heroDid": "bet $225 (92% pot)"
+    },
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "bet",
+      "why": "Size the turn so the river jam is about half the pot.",
+      "size": {
+       "minPot": 0.6
+      }
+     },
+     "heroDid": "bet $750 (82% pot)"
+    },
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "Fish rarely jam their flushes for you, so jam yourself.",
+      "size": "allin"
+     },
+     "heroDid": "all in"
+    }
+   ],
+   "lesson": "Mark: finding the donk is great when callers sit between you and a reg preflop raiser, because it will check to the reg and he won't stab often 4-way; target the fish's top pairs and draws. Plan turn size to leave ~0.5 SPR jam on the river. Gethin: fish rarely jam their flushes for you, so just jam yourself; 750 vs 700 because flush draws never bluff at that SPR.",
+   "result": "All three donked (Todd $60, Josiah $200, Gethin $225); LJ and CO called, BTN folded. Turn 4: Josiah $700, Gethin $750, both called (Todd bet ~pot $425). River 6d gives hero a full house and completes the flush: Josiah and Gethin jammed, LJ folded KJo, CO snap-called with A2 of diamonds. Todd checked, CO bet $500 and he check-raised all in, same result. BTN had TT.",
+   "assumptions": [
+    "Quiz hand (Gethin's line)."
+   ]
+  },
+  {
+   "id": "hh-23",
+   "theme": "bluff",
+   "title": "Delayed check-raise bluff on the ace turn, then barrel the flush river",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "cfEIj3k0-ck",
+    "video": "I Gave an Amateur, Pro and Millionaire the Same 5 Hands",
+    "views": 181000,
+    "timestamp": "47:01",
+    "url": "https://youtu.be/cfEIj3k0-ck?t=2821",
+    "hand": 98
+   },
+   "stakes": {
+    "label": "$5/$10",
+    "sb": 5,
+    "bb": 10
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 2000
+   },
+   "hero": {
+    "position": "BB",
+    "cards": [
+     "Kd",
+     "5d"
+    ]
+   },
+   "shown": {
+    "CO": [
+     "Ad",
+     "Jh"
+    ],
+    "BTN": [
+     "As",
+     "4s"
+    ]
+   },
+   "reads": {},
+   "villains": {
+    "CO": "preflop raiser, unknown",
+    "BTN": "unknown"
+   },
+   "board": [
+    "Qc",
+    "8c",
+    "5h",
+    "Ah",
+    "4c"
+   ],
+   "actions": [
+    [
+     "CO",
+     "raise",
+     35
+    ],
+    [
+     "BTN",
+     "call"
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "CO",
+     "check"
+    ],
+    [
+     "BTN",
+     "check"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "CO",
+     "bet",
+     50
+    ],
+    [
+     "BTN",
+     "call"
+    ],
+    [
+     "BB",
+     "raise",
+     350
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "BTN",
+     "fold"
+    ],
+    [
+     "BB",
+     "bet",
+     1050
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "raise",
+      "why": "The flop checked through, so both ranges are capped: check-raise the delayed c-bet as a bluff."
+     },
+     "heroDid": "raise to $350"
+    },
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "Keep bluffing when the flush comes; a big size folds AJ.",
+      "size": {
+       "minPot": 0.75
+      }
+     },
+     "heroDid": "bet $1,050 (122% pot)"
+    }
+   ],
+   "lesson": "Mark had the CO calling up to $350 on the turn: Todd's 400 got the fold now, but you would rather they call the turn and fold the river. Josiah used the inverse question ('what would I bet to get AJ to call?') and chose an efficient bluff size that loses the minimum vs a rare flush. Gethin sized the turn so he still had a big river bet if both players called, using his 5 as a blocker.",
+   "result": "Todd check-raised to $400 and both folded. Josiah and Gethin check-raised to $350; CO called, BTN folded. River 4c: Josiah bet $800, Gethin bet $1,050; CO (AJo) folded both times. BTN had A4s.",
+   "assumptions": [
+    "Quiz hand (Gethin's line). Players are unknown, so no reads."
+   ]
+  },
+  {
+   "id": "hh-24",
+   "theme": "bluff",
+   "title": "River jam bluff with Q2 against a capped limper",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "yxuOjh85WBc",
+    "video": "I Played Poker Without Looking At My Cards",
+    "views": 284000,
+    "timestamp": "00:45",
+    "url": "https://youtu.be/yxuOjh85WBc?t=45",
+    "hand": 118
+   },
+   "stakes": {
+    "label": "$5/$5 + $10 straddle",
+    "sb": 5,
+    "bb": 10
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1500,
+    "BTN": 940
+   },
+   "hero": {
+    "position": "BTN",
+    "cards": [
+     "Qd",
+     "2c"
+    ]
+   },
+   "shown": {},
+   "reads": {
+    "CO": {
+     "preset": "fish",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "CO": "late-position limper"
+   },
+   "board": [
+    "As",
+    "5h",
+    "2h",
+    "9c",
+    "7s"
+   ],
+   "actions": [
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "BTN",
+     "raise",
+     50
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "CO",
+     "check"
+    ],
+    [
+     "BTN",
+     "check"
+    ],
+    [
+     "CO",
+     "check"
+    ],
+    [
+     "BTN",
+     "bet",
+     125
+    ],
+    [
+     "CO",
+     "call"
+    ],
+    [
+     "CO",
+     "check"
+    ],
+    [
+     "BTN",
+     "allin"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "His best hand is weak Ax; to make AT call he'd bet 400-450, so the jam folds it.",
+      "size": "allin"
+     },
+     "heroDid": "all in ($765 into $365)"
+    }
+   ],
+   "lesson": "Big-bet-or-check on static ace-high flops, so check back to let villain reveal strength. CO's turn check means few two pairs, straights or sets; best common hand is weak Ax. Inverse question: to get AT/A8 to call he'd bet 400-450, so the jam is the bluff size that folds them.",
+   "result": "Hero jammed $765 into $365 and CO folded.",
+   "assumptions": [
+    "The app has no straddle, so the $10 straddle is played as the big blind ($5/$10 blinds).",
+    "Hero has $765 left for the river, as said."
+   ]
+  },
+  {
+   "id": "hh-25",
+   "theme": "bluff",
+   "title": "Missed check-raise semi-bluff: jam the river or check?",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "XLIRtwpICjY",
+    "video": "$100/hr at LOW STAKES? Mariano weighs in | Ep 6",
+    "views": 164000,
+    "timestamp": "21:21",
+    "url": "https://youtu.be/XLIRtwpICjY?t=1281",
+    "hand": 193
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1000
+   },
+   "hero": {
+    "position": "BB",
+    "cards": [
+     "5d",
+     "4d"
+    ]
+   },
+   "shown": {
+    "UTG": [
+     "As",
+     "2s"
+    ]
+   },
+   "reads": {
+    "UTG": {
+     "preset": "tag",
+     "level": "regular"
+    },
+    "SB": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "UTG": "same player, protects his check-back range",
+    "SB": "capped caller",
+    "BTN": "caller"
+   },
+   "board": [
+    "5c",
+    "Ad",
+    "Td",
+    "Qs",
+    "7h"
+   ],
+   "actions": [
+    [
+     "UTG",
+     "raise",
+     20
+    ],
+    [
+     "BTN",
+     "call"
+    ],
+    [
+     "SB",
+     "call"
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "SB",
+     "check"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "UTG",
+     "check"
+    ],
+    [
+     "BTN",
+     "check"
+    ],
+    [
+     "SB",
+     "check"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "UTG",
+     "bet",
+     50
+    ],
+    [
+     "BTN",
+     "fold"
+    ],
+    [
+     "SB",
+     "call"
+    ],
+    [
+     "BB",
+     "raise",
+     300
+    ],
+    [
+     "UTG",
+     "call"
+    ],
+    [
+     "SB",
+     "fold"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "UTG",
+     "check"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "The turn check-raise looks very strong: jam and about 90% of his range folds, every Ax included.",
+      "size": "allin"
+     },
+     "heroDid": "check"
+    }
+   ],
+   "lesson": "He calls it his biggest blunder of the session. The turn check-raise looks very strong and the SB is capped. On the river he talked himself into showdown value, but he should jam: about 90% of UTG's range, including all the Ax, folds.",
+   "result": "Hero checked and lost to A2s.",
+   "assumptions": [
+    "Stacks $1,000."
+   ]
+  },
+  {
+   "id": "hh-26",
+   "theme": "bluff",
+   "title": "4-high river bluff: how big against a sticky player?",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "LRdXnYB4kP8",
+    "video": "These Hands Are INSANE (I'm Not on Drugs!) | Ep 2",
+    "views": 180000,
+    "timestamp": "23:38",
+    "url": "https://youtu.be/LRdXnYB4kP8?t=1418",
+    "hand": 220
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1500,
+    "SB": 1700
+   },
+   "hero": {
+    "position": "BTN",
+    "cards": [
+     "4d",
+     "2s"
+    ]
+   },
+   "shown": {
+    "SB": [
+     "Kd",
+     "Qs"
+    ]
+   },
+   "reads": {
+    "SB": {
+     "preset": "station",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "SB": "sticky, passive recreational nemesis"
+   },
+   "board": [
+    "9c",
+    "Kh",
+    "6c",
+    "3c",
+    "Jh"
+   ],
+   "actions": [
+    [
+     "BTN",
+     "raise",
+     25
+    ],
+    [
+     "SB",
+     "call"
+    ],
+    [
+     "SB",
+     "check"
+    ],
+    [
+     "BTN",
+     "bet",
+     25
+    ],
+    [
+     "SB",
+     "call"
+    ],
+    [
+     "SB",
+     "check"
+    ],
+    [
+     "BTN",
+     "bet",
+     55
+    ],
+    [
+     "SB",
+     "call"
+    ],
+    [
+     "SB",
+     "check"
+    ],
+    [
+     "BTN",
+     "bet",
+     410
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "$410 isn't scary enough for a sticky player: go egregious, about 4x pot, to fold his whole range.",
+      "size": {
+       "minPot": 3.5
+      }
+     },
+     "heroDid": "bet $410 (190% pot)"
+    }
+   ],
+   "lesson": "Small turn bet on the flush card forces flushes to raise and keeps weak hands in; quick call means no flush. $410 wasn't scary enough for a sticky player who fast-plays strong hands; he should go egregious, $900-1,100 or 4x pot, to fold his whole range. Opening 100% of buttons requires sharper postflop play.",
+   "result": "SB called with KQo (no club); hero lost.",
+   "assumptions": [
+    "Open to $25 (not given). Hero's stack $1,500."
+   ]
+  },
+  {
+   "id": "hh-27",
+   "theme": "bluff",
+   "title": "K-high river overbet bluff in a 3-bet pot",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "mr9I9mlfFCI",
+    "video": "I Made My Poker Table FURIOUS\u2026.and I Don\u2019t Regret It! | Ep 5",
+    "views": 199000,
+    "timestamp": "09:42",
+    "url": "https://youtu.be/mr9I9mlfFCI?t=582",
+    "hand": 233
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1000
+   },
+   "hero": {
+    "position": "CO",
+    "cards": [
+     "Kc",
+     "Tc"
+    ]
+   },
+   "shown": {},
+   "reads": {
+    "UTG": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "UTG": "recreational player"
+   },
+   "board": [
+    "6h",
+    "3h",
+    "2s",
+    "5h",
+    "7d"
+   ],
+   "actions": [
+    [
+     "UTG",
+     "raise",
+     25
+    ],
+    [
+     "CO",
+     "raise",
+     80
+    ],
+    [
+     "UTG",
+     "call"
+    ],
+    [
+     "UTG",
+     "check"
+    ],
+    [
+     "CO",
+     "bet",
+     60
+    ],
+    [
+     "UTG",
+     "call"
+    ],
+    [
+     "UTG",
+     "check"
+    ],
+    [
+     "CO",
+     "bet",
+     100
+    ],
+    [
+     "UTG",
+     "call"
+    ],
+    [
+     "UTG",
+     "check"
+    ],
+    [
+     "CO",
+     "bet",
+     650
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "His check-calls say overpair, few flushes; a big overbet folds TT-JJ.",
+      "size": {
+       "minPot": 1.0
+      }
+     },
+     "heroDid": "bet $650 (133% pot)"
+    }
+   ],
+   "lesson": "A bit bigger than 1/3 on the flop since UTG has few sets/straights and the board is dynamic. On the flush turn he bets small to incentivize raises with flushes, so a check-call means few flushes. On the river villain is an overpair (TT, 99, JJ), so a big overbet folds those while losing the minimum to a trapped A4 of hearts.",
+   "result": "Hero bet $650 and UTG folded after a long tank.",
+   "assumptions": [
+    "Stacks $1,000."
+   ]
+  },
+  {
+   "id": "hh-28",
+   "theme": "bluff",
+   "title": "Top pair turns into a river check-raise against a small bet",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "4fOKT0pRl18",
+    "video": "What High Stakes Pros See That Low Stakes Players Miss",
+    "views": 182000,
+    "timestamp": "15:00",
+    "url": "https://youtu.be/4fOKT0pRl18?t=900",
+    "hand": 286
+   },
+   "stakes": {
+    "label": "$5/$10",
+    "sb": 5,
+    "bb": 10
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1500
+   },
+   "hero": {
+    "position": "BB",
+    "cards": [
+     "Ts",
+     "8s"
+    ]
+   },
+   "shown": {
+    "CO": [
+     "Kc",
+     "Tc"
+    ]
+   },
+   "reads": {
+    "CO": {
+     "preset": "fish",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "CO": "fish"
+   },
+   "board": [
+    "Td",
+    "7c",
+    "5h",
+    "2s",
+    "6d"
+   ],
+   "actions": [
+    [
+     "CO",
+     "raise",
+     35
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "CO",
+     "bet",
+     50
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "CO",
+     "bet",
+     100
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "CO",
+     "bet",
+     125
+    ],
+    [
+     "BB",
+     "raise",
+     700
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "raise",
+      "why": "Small in-position river bets are thin value; a big raise folds AT and KT."
+     },
+     "heroDid": "raise to $700"
+    }
+   ],
+   "lesson": "Small in-position river bets are under-bluffed and are thin value like Tx, since bluffs can just check back. Calling may be +EV, but raising is better: sets/straights/two pair would size up, so a big raise folds AT/KT.",
+   "result": "Alex check-raised to $700 and villain folded KcTc. Abby folded the turn.",
+   "assumptions": [
+    "Open to $35 (not given; fits the $75 pot)."
+   ]
+  },
+  {
+   "id": "hh-29",
+   "theme": "bluff",
+   "title": "Check-raise the ace turn, then overbet the river",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "ddSfMpSy838",
+    "video": "I'm The KING of Low Stakes Poker | Ep 13",
+    "views": 157000,
+    "timestamp": "18:42",
+    "url": "https://youtu.be/ddSfMpSy838?t=1122",
+    "hand": 336
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1000
+   },
+   "hero": {
+    "position": "BB",
+    "cards": [
+     "Kc",
+     "9s"
+    ]
+   },
+   "shown": {},
+   "reads": {
+    "BTN": {
+     "preset": "unknown",
+     "level": "rec"
+    }
+   },
+   "villains": {
+    "BTN": "opener"
+   },
+   "board": [
+    "9h",
+    "4d",
+    "4s",
+    "Ah",
+    "Td"
+   ],
+   "actions": [
+    [
+     "BTN",
+     "raise",
+     20
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "BTN",
+     "check"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "BTN",
+     "bet",
+     25
+    ],
+    [
+     "BB",
+     "raise",
+     100
+    ],
+    [
+     "BTN",
+     "call"
+    ],
+    [
+     "BB",
+     "bet",
+     425
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "raise",
+      "why": "His turn stab is mostly Ax; check-raise small so AJ and AT call once."
+     },
+     "heroDid": "raise to $100"
+    },
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "Then overbet the river to fold them; he has almost no strong hands.",
+      "size": {
+       "minPot": 1.0
+      }
+     },
+     "heroDid": "bet $425 (173% pot)"
+    }
+   ],
+   "lesson": "A BTN with a 4 or a flush draw would have bet the flop, so the turn stab is mostly Ax. K9 has little showdown value, so he check-raises small so AJ/AT call once, then overbets the river to fold them. Villain has almost no nutted hands.",
+   "result": "Villain folded.",
+   "assumptions": [
+    "Stacks $1,000."
+   ]
+  },
+  {
+   "id": "hh-30",
+   "theme": "bluff",
+   "title": "Pair plus open-ender: check-raise a reg's turn bet",
+   "source": {
+    "channel": "Hungry Horse Poker",
+    "videoId": "LRdXnYB4kP8",
+    "video": "These Hands Are INSANE (I'm Not on Drugs!) | Ep 2",
+    "views": 180000,
+    "timestamp": "26:54",
+    "url": "https://youtu.be/LRdXnYB4kP8?t=1614",
+    "hand": 221
+   },
+   "stakes": {
+    "label": "$5/$5",
+    "sb": 5,
+    "bb": 5
+   },
+   "tableSize": 9,
+   "stacks": {
+    "default": 1000
+   },
+   "hero": {
+    "position": "BB",
+    "cards": [
+     "Jh",
+     "Tc"
+    ]
+   },
+   "shown": {},
+   "reads": {
+    "LJ": {
+     "preset": "tag",
+     "level": "regular"
+    }
+   },
+   "villains": {
+    "LJ": "live pro / reg"
+   },
+   "board": [
+    "Kd",
+    "8h",
+    "Ts",
+    "9c"
+   ],
+   "actions": [
+    [
+     "LJ",
+     "raise",
+     25
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "LJ",
+     "bet",
+     20
+    ],
+    [
+     "BB",
+     "call"
+    ],
+    [
+     "BB",
+     "check"
+    ],
+    [
+     "LJ",
+     "bet",
+     75
+    ],
+    [
+     "BB",
+     "raise",
+     220
+    ],
+    [
+     "LJ",
+     "fold"
+    ]
+   ],
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "raise",
+      "why": "Regs bet this turn too thin and know live check-raises are rarely bluffs, so they fold."
+     },
+     "heroDid": "raise to $220"
+    }
+   ],
+   "lesson": "Most players just call with pair plus open-ender, but vs a thinking player a check-raise is better. Regs bet this turn too thin (KQ, AK, AA) and those fold, and regs know live turn check-raises are almost never bluffs. A small size is enough while still running into strong hands sometimes.",
+   "result": "Hero check-raised small and the reg folded.",
+   "assumptions": [
+    "Check-raise to $220 (size not given; he said small)."
+   ]
+  }
+ ]
+}

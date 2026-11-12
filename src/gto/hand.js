@@ -12,6 +12,8 @@
 import { loadChart } from './preflop/charts.js';
 import { mapSeats, createPreflopWalker, matchAction } from './preflop/walker.js';
 import { createStreet } from './postflop/street.js';
+import { createUnsolvedStreet } from './postflop/unsolved.js';
+import { typicalPolicy } from './players/models.js';
 import { cardId, handIndex, classOfCards, expandClasses, collapseToClasses } from './cards.js';
 import { currentPlayer, getOptions } from '../utils/handEngine.js';
 
@@ -35,7 +37,8 @@ export function solverAction(state, action) {
 // known: { seat: ['As', 'Kd'] } cards we'll ask about (the solve makes sure it can value them).
 // folders: positions that fold first or aren't in the hand (lets a 9-handed hand fit the 8-handed charts).
 // models: { seat: model } for players with a read (modelFor(profile)); everyone else plays GTO.
-export async function createGtoHand({ state, stackBB, known = {}, detail = 'full', seed = 1, folders = new Set(), models = {} }) {
+// steady: solve every street with a fixed number of iterations instead of a time limit (repeatable results).
+export async function createGtoHand({ state, stackBB, known = {}, detail = 'full', seed = 1, folders = new Set(), models = {}, steady = false }) {
   const bb = state.bb;
   const chart = await loadChart(stackBB, (state.ante ?? 0) / bb);
   const seatOf = mapSeats(state.preflopOrder, folders);
@@ -53,7 +56,9 @@ export async function createGtoHand({ state, stackBB, known = {}, detail = 'full
   let street = null; // the current postflop street session
   let order = []; // seats in postflop order on the current street
   const rangesBySeat = new Map(); // 1326-weight ranges carried from street to street
-  let unavailable = null; // why the postflop can't be solved (too many players...)
+  let unavailable = null; // why the current street can't be solved (too many players)
+  let aggressor = null; // the seat that bet or raised last on the current street (preflop: the last raiser)
+  let bets = 0; // bets and raises on the current street
 
   // Postflop: set up a new street from the state right after its cards are dealt.
   function startStreet(s) {
@@ -69,19 +74,29 @@ export async function createGtoHand({ state, stackBB, known = {}, detail = 'full
       }
     }
     order = alive.map((p) => p.seat);
-    if (alive.length > MAX_POSTFLOP_PLAYERS) {
-      unavailable = `postflop GTO covers heads-up and 3-way pots; this one has ${alive.length} players.`;
-      street = null;
-      return;
-    }
-    street = createStreet({
+    const spec = {
       board: s.board.map(cardId),
       ranges: alive.map((p) => rangesBySeat.get(p.seat)),
       pot: s.pot / bb,
       stacks: alive.map((p) => (p.stack - p.invested) / bb),
+      aggressor: order.indexOf(aggressor), // the last street's, as a player of this one
+      aggressorRaised: street !== null && bets >= 2, // ... who raised a bet postflop (not the preflop raiser)
+    };
+    aggressor = null;
+    bets = 0;
+    if (alive.length > MAX_POSTFLOP_PLAYERS) {
+      // Too many players to solve: the ranges are still narrowed by what everyone does (postflop/unsolved.js).
+      unavailable = `postflop GTO covers heads-up and 3-way pots; this one has ${alive.length} players.`;
+      street = createUnsolvedStreet({ ...spec, policies: alive.map((p) => models[p.seat]?.policy ?? typicalPolicy) });
+      return;
+    }
+    unavailable = null;
+    street = createStreet({
+      ...spec,
       include: alive.map((p) => (knownHand[p.seat] !== undefined ? [knownHand[p.seat]] : [])),
       models: alive.map((p) => models[p.seat] ?? null),
       detail,
+      steady,
       seed: seed * 31 + STREET_INDEX[s.street],
     });
   }
@@ -118,7 +133,7 @@ export async function createGtoHand({ state, stackBB, known = {}, detail = 'full
         const values = advice.loss.map((loss) => advice.loss[base] - loss);
         return { source: 'chart', chart: chart.config, options: optionsFrom(advice.actions, advice.strategy, values), lossBB: advice.loss, exact: advice.exact, note: advice.note };
       }
-      if (!street) return { unavailable: unavailable ?? 'The street has not started.' };
+      if (!street || street.unsolved) return { unavailable: unavailable ?? 'The street has not started.' };
       const advice = street.advice(order.indexOf(actor.seat), handIndex(a, b));
       return { source: 'solver', options: optionsFrom(advice.actions, advice.strategy, advice.values), exact: true, offLine: advice.offLine, iterations: advice.iterations, elapsed: advice.elapsed };
     },
@@ -142,6 +157,10 @@ export async function createGtoHand({ state, stackBB, known = {}, detail = 'full
     apply(s, action) {
       const actor = currentPlayer(s);
       const real = solverAction(s, action);
+      if (real.type === 'bet' || real.type === 'raise' || real.type === 'allin') {
+        aggressor = actor.seat;
+        bets += 1;
+      }
       if (s.street === 'Preflop') walker.apply(actor.position, real);
       else if (street) street.apply({ player: order.indexOf(actor.seat), ...real });
     },

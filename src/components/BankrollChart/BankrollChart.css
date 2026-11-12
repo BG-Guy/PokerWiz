@@ -1,4 +1,4 @@
-/* Bankroll chart card: range chips and the full-screen button above the plot, a reading hint below it. */
+/* Bankroll chart card: range chips with the Filter and Full screen buttons above the plot, a reading hint below. */
 
 .bankroll-chart {
   display: flex;
@@ -16,13 +16,17 @@
 .bankroll-chart-controls .filter-chips {
   min-width: 0;
 }
+.bankroll-chart-buttons {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
 
-/* Full-screen button: a quiet outlined pill that lights up on hover */
-.bankroll-chart-expand {
+/* Filter and Full screen: quiet outlined pills that light up on hover. Filter is filled while it narrows the chart. */
+.bankroll-chart-button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  flex-shrink: 0;
   min-height: 36px;
   padding: 0 12px;
   border-radius: 999px;
@@ -32,23 +36,48 @@
   color: var(--text-muted);
   transition: color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
-.bankroll-chart-expand:hover {
+.bankroll-chart-button:hover {
   color: var(--text);
   border-color: var(--text-faint);
 }
-.bankroll-chart-expand:active {
+.bankroll-chart-button:active {
   transform: scale(0.96);
 }
-/* Phones: icon only, so the range chips keep their room */
+.bankroll-chart-button.is-on {
+  background: var(--selected-bg);
+  border-color: var(--selected-bg);
+  color: var(--selected-text);
+}
+/* Phones: icons only (40px to tap), so the range chips keep their room */
 @media (max-width: 519px) {
-  .bankroll-chart-expand {
-    width: 36px;
+  .bankroll-chart-button {
+    width: 40px;
+    min-height: 40px;
     padding: 0;
     justify-content: center;
   }
-  .bankroll-chart-expand span {
+  .bankroll-chart-button span {
     display: none;
   }
+}
+
+/* What the chart is narrowed to */
+.bankroll-chart-scope {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  font-size: 13px;
+  font-weight: 700;
+}
+.bankroll-chart-scope span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .bankroll-chart-hint {
@@ -62,4 +91,36 @@
   text-align: center;
   color: var(--text-muted);
   font-weight: 600;
+}
+
+/* The filter sheet: the filters, then what's on the chart adds up to, then the way back */
+.bankroll-chart-sheet .modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.bankroll-chart-sheet-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 18px;
+}
+.bankroll-chart-sheet-title span {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+.bankroll-chart-sheet .bankroll-chart-empty {
+  padding: 16px 0;
+}
+/* Stays in reach at the foot of the sheet, with the sheet's colour fading in above it */
+.bankroll-chart-sheet-done {
+  position: sticky;
+  bottom: 0;
+  justify-content: center;
+  min-height: 46px;
+  box-shadow: 0 -14px 16px 8px var(--surface), 0 14px 0 8px var(--surface);
 }

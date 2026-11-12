@@ -1,7 +1,8 @@
 // Left pane of Hand Review: search box, verdict filter chips, sort order, and the list of hands. Each row
 // shows the hand (cards, title, result, verdict), then your rating (rate or re-rate it right there), how
 // tilted you were and the last coach score, and a Coach button. Swipe a row left for Edit and Delete (a long
-// swipe deletes at once; HandReview offers Undo).
+// swipe deletes at once; HandReview offers Undo). On a phone a tap opens the hand's sheet (onPeek); on a wide
+// screen it opens beside the list.
 import { Link } from 'react-router-dom';
 import { VERDICTS } from '../../constants/poker.js';
 import { bigBlindOf, formatDate } from '../../utils/format.js';
@@ -41,7 +42,15 @@ export default function HandList({
   onRate,
   onEdit,
   onDelete,
+  onPeek,
 }) {
+  // On a phone (onPeek given) a tap on a hand opens its short version in a sheet; the sheet has the way to the
+  // full hand. A modified click (new tab) still follows the link.
+  const peek = (event, hand) => {
+    if (!onPeek || event.metaKey || event.ctrlKey || event.shiftKey || event.button > 0) return;
+    event.preventDefault();
+    onPeek(hand);
+  };
   // Chip options with a count of hands per verdict.
   const verdictOptions = [
     { value: 'all', label: 'All', count: countSource.length },
@@ -125,7 +134,7 @@ export default function HandList({
               >
                 <div className={`hand-list-row ${hand.id === selectedId ? 'is-selected' : ''}`}>
                   <div className="hand-list-body">
-                    <Link to={{ pathname: `/hands/${hand.id}`, search: linkSearch }} className="hand-list-item">
+                    <Link to={{ pathname: `/hands/${hand.id}`, search: linkSearch }} className="hand-list-item" onClick={(event) => peek(event, hand)} aria-haspopup={onPeek ? 'dialog' : undefined}>
                       <span className="hand-list-cards">
                         {hand.holeCards.map((code) => (
                           <PlayingCard key={code} code={code} size="sm" />

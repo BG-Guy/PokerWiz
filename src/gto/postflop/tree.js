@@ -1,7 +1,8 @@
 // The game tree of a postflop solve: from the start of one street to the end of the hand, for 2 or more
 // players (seat 0 acts first, the last seat is the button side).
 //
-//   decision  { type: DECISION, player, actions: [{ type, to }], children, board }   to = the player's street total
+//   decision  { type: DECISION, player, actions: [{ type, to }], children, board, pot, toCall, bets, raises,
+//               lead, barrel }                                                  to = the player's street total
 //   chance    { type: CHANCE, street, cards: [card ids], children }           the next card (sampled, see solver.js)
 //   fold      { type: FOLD, winner, pot, invested }                           everyone else folded
 //   showdown  { type: SHOWDOWN, pot, invested, alive, board }                 5 cards out, best hand wins
@@ -10,7 +11,7 @@
 // The street being solved can carry the hand's real actions (`path`): any real bet size that isn't in the menu
 // is added at that spot, so the solve values exactly what was done. Later streets only get betting while
 // `bettingStreets` lasts; after that the cards are dealt out with no more betting (the hand is checked down).
-import { menuFor, STREETS, ALL_IN_MAX_POTS, FORCE_ALL_IN_SHARE } from './sizes.js';
+import { menuFor, STREETS, ALL_IN_MAX_POTS, FORCE_ALL_IN_SHARE, REAL_SIZE_MERGE } from './sizes.js';
 
 export const DECISION = 0;
 export const CHANCE = 1;
@@ -22,6 +23,8 @@ const STREET_OF_BOARD = { 3: 0, 4: 1, 5: 2 };
 
 // spec: {
 //   board: card ids (3-5), pot, stacks: chips behind per player at the start of the street,
+//   aggressor: the player who bet or raised last on the street before (-1 or left out: nobody),
+//   aggressorRaised: that was a raise, not just a bet,
 //   path: real actions this street [{ player, type: fold|check|call|bet|raise|allin, to }],
 //   bettingStreets: streets with betting, counting this one (default: all that are left),
 //   deal(board) -> card ids to branch on for the next card (sampled by the solver),
@@ -49,6 +52,9 @@ export function buildPostflopTree(spec) {
     currentBet: 0,
     lastRaise: 0,
     bets: 0,
+    aggressor: -1, // who bet or raised last on this street
+    lastAggressor: spec.aggressor ?? -1, // ... and on the street before (the preflop raiser, on the flop)
+    lastRaised: Boolean(spec.aggressorRaised), // ... and whether that was a raise (not for the preflop)
     queue: [...Array(P).keys()].filter((p) => spec.stacks[p] > 0),
     bettingLeft: bettingStreets,
     pathAt: 0, // how much of the real path this node is on (-1 once off it)
@@ -108,7 +114,7 @@ export function buildPostflopTree(spec) {
         }
       }
       // All in, when it isn't a giant overbet (always on the river, where jams are standard).
-      if (menu.allInAlways || cap - s.currentBet <= ALL_IN_MAX_POTS * potAfterCall) actions.push({ type: 'allin', to: cap });
+      if (menu.allInAlways || cap - s.currentBet <= (menu.allInPots ?? ALL_IN_MAX_POTS) * potAfterCall) actions.push({ type: 'allin', to: cap });
     }
     // No duplicates (several sizes can turn into the same all in).
     const seen = new Set();
@@ -133,6 +139,20 @@ export function buildPostflopTree(spec) {
         const jam = to >= cap - 0.005;
         const found = actions.findIndex((a) => (jam ? a.type === 'allin' : (a.type === 'bet' || a.type === 'raise') && close(a.to, to)));
         if (found >= 0) return found;
+        if (!jam) {
+          // Nearly a size the menu has (within REAL_SIZE_MERGE of it, as money put in over the bet faced): the
+          // real size takes that one's place. Two sizes that close split one strategy between them, and the
+          // solve valued them apart by more than the difference can be worth.
+          const near = actions.findIndex((a) => {
+            if (a.type !== 'bet' && a.type !== 'raise') return false;
+            const ratio = (a.to - s.currentBet) / (to - s.currentBet);
+            return ratio <= REAL_SIZE_MERGE && ratio >= 1 / REAL_SIZE_MERGE;
+          });
+          if (near >= 0) {
+            actions[near] = { ...actions[near], to };
+            return near;
+          }
+        }
         actions.push(jam ? { type: 'allin', to: cap } : { type: s.currentBet > 0 ? 'raise' : 'bet', to });
         return actions.length - 1;
       }
@@ -162,6 +182,7 @@ export function buildPostflopTree(spec) {
       s.lastRaise = Math.max(s.lastRaise, round(action.to - s.currentBet));
       s.currentBet = action.to;
       s.bets += 1;
+      s.aggressor = p;
       // Everyone else still able to act gets to respond, in order after p.
       const order = [];
       for (let k = 1; k < P; k++) {
@@ -182,6 +203,9 @@ export function buildPostflopTree(spec) {
     n.currentBet = 0;
     n.lastRaise = 0;
     n.bets = 0;
+    n.lastAggressor = s.aggressor;
+    n.lastRaised = s.bets >= 2;
+    n.aggressor = -1;
     n.bettingLeft -= 1;
     n.pathAt = -1;
     const canAct = [...Array(P).keys()].filter((p) => !n.folded[p] && !n.allIn[p]);
@@ -217,6 +241,14 @@ export function buildPostflopTree(spec) {
       street: s.street,
       pot: s.pot,
       toCall: round(s.currentBet - s.streetBet[next]),
+      bets: s.bets, // bets and raises so far on this street
+      // How many raises the bet faced has behind it (player models: a raise says more than a bet): the raises
+      // on this street, plus one when the bettor raised on the street before and is betting again.
+      raises: Math.max(0, s.bets - 1) + (s.bets >= 1 && s.lastRaised && s.aggressor === s.lastAggressor ? 1 : 0),
+      // Opening the betting against the last street's aggressor: before they've acted (a lead, or "donk"), or
+      // as that aggressor (a continuation bet). Player models bet differently in each.
+      lead: s.bets === 0 && s.lastAggressor >= 0 && s.lastAggressor !== next && s.queue.includes(s.lastAggressor),
+      barrel: s.bets === 0 && s.lastAggressor === next,
       invested: Float64Array.from(s.invested),
       board: s.board, // the cards out at this decision (player models judge hand strength on them)
     };

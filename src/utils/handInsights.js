@@ -1,34 +1,42 @@
 // Hand insights: patterns in the hands you've recorded (results by position, verdicts, showdowns,
 // all-ins, and how your own rating and tilt line up with results). Everything here comes from saved hands.
-import { formatUnits } from './format.js';
+import { amountFormatters } from './format.js';
 
 const sum = (list) => list.reduce((a, b) => a + b, 0);
 const average = (list) => (list.length ? sum(list) / list.length : null);
-const dollars = (n) => formatUnits(n, { whole: true }); // hands arrive converted (handsForDisplay)
-const isAllIn = (hand) => hand.streets.some((s) => s.actions.some((a) => a.allIn || a.verb === 'shoves' || a.verb === 'all in'));
+export const isAllIn = (hand) => hand.streets.some((s) => s.actions.some((a) => a.allIn || a.verb === 'shoves' || a.verb === 'all in'));
+export const reachedShowdown = (hand) => (hand.tags ?? []).includes('Showdown') || hand.streets.at(-1)?.name === 'River';
+export const VERDICT_LABELS = { good: 'Good play', mistake: 'Mistake', cooler: 'Cooler', review: 'To review' };
 
-export function handInsights(hands) {
+// hands: in the unit they're shown in (handScope in format.js). money: the formatters for that unit. Every
+// group (a seat, a verdict, showdown or not) keeps its hands, so a row can open the hands behind it.
+export function handInsights(hands, money = amountFormatters()) {
+  const dollars = (n) => money.full(n);
   const net = sum(hands.map((h) => h.result ?? 0));
   const rated = hands.filter((h) => h.rating != null);
   const tilted = hands.filter((h) => h.tilt != null);
 
   // Net result by the hero's seat.
   const positions = new Map();
-  for (const hand of hands) positions.set(hand.heroPosition, (positions.get(hand.heroPosition) ?? 0) + (hand.result ?? 0));
-  const byPosition = [...positions.entries()].map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value);
+  for (const hand of hands) positions.set(hand.heroPosition, [...(positions.get(hand.heroPosition) ?? []), hand]);
+  const byPosition = [...positions.entries()]
+    .map(([label, list]) => ({ key: label, label, value: sum(list.map((h) => h.result ?? 0)), hands: list }))
+    .sort((a, b) => b.value - a.value);
 
   // Verdict counts.
-  const verdictLabels = { good: 'Good play', mistake: 'Mistake', cooler: 'Cooler', review: 'To review' };
-  const byVerdict = Object.entries(verdictLabels)
-    .map(([id, label]) => ({ label, value: hands.filter((h) => h.verdict === id).length }))
+  const byVerdict = Object.entries(VERDICT_LABELS)
+    .map(([id, label]) => {
+      const list = hands.filter((h) => h.verdict === id);
+      return { key: id, label, value: list.length, hands: list };
+    })
     .filter((v) => v.value > 0);
 
   // Showdown vs. no showdown.
-  const showdown = hands.filter((h) => (h.tags ?? []).includes('Showdown') || h.streets.at(-1)?.name === 'River');
+  const showdown = hands.filter(reachedShowdown);
   const noShowdown = hands.filter((h) => !showdown.includes(h));
   const byShowdown = [
-    { label: 'Showdown', value: sum(showdown.map((h) => h.result ?? 0)) },
-    { label: 'No showdown', value: sum(noShowdown.map((h) => h.result ?? 0)) },
+    { key: 'showdown', label: 'Showdown', value: sum(showdown.map((h) => h.result ?? 0)), hands: showdown },
+    { key: 'no-showdown', label: 'No showdown', value: sum(noShowdown.map((h) => h.result ?? 0)), hands: noShowdown },
   ];
 
   const allIns = hands.filter(isAllIn);

@@ -7,6 +7,9 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { getHands, updateHand, deleteHand } from '../../api/hands.js';
 import { getSessions } from '../../api/sessions.js';
 import { useApi } from '../../hooks/useApi.js';
+import { useMediaQuery } from '../../hooks/useMediaQuery.js';
+import { useClosingValue } from '../../hooks/useClosingValue.js';
+import { useUnit } from '../../theme/UnitContext.jsx';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
@@ -14,6 +17,7 @@ import HandsTabs from '../../components/HandsTabs/HandsTabs.jsx';
 import UndoToast from '../../components/UndoToast/UndoToast.jsx';
 import HandList from './HandList.jsx';
 import HandDetail from './HandDetail.jsx';
+import HandSheet from './HandSheet.jsx';
 import './HandReview.css';
 
 const loadHandReview = () => Promise.all([getHands(), getSessions()]);
@@ -39,6 +43,12 @@ export default function HandReview() {
   const [query, setQuery] = useState('');
   const [saveError, setSaveError] = useState(null);
   const { data, error, reload, setData } = useApi(loadHandReview);
+  // Phones and tablets show the list alone: a tap on a hand opens its short version in a sheet, which leads on
+  // to the full hand. A wide screen shows the hand beside the list instead.
+  const wide = useMediaQuery('(min-width: 1100px)');
+  const [peekId, setPeekId] = useState(null);
+  const [peekShown, peekOpen] = useClosingValue(peekId);
+  useUnit(); // amounts follow the BB/$ switch
   const [deleted, setDeleted] = useState(null); // the hand waiting for its Undo bar to run out
   const pending = useRef(null); // that hand, and where it was in the list: { hand, index }
 
@@ -148,6 +158,7 @@ export default function HandReview() {
             onRate={(id, rating) => updateReview(id, { rating })}
             onEdit={swipeEdit}
             onDelete={swipeDelete}
+            onPeek={wide ? undefined : (hand) => setPeekId(hand.id)}
             query={query}
             onQueryChange={setQuery}
             session={session}
@@ -171,6 +182,9 @@ export default function HandReview() {
           )}
         </div>
       </div>
+
+      {/* The short version of the tapped hand (phones), with the way to its full page */}
+      <HandSheet hand={allHands.find((hand) => hand.id === peekShown) ?? null} open={peekOpen} onClose={() => setPeekId(null)} search={search} />
 
       {deleted && <UndoToast key={deleted.id} message={`Deleted "${deleted.title}"`} onUndo={undoDelete} onDone={commitDelete} />}
     </div>

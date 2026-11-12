@@ -23,7 +23,7 @@ export default function ReadSheet({ open, onClose, title, profile, onApply }) {
   const { label } = describeProfile(draft);
 
   return (
-    <Modal open={open} onClose={onClose} title={title} expandable>
+    <Modal open={open} onClose={onClose} title={title}>
       <div className="read-sheet">
         <header className="read-sheet-lead">
           <span className="read-sheet-label">{tendency?.id === 'unknown' && level.id === 'regular' ? 'No read' : label}</span>

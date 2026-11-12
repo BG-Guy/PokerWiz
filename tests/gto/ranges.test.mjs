@@ -7,6 +7,7 @@ import { useDiskCharts, playHand, preflopLine } from './helpers.mjs';
 import { solvePostflop } from '../../src/gto/postflop/solver.js';
 import { analyzeHand } from '../../src/coach/analyzeHand.js';
 import { cardId, HAND_CARDS, CLASS_NAMES, collapseToClasses } from '../../src/gto/cards.js';
+import { COMBOS } from '../../src/coach/combos.js';
 
 useDiskCharts();
 
@@ -50,6 +51,49 @@ const NINE_LIMP_TO = (last) => {
   const seats = ['UTG+1', 'MP', 'LJ', 'HJ', 'CO', 'BTN', 'SB', 'BB'];
   return [['UTG', 'call'], ...seats.slice(0, seats.indexOf(last)).map((p) => [p, 'fold'])];
 };
+
+test('a fourth caller comes to the flop with a calling range, not with every hand', async () => {
+  // The charts play pots of up to three players, so the big blind's call here is off the tree. It gets the
+  // range it would call with as the third player in (the small blind having folded).
+  const fourWay = await preflopLine({ line: [['HJ', 'raise', 2.5], ['BTN', 'call'], ['SB', 'call'], ['BB', 'call']] });
+  const threeWay = await preflopLine({ line: [['HJ', 'raise', 2.5], ['BTN', 'call'], ['BB', 'call']] });
+  const range = fourWay.ranges[fourWay.order.indexOf('BB')];
+  assert.deepEqual(fourWay.order, ['SB', 'BB', 'HJ', 'BTN']);
+  assert.ok(width(range) > 0.15 && width(range) < 0.8, `the big blind calls ${width(range)} of hands`);
+  assert.ok(Math.abs(width(range) - width(threeWay.ranges[threeWay.order.indexOf('BB')])) < 0.02, 'as wide as its 3-way call');
+  assert.ok(classWeight(range, '72o') < 0.05, `seven-deuce offsuit isn't in it (${classWeight(range, '72o')})`);
+  assert.ok(classWeight(range, '87s') > 0.5, `suited connectors are (${classWeight(range, '87s')})`);
+});
+
+test('a flop with four players is not solved, but what they do there still narrows their ranges', async () => {
+  // Four to a K-7-2 flop. The button bets into three players and only the big blind (the hero) calls; then the
+  // turn is heads-up. The button's range should hold far more kings than the range it called preflop with.
+  const hero = { position: 'BB', cards: ['9h', '9d'] };
+  const preflop = [['UTG', 'fold'], ['UTG+1', 'fold'], ['LJ', 'fold'], ['HJ', 'fold'], ['CO', 'raise', 2.5], ['BTN', 'call'], ['SB', 'call'], ['BB', 'call']];
+  const flop = [['SB', 'check'], ['BB', 'check'], ['CO', 'check'], ['BTN', 'bet', 7.5], ['SB', 'fold'], ['BB', 'call'], ['CO', 'fold']];
+  const turn = [['BB', 'check'], ['BTN', 'bet', 15], ['BB', 'call']];
+  const board = ['Ks', '7d', '2c', '4h'];
+  // The share of the button's range (as the coach holds it after these actions) that has a king.
+  const kings = async (actions) => {
+    const { record } = playHand({ hero, board: board.slice(0, 3), actions });
+    const button = record.positions.indexOf('BTN');
+    const { weights } = (await analyzeHand(record, { rangesOnly: true })).ranges.find((r) => r.seat === button);
+    let total = 0;
+    let withKing = 0;
+    COMBOS.forEach((combo, i) => {
+      total += weights[i];
+      if (combo.cards.some((card) => card >> 2 === 11)) withKing += weights[i];
+    });
+    return withKing / total;
+  };
+  const [before, after] = [await kings(preflop), await kings([...preflop, ...flop])];
+  assert.ok(after > 0.3 && after > 1.5 * before, `kings in the button's range: ${before.toFixed(2)} before the flop bet, ${after.toFixed(2)} after`);
+
+  const report = await analyzeHand(playHand({ hero, board, actions: [...preflop, ...flop, ...turn] }).record, { detail: 'fast', steady: true });
+  const graded = (street) => report.decisions.filter((d) => d.street === street).map((d) => d.graded);
+  assert.deepEqual(graded('Flop'), [false, false], 'the 4-way flop is not graded');
+  assert.deepEqual(graded('Turn'), [true, true], 'the heads-up turn is');
+});
 
 test('the big blind defends a wider range against a button open than against an UTG open, and flats small pairs', async () => {
   const vsButton = await preflopLine({ line: BTN_VS_BB });

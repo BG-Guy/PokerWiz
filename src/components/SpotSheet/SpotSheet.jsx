@@ -24,7 +24,7 @@ export default function SpotSheet({ row, open, onClose }) {
   const handType = row.street === 'Preflop' || row.str === null ? handFamily(row.cls) : `${strengthBucket(row.str)} hand`;
 
   return (
-    <Modal open={open} onClose={onClose} title={spotTitle(row)} expandable>
+    <Modal open={open} onClose={onClose} title={spotTitle(row)}>
       <div className="spot-sheet">
         <div className="spot-sheet-cards">
           <span className="spot-sheet-hand">

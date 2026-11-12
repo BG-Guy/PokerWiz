@@ -1,5 +1,6 @@
-// Filters and extras for the full-screen chart: cash or tournaments (when you've played both), game, stakes and
-// venue, plus switches for shaded downswings and peak / low markers.
+// Filters and extras for the bankroll chart (in the sheet its Filter button opens): cash or tournaments (when
+// you've played both), game, stakes and venue, what runs along the bottom, plus switches for shaded downswings
+// and peak / low markers. They apply to the chart on the card and to its full-screen view.
 import FilterChips from '../FilterChips/FilterChips.jsx';
 import ToggleChip from '../ToggleChip/ToggleChip.jsx';
 import './BankrollFilters.css';
@@ -9,20 +10,27 @@ const FORMATS = [
   { value: 'tournament', label: 'Tournaments' },
 ];
 
+const X_MODES = [
+  { value: 'hours', label: 'Hours' },
+  { value: 'sessions', label: 'Sessions' },
+  { value: 'date', label: 'Date' },
+];
+
 // options: { game, stakes, venue } as valuesOf() lists. onReset: clears game, stakes and venue (null when clear).
-export default function BankrollFilters({ filters, options, hasTournaments, onChange, extras, onToggle, onReset }) {
+// xMode / onXMode: what the chart measures along the bottom.
+export default function BankrollFilters({ filters, options, hasTournaments, onChange, extras, onToggle, onReset, xMode, onXMode }) {
   const withAll = (list) => [{ value: 'all', label: 'All' }, ...list.map(({ value }) => ({ value, label: value }))];
 
   return (
     <section className="bankroll-filters" aria-label="Filters">
-      <div className="bankroll-filters-top">
-        <h3 className="bankroll-filters-title">Filters</h3>
-        {onReset && (
+      {onReset && (
+        <div className="bankroll-filters-top">
+          <span className="bankroll-filters-label">Showing some of your sessions</span>
           <button type="button" className="btn-link" onClick={onReset}>
-            Clear
+            Show all
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Cash and tournaments are never mixed: one counts big blinds, the other dollars */}
       {hasTournaments && (
@@ -59,6 +67,12 @@ export default function BankrollFilters({ filters, options, hasTournaments, onCh
             </label>
           ) : null
         )}
+      </div>
+
+      {/* What the curve is measured against */}
+      <div className="bankroll-filters-row">
+        <span className="bankroll-filters-label">Along the bottom</span>
+        <FilterChips options={X_MODES} value={xMode} onChange={onXMode} label="Measure along the bottom by" />
       </div>
 
       {/* Extras drawn on the chart */}

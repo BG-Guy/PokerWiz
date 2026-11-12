@@ -16,7 +16,10 @@ const MENUS = {
     },
     later: {
       turn: { first: [0.66], later: [0.66], raise: [3], maxBets: 3 },
-      river: { first: [0.75], later: [0.75], raise: [3], maxBets: 3 },
+      // The river of a turn solve also has the jam while it's up to 4 pots (reviews only, see menuFor): a turn
+      // play is often the first half of a two-street line that ends in a river overbet (a turn check-raise
+      // then a jam), and without the jam the turn half was valued as if the river could only bet 75%.
+      river: { first: [0.75], later: [0.75], raise: [3], maxBets: 3, allInPots: 4 },
     },
   },
   3: {
@@ -45,10 +48,16 @@ export const STREETS = ['flop', 'turn', 'river'];
 export function menuFor({ players, street, isRoot, detail = 'full' }) {
   const table = MENUS[Math.min(3, players)];
   if (isRoot) return detail === 'fast' && players === 2 ? FAST_ROOT[street] : table.root[street];
-  return table.later[street] ?? table.root[street];
+  const later = table.later[street] ?? table.root[street];
+  // Fast solves keep the smaller tree: no wider all in on later streets.
+  return detail === 'fast' && later.allInPots ? { ...later, allInPots: undefined } : later;
 }
 
-// All in is offered when it isn't a giant overbet: at most this many pots (after calling).
+// All in is offered when it isn't a giant overbet: at most this many pots (after calling), unless the menu
+// says otherwise (allInPots, allInAlways).
 export const ALL_IN_MAX_POTS = 1.6;
+// A real bet or raise within this ratio of a menu size (as money put in over the bet faced) replaces that size
+// in the tree instead of standing next to it.
+export const REAL_SIZE_MERGE = 1.12;
 // A bet or raise that would put in at least this share of the stack becomes all in.
 export const FORCE_ALL_IN_SHARE = 0.67;

@@ -1,19 +1,20 @@
-// Full-screen bankroll chart: the curve as big as the screen allows (phones upright or sideways, desktop), with
-// a time range, the x axis by hours / sessions / date, filters (cash or tournaments, game, stakes, venue),
-// shaded downswings and peak / low markers, and a summary of whatever is on screen. Escape or Back closes it.
+// Full-screen bankroll graph: just the curve, as big as the screen, with a dot for every session. Tap a dot (or
+// drag along the curve) for that session's story and the way to it. A phone held upright shows the graph on its
+// side, so turning the phone gives it the long edge; a phone already on its side, a tablet or a desktop shows it
+// straight. The slim bar on top has the way out and the time range. Escape or Back closes it, and it can open
+// over a sheet (the Net profit sheet's curve).
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { amountFormatters, sessionsForDisplay, todayIso } from '../../utils/format.js';
-import { bankrollSeries, filterSessions, rangeSummary, valuesOf } from '../../utils/bankroll.js';
+import { plural, todayIso } from '../../utils/format.js';
+import { bankrollSeries, inRange } from '../../utils/bankroll.js';
+import { useDialogLayer } from '../../hooks/useDialogLayer.js';
 import { useMediaQuery } from '../../hooks/useMediaQuery.js';
 import FilterChips from '../FilterChips/FilterChips.jsx';
 import Icon from '../Icon/Icon.jsx';
 import BankrollPlot from '../BankrollChart/BankrollPlot.jsx';
-import BankrollSummary from './BankrollSummary.jsx';
-import BankrollFilters from './BankrollFilters.jsx';
 import './BankrollFullscreen.css';
 
-const CLOSE_MS = 220; // matches the closing animation in BankrollFullscreen.css
+const CLOSE_MS = 200; // matches the closing animation in BankrollFullscreen.css
 
 const RANGES = [
   { value: 'all', label: 'All time' },
@@ -21,44 +22,28 @@ const RANGES = [
   { value: '90', label: '90 days' },
   { value: '30', label: '30 days' },
 ];
-const X_MODES = [
-  { value: 'hours', label: 'Hours' },
-  { value: 'sessions', label: 'Sessions' },
-  { value: 'date', label: 'Date' },
-];
-const RANGE_WORDS = { all: 'All time', year: 'This year', 90: 'Last 90 days', 30: 'Last 30 days' };
-const NO_FILTERS = { format: 'cash', game: 'all', stakes: 'all', venue: 'all' };
+// The same query as the stylesheet's: an upright phone, where the stage is turned a quarter.
+const UPRIGHT_PHONE = '(orientation: portrait) and (max-width: 639px)';
 
-// sessions: every finished session as stored (cash and tournaments, in dollars).
-export default function BankrollFullscreen({ open, onClose, sessions }) {
-  // Stays on the page while it animates away after closing (same pattern as Modal).
+// sessions: the ones on the chart, in the unit they're shown in (moneyScope().sessions). money: the formatters
+// for that unit. scope: a few words about what's on it ("Cash games · $1/$3"). initialRange: the time range
+// it opens on.
+export default function BankrollFullscreen({ open, onClose, sessions, money, title = 'Bankroll', scope = '', xMode = 'hours', showDownswings = false, showMarkers = true, initialRange = 'all' }) {
+  // Stays on the page while it animates away after closing (the same pattern as Modal).
   const [shown, setShown] = useState(open);
   if (open && !shown) setShown(true);
   const closing = shown && !open;
-  const dialogRef = useRef(null);
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
+  const viewRef = useRef(null);
+  const [range, setRange] = useState(initialRange);
+  const rotated = useMediaQuery(UPRIGHT_PHONE);
 
-  // What's on screen.
-  const [range, setRange] = useState('all');
-  const [xMode, setXMode] = useState('hours');
-  const [filters, setFilters] = useState(NO_FILTERS);
-  const [extras, setExtras] = useState({ downswings: true, markers: true });
-  const isTouch = useMediaQuery('(pointer: coarse)');
+  // While open: Escape closes this layer only, the page behind stops scrolling, focus moves in.
+  useDialogLayer(open, onClose, viewRef);
 
-  // While open: Escape closes, the page behind stops scrolling, and focus moves into the view.
+  // Opening again starts from the range it was asked for.
   useEffect(() => {
-    if (!open) return undefined;
-    const onKey = (event) => event.key === 'Escape' && !event.defaultPrevented && onCloseRef.current();
-    const previousOverflow = document.body.style.overflow;
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    dialogRef.current?.focus({ preventScroll: true });
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [open]);
+    if (open) setRange(initialRange);
+  }, [open, initialRange]);
 
   // Closing: leave the page once the closing animation has played (at once if motion is reduced).
   useEffect(() => {
@@ -68,91 +53,50 @@ export default function BankrollFullscreen({ open, onClose, sessions }) {
     return () => clearTimeout(timer);
   }, [closing]);
 
-  // The sessions on screen, the curve and its summary. Tournaments have no big blind, so they're shown in dollars.
-  const dollars = filters.format === 'tournament';
-  const ofFormat = useMemo(() => sessions.filter((s) => (s.format ?? 'cash') === filters.format), [sessions, filters.format]);
-  const visible = useMemo(
-    () => sessionsForDisplay(filterSessions(sessions, { ...filters, range }, todayIso())),
-    [sessions, filters, range]
-  );
-  const points = useMemo(() => bankrollSeries(visible), [visible]);
-  const summary = useMemo(() => rangeSummary(visible), [visible]);
-  const money = amountFormatters({ dollars });
-  const hasTournaments = sessions.some((s) => s.format === 'tournament');
-  const options = useMemo(
-    () => ({ game: valuesOf(ofFormat, 'game'), stakes: valuesOf(ofFormat, 'stakes'), venue: valuesOf(ofFormat, 'venue') }),
-    [ofFormat]
-  );
-  const filtered = Object.keys(NO_FILTERS).some((key) => key !== 'format' && filters[key] !== 'all');
-
-  // A new format has its own games, stakes and venues: start those over.
-  const changeFilter = (key, value) =>
-    setFilters((current) => (key === 'format' ? { ...NO_FILTERS, format: value } : { ...current, [key]: value }));
+  const points = useMemo(() => bankrollSeries(inRange(sessions, range, todayIso())), [sessions, range]);
 
   if (!shown) return null;
 
-  const scope = [dollars ? 'Tournaments' : 'Cash games', RANGE_WORDS[range], filters.game !== 'all' && filters.game, filters.stakes !== 'all' && filters.stakes, filters.venue !== 'all' && filters.venue]
-    .filter(Boolean)
-    .join(' · ');
+  const count = points.length - 1;
+  const words = [scope, plural(count, 'session'), money.unit === 'bb' ? 'in big blinds' : 'in dollars'].filter(Boolean).join(' · ');
 
   return createPortal(
-    <div className={`bankroll-fs ${closing ? 'is-closing' : ''}`} role="dialog" aria-modal="true" aria-label="Bankroll chart" aria-hidden={closing || undefined} tabIndex={-1} ref={dialogRef}>
-      {/* Title, what's on screen, and the way out */}
-      <header className="bankroll-fs-header">
-        <div className="bankroll-fs-heading">
-          <h2 className="bankroll-fs-title">Bankroll</h2>
-          <p className="bankroll-fs-scope">{scope}</p>
-        </div>
-        <button type="button" className="bankroll-fs-close" onClick={onClose} aria-label="Close full screen">
-          <Icon name="shrink" size={18} />
-        </button>
-      </header>
+    <div className={`bankroll-fs ${closing ? 'is-closing' : ''}`} role="dialog" aria-modal="true" aria-label={`${title} chart, full screen`} aria-hidden={closing || undefined} tabIndex={-1} ref={viewRef}>
+      {/* The stage: the whole screen, turned on its side on an upright phone */}
+      <div className="bankroll-fs-stage">
+        <header className="bankroll-fs-bar">
+          <button type="button" className="bankroll-fs-close" onClick={onClose} aria-label="Close full screen">
+            <Icon name="close" size={18} />
+          </button>
+          <div className="bankroll-fs-heading">
+            <h2 className="bankroll-fs-title">{title}</h2>
+            <p className="bankroll-fs-scope">{words}</p>
+          </div>
+          <FilterChips options={RANGES} value={range} onChange={setRange} label="Time range" />
+        </header>
 
-      <div className="bankroll-fs-body">
-        {/* The chart, with the time range and x axis right above it */}
-        <section className="bankroll-fs-main">
-          <div className="bankroll-fs-toolbar">
-            <FilterChips options={RANGES} value={range} onChange={setRange} label="Time range" />
-            <div className="bankroll-fs-axis" role="group" aria-label="Measure along the bottom by">
-              {X_MODES.map((mode) => (
-                <button key={mode.value} type="button" className={mode.value === xMode ? 'is-active' : ''} aria-pressed={mode.value === xMode} onClick={() => setXMode(mode.value)}>
-                  {mode.label}
+        <div className="bankroll-fs-plot">
+          {count > 0 ? (
+            <BankrollPlot points={points} money={money} xMode={xMode} showDownswings={showDownswings} showMarkers={showMarkers} detailed rotated={rotated} />
+          ) : (
+            <div className="bankroll-fs-empty">
+              <p>No sessions in this range.</p>
+              {range !== 'all' && (
+                <button type="button" className="btn btn-ghost" onClick={() => setRange('all')}>
+                  Show all time
                 </button>
-              ))}
+              )}
             </div>
-          </div>
-
-          <div className="bankroll-fs-plot">
-            {points.length > 1 ? (
-              <BankrollPlot points={points} money={money} xMode={xMode} showDownswings={extras.downswings} showMarkers={extras.markers} />
-            ) : (
-              <div className="bankroll-fs-empty">
-                <p>No sessions match these filters.</p>
-                {(filtered || range !== 'all') && (
-                  <button type="button" className="btn btn-ghost" onClick={() => { setFilters({ ...NO_FILTERS, format: filters.format }); setRange('all'); }}>
-                    Show everything
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-          <p className="bankroll-fs-hint">{isTouch ? 'Tap or drag on the chart to read a session.' : 'Hover the chart, or focus it and use the arrow keys, to read a session.'}</p>
-        </section>
-
-        {/* What the curve adds up to, then the filters and extras */}
-        <aside className="bankroll-fs-side">
-          <BankrollSummary summary={summary} money={money} dollars={dollars} />
-          <BankrollFilters
-            filters={filters}
-            options={options}
-            hasTournaments={hasTournaments}
-            onChange={changeFilter}
-            extras={extras}
-            onToggle={(key) => setExtras((current) => ({ ...current, [key]: !current[key] }))}
-            onReset={filtered ? () => setFilters({ ...NO_FILTERS, format: filters.format }) : null}
-          />
-        </aside>
+          )}
+        </div>
       </div>
+
+      {/* Upright phone: a nudge to turn it, written the way the phone is held now */}
+      {rotated && (
+        <p className="bankroll-fs-turn" aria-hidden="true">
+          <Icon name="repeat" size={16} /> Turn your phone
+        </p>
+      )}
     </div>,
     document.body
   );

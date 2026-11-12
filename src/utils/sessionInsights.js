@@ -1,10 +1,10 @@
 // Bankroll insights: the downswing you're in (or not), month to month, how much you've played, an honest
 // "is it normal?" check of your downswing against your own win rate and swings, and a short line of
-// encouragement. Pure functions; sessions come in as cash games converted for display (sessionsForDisplay).
+// encouragement. Pure functions; sessions come in as cash games in the unit they're shown in (moneyScope).
 import { sessionProfit } from './stats.js';
 import { bankrollSeries, currentDrawdown, downswings, monthToMonth, sessionsPerWeek } from './bankroll.js';
 import { createRandom } from '../coach/random.js';
-import { formatUnits } from './format.js';
+import { amountFormatters } from './format.js';
 
 // Below this much data the "is it normal?" check says it needs more sessions instead of guessing.
 export const MIN_SESSIONS = 10;
@@ -92,7 +92,8 @@ const VERDICTS = [
 // Is the downswing normal for your numbers? Tests your current downswing (or, at a peak, your biggest one) by
 // asking how many simulated players with your win rate and swings see one at least this deep over the hours
 // you've played. Statuses: 'not-enough' (too little data), 'none' (never far below a peak), or a verdict.
-export function varianceCheck(sessions, { runs = 2000 } = {}) {
+// money: the formatters for the unit the sessions are in (moneyScope().money).
+export function varianceCheck(sessions, { runs = 2000, money = amountFormatters() } = {}) {
   const stats = hourlyVariance(sessions);
   if (!stats || stats.sessions < MIN_SESSIONS || stats.hours < MIN_HOURS) {
     return {
@@ -120,7 +121,7 @@ export function varianceCheck(sessions, { runs = 2000 } = {}) {
   const typicalWorst = worst[Math.floor(worst.length / 2)];
   const roughWorst = worst[Math.floor(worst.length * 0.9)];
   const hoursText = `${Math.round(stats.hours)} hours`;
-  const depthText = formatUnits(-depth, { whole: true });
+  const depthText = money.full(-depth);
   const subject = which === 'current' ? `a downswing as deep as this one (${depthText} at its worst)` : `a downswing as deep as your biggest (${depthText})`;
 
   return {
@@ -181,8 +182,8 @@ export function pepTalk(sessions, status = downswingStatus(sessions)) {
   return { mood, text: lines[sessions.length % lines.length] };
 }
 
-// Everything the bankroll insight cards show, in one pass.
-export function bankrollInsights(sessions) {
+// Everything the bankroll insight cards show, in one pass. money: the formatters for the sessions' unit.
+export function bankrollInsights(sessions, money = amountFormatters()) {
   const hours = sessions.reduce((total, s) => total + hoursOf(s), 0);
   const status = downswingStatus(sessions);
   const months = monthToMonth(sessions);
@@ -196,7 +197,7 @@ export function bankrollInsights(sessions) {
       averageHours: sessions.length ? hours / sessions.length : 0,
       longestHours: Math.max(0, ...sessions.map(hoursOf)),
     },
-    normal: varianceCheck(sessions),
+    normal: varianceCheck(sessions, { money }),
     pep: pepTalk(sessions, status),
   };
 }

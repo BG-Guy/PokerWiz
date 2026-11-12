@@ -12,6 +12,25 @@
   align-items: center;
   gap: 12px;
 }
+/* A row that opens what's behind it: a button with a chevron, tall enough to tap */
+.bar-list.is-clickable {
+  gap: 0;
+}
+.bar-list-open {
+  grid-template-columns: minmax(48px, 88px) 1fr minmax(64px, auto) 14px;
+  width: 100%;
+  min-height: 44px;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: opacity 0.15s ease;
+}
+.bar-list-open:active {
+  opacity: 0.6;
+}
+.bar-list-open svg {
+  color: var(--text-faint);
+}
 
 .bar-list-label {
   font-weight: 700;

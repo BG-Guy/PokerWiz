@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { isTournament, sessionProfit } from '../../utils/stats.js';
 import { gradeSession } from '../../utils/sessionGrade.js';
-import { formatDuration, formatMoney, formatUnits, formatWeekday, parseDate } from '../../utils/format.js';
+import { formatDuration, formatMoney, formatWeekday, getMoneyUnit, parseDate } from '../../utils/format.js';
 import Money from '../../components/Money/Money.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
 import GradeBadge from '../../components/GradeBadge/GradeBadge.jsx';
@@ -16,18 +16,20 @@ import Collapse from '../../components/Collapse/Collapse.jsx';
 import EditSessionSheet from './EditSessionSheet.jsx';
 import './SessionRow.css';
 
-// session is the display copy (BB/$ unit); rawSession is the saved one in dollars, which the edit sheet changes.
-export default function SessionRow({ session, rawSession, sessionHands, isOpen, onToggle, onSaved, onDeleted }) {
+// session: as saved, in dollars. One session was played at one big blind, so its own amounts follow the BB/$
+// switch whatever the totals above it are shown in.
+export default function SessionRow({ session, sessionHands, isOpen, onToggle, onSaved, onDeleted }) {
   const [editing, setEditing] = useState(false);
   const [editSheet, editOpen] = useClosingValue(editing); // stays up while it slides closed
   const tournament = isTournament(session);
-  const unit = tournament ? null : 1; // cash games arrive converted to the BB/$ unit; tournaments stay in dollars
+  const unit = tournament ? null : session.bigBlind; // tournaments have no big blind: always dollars
+  const inBB = getMoneyUnit() === 'bb' && unit > 0;
   const amount = (value, options) => formatMoney(value, { bb: unit, ...options });
   const profit = sessionProfit(session);
-  const hourly = profit / (session.durationMin / 60);
+  const hourly = profit / Math.max(session.durationMin / 60, 0.25);
   const detailsId = `session-details-${session.id}`;
   const handCount = sessionHands.length;
-  const grade = gradeSession(rawSession, sessionHands);
+  const grade = gradeSession(session, sessionHands);
 
   return (
     <li className={`session-row ${isOpen ? 'is-open' : ''}`}>
@@ -63,7 +65,7 @@ export default function SessionRow({ session, rawSession, sessionHands, isOpen, 
             </div>
             <div>
               <dt>Hourly</dt>
-              <dd className="num">{tournament ? formatMoney(Math.round(hourly)) : formatUnits(hourly, { whole: true })}/h</dd>
+              <dd className="num">{amount(inBB ? hourly : Math.round(hourly))}/h</dd>
             </div>
             {session.expenses > 0 && (
               <div>
@@ -120,7 +122,7 @@ export default function SessionRow({ session, rawSession, sessionHands, isOpen, 
 
       {editSheet && (
         <EditSessionSheet
-          session={rawSession}
+          session={session}
           handCount={handCount}
           open={editOpen}
           onClose={() => setEditing(false)}

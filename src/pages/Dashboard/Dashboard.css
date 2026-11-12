@@ -1,4 +1,5 @@
-/* Dashboard layout: stat row on top, then a grid of panels (stacked on phones, 2 columns on desktop). */
+/* Dashboard layout: stat row on top, then a grid of panels (stacked on phones, 2 columns on desktop). Goals and
+   recent sessions are rows you can tap: each opens its short version in a sheet. */
 
 .dashboard-stats {
   display: grid;
@@ -36,22 +37,56 @@
   font-weight: 700;
 }
 
-/* Goal snapshot */
+/* Why the totals are in dollars (only when the BB/$ switch is overruled) */
+.dashboard-unit-note {
+  margin: -6px 2px 16px;
+}
+
+/* Goal snapshot: each goal is a button that opens its pace */
 .dashboard-goal-list {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 6px;
 }
 .dashboard-goal {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: calc(100% + 20px);
+  margin: 0 -10px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: background-color 0.15s ease;
+}
+.dashboard-goal:hover {
+  background: var(--surface-2);
+}
+.dashboard-goal:active {
+  background: var(--border);
 }
 .dashboard-goal-top {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   font-weight: 700;
+}
+.dashboard-goal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+/* The cue that a row opens something */
+.dashboard-row-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-faint);
 }
 .dashboard-goal-pct {
   color: var(--text-muted);
@@ -73,17 +108,31 @@
   display: flex;
   flex-direction: column;
 }
-.dashboard-session {
-  display: grid;
-  grid-template-columns: 64px 1fr auto;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
+.dashboard-session-list li {
   border-top: 1px solid var(--border);
 }
-.dashboard-session:first-child {
+.dashboard-session-list li:first-child {
   border-top: 0;
-  padding-top: 0;
+}
+/* A session: a button that opens its short version */
+.dashboard-session {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) auto 16px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  padding: 12px 0;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: opacity 0.15s ease;
+}
+.dashboard-session:active {
+  opacity: 0.6;
+}
+.dashboard-session-chevron {
+  color: var(--text-faint);
 }
 .dashboard-session-date {
   display: flex;

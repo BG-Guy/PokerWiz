@@ -1,6 +1,6 @@
 // Bankroll math for the chart, its full-screen view and the insight details: ordering, filters, the running
-// curve, downswings, months, streaks and breakdowns. Pure functions; sessions come in already converted for
-// display (sessionsForDisplay), so every amount is in the unit on screen.
+// curve, downswings, months, streaks and breakdowns. Pure functions; sessions come in already in the unit they
+// are shown in (moneyScope in format.js), so every amount is in the unit on screen.
 import { sessionProfit, summarize } from './stats.js';
 import { parseDate } from './format.js';
 

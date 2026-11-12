@@ -104,6 +104,8 @@ const lerp = (a, b, t) => a + (b - a) * t;
 //   vpip        share of hands this player voluntarily plays (0.10 nit ... 0.55 maniac)
 //   widthMult   multiplier on position-based baseline ranges (1 = average regular)
 //   pfrRatio    share of played hands that are raised rather than called/limped
+//   threeBet    share of all hands re-raised when facing a raise: about 2% for a calling station (the
+//               premiums), 7% for a TAG, 14% for a maniac; unskilled players re-raise less
 //   aggression  postflop aggression factor (bets+raises : calls), about 0.5 ... 5
 //   bluffMult   multiplier on bluffing frequency
 //   foldMult    >1 folds more than MDF says (nit), <1 folds less (calling station)
@@ -125,6 +127,7 @@ export function modelParams(profile, imageOf = null) {
   const vpip = L < 0.5 ? 0.1 + 0.28 * L : 0.24 + 0.62 * (L - 0.5);
   let widthMult = vpip / 0.24;
   const pfrRatio = 0.2 + 0.7 * A;
+  let threeBet = (0.02 + 0.13 * A ** 2) * clamp(0.6 + 0.8 * S, 0.6, 1);
   let aggression = 0.5 + 4.5 * A ** 1.3;
   let bluffMult = 0.3 + 1.7 * A;
   // Folding against what minimum defence asks for: tight players fold more (a nit about 20% more), loose ones
@@ -139,6 +142,7 @@ export function modelParams(profile, imageOf = null) {
 
   // Tilt: plays more hands, bets and bluffs more, won't fold, and decisions get sloppy.
   widthMult *= 1 + 0.6 * T;
+  threeBet *= 1 + T;
   aggression *= 1 + 0.5 * T;
   bluffMult *= 1 + T;
   foldMult *= 1 - 0.3 * T;
@@ -179,6 +183,7 @@ export function modelParams(profile, imageOf = null) {
     vpip: clamp(vpip * (widthMult / (vpip / 0.24)), 0.05, 0.95),
     widthMult: clamp(widthMult, 0.3, 3.8),
     pfrRatio: clamp(pfrRatio, 0.15, 0.95),
+    threeBet: clamp(threeBet, 0.008, 0.3),
     aggression: clamp(aggression, 0.3, 7),
     bluffMult: clamp(bluffMult, 0.1, 4),
     foldMult: clamp(foldMult, 0.3, 1.6),

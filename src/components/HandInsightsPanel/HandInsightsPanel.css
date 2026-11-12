@@ -9,27 +9,54 @@
   margin-bottom: 0;
 }
 
+/* The headline boxes are buttons: each opens its story */
 .hand-insights-stats {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin: 0;
 }
-.hand-insights-stats div {
+.hand-insights-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 60px;
   padding: 10px 12px;
   border-radius: 12px;
+  border: 1px solid transparent;
   background: var(--bg);
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: border-color 0.15s ease, transform 0.15s ease;
 }
-.hand-insights-stats dt {
+.hand-insights-stat:hover {
+  border-color: var(--border);
+}
+.hand-insights-stat:active {
+  transform: scale(0.98);
+}
+.hand-insights-stat-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
   font-size: 11px;
   font-weight: 700;
   color: var(--text-muted);
 }
-.hand-insights-stats dd {
-  margin: 2px 0 0;
+.hand-insights-stat-label svg {
+  color: var(--text-faint);
+}
+.hand-insights-stat-value {
   font-family: var(--font-display);
   font-size: 18px;
   font-weight: 600;
+}
+.hand-insights-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-faint);
 }
 .hand-insights-inline {
   display: inline-flex;

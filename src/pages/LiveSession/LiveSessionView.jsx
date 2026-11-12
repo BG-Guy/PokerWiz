@@ -5,6 +5,10 @@ import { Link } from 'react-router-dom';
 import { addSessionEvent, discardSession } from '../../api/sessions.js';
 import { formatClock, formatMoney, formatTime } from '../../utils/format.js';
 import { stakeDetails } from '../../utils/stakes.js';
+import { LIVE_HANDS_AN_HOUR, liveSessionDetail } from '../../utils/sessionDetails.js';
+import { useDetailView } from '../../hooks/useDetailView.js';
+import DetailSheet from '../../components/DetailSheet/DetailSheet.jsx';
+import StatDetail from '../../components/StatDetail/StatDetail.jsx';
 import { useClosingValue } from '../../hooks/useClosingValue.js';
 import Panel from '../../components/Panel/Panel.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
@@ -26,6 +30,7 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
   const [editing, setEditing] = useState(null); // 'setup', a timeline entry, or null
   const [sheet, sheetOpen] = useClosingValue(editing); // stays up while it slides closed
   const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const detail = useDetailView(); // the number on the card whose story is open
 
   // Tick the session clock every second.
   useEffect(() => {
@@ -36,8 +41,15 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
   const elapsedMs = now - new Date(session.startedAt).getTime();
   const handCount = session.events.filter((e) => e.type === 'hand').length;
   // Hands dealt so far, at a live table's ~30 hands an hour.
-  const handsDealt = Math.floor((elapsedMs / 3600000) * 30);
+  const handsDealt = Math.floor((elapsedMs / 3600000) * LIVE_HANDS_AN_HOUR);
   const noteCount = session.events.filter((e) => e.type === 'note').length;
+  const numbers = [
+    { id: 'buyin', label: 'Buy-in', value: formatMoney(session.buyIn, { sign: false, bb: session.bigBlind }) },
+    { id: 'dealt', label: 'Hands dealt', value: `~${handsDealt}` },
+    { id: 'saved', label: 'Saved', value: handCount },
+    { id: 'notes', label: 'Notes', value: noteCount },
+  ];
+  const shownDetail = detail.shownKey ? liveSessionDetail(detail.shownKey, session, elapsedMs) : null;
 
   const toggleComposer = (name) => {
     setError(null);
@@ -87,24 +99,15 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
           <div className="live-view-clock num" role="timer" aria-label="Time played">
             {formatClock(elapsedMs)}
           </div>
-          <dl className="live-view-numbers">
-            <div>
-              <dt>Buy-in</dt>
-              <dd className="num">{formatMoney(session.buyIn, { sign: false, bb: session.bigBlind })}</dd>
-            </div>
-            <div>
-              <dt>Hands dealt</dt>
-              <dd className="num">~{handsDealt}</dd>
-            </div>
-            <div>
-              <dt>Saved</dt>
-              <dd className="num">{handCount}</dd>
-            </div>
-            <div>
-              <dt>Notes</dt>
-              <dd className="num">{noteCount}</dd>
-            </div>
-          </dl>
+          {/* The session so far in four numbers: tap one for its story */}
+          <div className="live-view-numbers">
+            {numbers.map((item) => (
+              <button key={item.id} type="button" className="live-view-number" onClick={() => detail.open(item.id)} ref={detail.cardRef(item.id)} aria-haspopup="dialog">
+                <span className="live-view-number-label">{item.label}</span>
+                <span className="live-view-number-value num">{item.value}</span>
+              </button>
+            ))}
+          </div>
         </section>
 
         {/* Quick actions */}
@@ -220,6 +223,11 @@ export default function LiveSessionView({ session, onChange, onFinished, onDisca
         onConfirm={handleDiscard}
         onClose={() => setConfirmDiscard(false)}
       />
+
+      {/* The story behind a number on the card */}
+      <DetailSheet open={detail.openKey !== null} onClose={detail.close} title={shownDetail?.title ?? ''} originRef={detail.originRef}>
+        {shownDetail && <StatDetail detail={shownDetail} />}
+      </DetailSheet>
 
       <FinishSessionSheet
         open={finishOpen}

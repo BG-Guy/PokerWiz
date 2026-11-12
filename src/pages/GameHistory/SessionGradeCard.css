@@ -1,4 +1,23 @@
-/* Session grade: the big letter tile (GradeBadge: green A/B, neutral C, amber D, red F), then one row per part. */
+/* Session grade: the big letter tile (GradeBadge: green A/B, neutral C, amber D, red F), then one row per part.
+   On the session's page the card opens how the grade is worked out. */
+
+.session-grade.is-clickable {
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.session-grade.is-clickable:hover {
+  border-color: var(--text-faint);
+}
+.session-grade-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 36px;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
 
 .session-grade {
   padding: 18px;

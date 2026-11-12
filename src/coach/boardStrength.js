@@ -49,6 +49,16 @@ export function computeStrengths(board, dead = []) {
     const deck = [];
     for (let c = 0; c < 52; c++) if (!blocked.has(c)) deck.push(c);
     const topBoardRank = Math.max(...board.map(rankOf));
+    // On the turn, a river card can make a straight or a flush on the board itself (9-8-7-6 and a ten): that's
+    // everyone's hand, not a draw of this one. What the board alone would be with each card (-1 on the flop,
+    // where four cards make nothing).
+    const boardWith = new Int8Array(52).fill(-1);
+    if (board.length === 4) {
+      for (const card of deck) {
+        extended[board.length] = card;
+        boardWith[card] = categoryOf(evaluate(extended, null, 0));
+      }
+    }
     for (const i of order) {
       const hole = COMBOS[i].cards;
       const [a, b] = hole;
@@ -60,6 +70,7 @@ export function computeStrengths(board, dead = []) {
         extended[board.length] = card;
         const next = categoryOf(evaluate(hole, extended, board.length + 1));
         const hitsHoleCard = rankOf(card) === rankOf(a) || rankOf(card) === rankOf(b);
+        if (next >= 4 && next <= boardWith[card]) continue; // the board's own straight or flush
         if (next >= 4) outs += 1; // straight, flush or better
         else if (current <= 1 && next === 3 && hitsHoleCard) outs += 0.7; // set / trips with a hole card
         else if (current <= 1 && next === 2 && hitsHoleCard) outs += 0.5; // two pair with a hole card

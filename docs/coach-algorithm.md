@@ -1,9 +1,9 @@
 # How the coach works: the GTO engine
 
 Since version 0.3.0 the coach and the Practice opponents run on a game-theory-optimal (GTO) engine
-(`src/gto/`). Everyone is assumed to play GTO, and only position and stack depth matter. The engine can also
-play the best answer to a player's tendencies (see "Player models" below), but that's switched off in the app
-for now.
+(`src/gto/`). Everyone is assumed to play GTO, and only position and stack depth matter. A player you've set a
+read on (a tendency and a skill level) is played as that kind of player instead, and the coach then shows the
+best answer to them (see "Player models" below).
 
 The engine follows the approach published poker AIs use (Libratus, Pluribus, and solvers like PioSolver and
 postflop-solver), scaled to run in a phone's browser:
@@ -136,8 +136,11 @@ or ante), for the stack that matters: your stack against the deepest opponent's.
   solution (almost) never takes doesn't wipe the range out: it keeps its shape.
 - **Spots not in the chart:** the closest stored spot stands in. That's the same player, betting level and
   price, with as many of the same players in the pot as possible.
-- **Off the tree:** a fourth caller, or 9 players all in a pot, can't be followed exactly. The decisions after
-  that are marked "not graded".
+- **Off the tree:** a fourth caller, or 9 players all in a pot, can't be followed exactly. The preflop
+  decisions after that are marked "not graded". The extra caller still gets a range for the flop: the one they
+  would call with as the third player in (as if the caller before them had folded), and so does every caller
+  after them. Before 2026-11-12 they kept every hand, seven-deuce offsuit included, and so did every postflop
+  answer that followed.
 
 ## Postflop (`src/gto/postflop/`)
 
@@ -149,9 +152,30 @@ with (`solver.js`). This is "re-solving", as in Libratus. It runs Discounted CFR
 Every hand of every player is updated in each pass, and card removal is exact between each pair of players
 (`showdown.js`).
 
-The actions really taken in the hand keep at least 0.1% of each hand's reach (a tremble, as in the preflop
-solve). When a player makes a bet the solution never makes, which live players do, the answers to it are
-still worked out against their range instead of against nobody, where they would never be trained.
+The strategy a solve returns is the average of its passes, with pass t counting t^4. Discounted CFR's usual
+t^2 suits long solves; at the 100 to 1,200 passes a solve gets here, t^4 is closer to equilibrium at every
+budget measured (exact best responses, button against big blind: 0.55% of the pot instead of 0.68% on a K72
+flop after 110 passes, 0.21% instead of 0.24% on a turn after 260, 3-way 0.054% instead of 0.071%), and it
+leaves next to nothing of the first, random passes in the result.
+
+**What a real action says about a range.** A player's range after an action is their range before it times
+how often each hand takes that action in the solve. When the solution never takes the action (a bet it doesn't
+make, which live players make all the time), three things decide what the range is:
+
+- **Trembles by cost.** On the real line every hand takes the real action a little more often than its
+  strategy says (as in the preflop solve), so the answers to it are trained against a range. How much more
+  depends on what the action would cost the hand, by the solve's own values: 2% when it costs nothing, e times
+  less for every 5% of the pot it gives up. A big bet the solution doesn't make is then made by the hands
+  that lose least by making it (the strong ones and the cheapest bluffs). Until 2026-11-12 every hand got the
+  same 0.1%, so such a bet was read as the player's whole range: the coach saw top pairs where a river lead
+  after two calls is mostly flushes, and raised it all in with bottom set.
+- **Sizes near the real one.** A real bet or raise also takes over part of what each hand does with the menu's
+  sizes close to it (72% at 1.5 times the size, 38% at twice, 9% at three times). The solution spreads one
+  betting range over the sizes it's offered, so a real size between two of them often ends up unused; it's
+  then made by a blend of the hands that bet the sizes around it, which is balanced the way they are.
+- **Merged sizes.** A real size within 12% of a menu size takes its place in the tree instead of standing
+  next to it. Two sizes that close split one strategy between them, and the solve valued them apart by more
+  than the difference can be worth (a raise to 44 bb worth 9 bb more than one to 45 bb).
 
 What keeps it fast enough for a phone:
 
@@ -161,9 +185,12 @@ What keeps it fast enough for a phone:
   - River: 33% and 75%, plus 125% in position, and all in.
   - Raises: 2.5-3x the bet.
 
-  Later streets get one size each. All in is added whenever it isn't a giant overbet, and on the river always.
-- **The real sizes:** every bet in the hand that isn't in the menu is added at its spot, so the coach values
-  exactly what was done.
+  Later streets get one size each. All in is added whenever it isn't a giant overbet (1.6 pots), and on the
+  river always. In reviews, the river of a heads-up turn solve also has it up to 4 pots: a turn play is often
+  the first half of a line that ends in a river overbet (a check-raise, then a jam), and without the jam the
+  turn half was valued as if the river could only be bet 75%.
+- **The real sizes:** every bet in the hand that isn't in the menu is added at its spot (or takes the place
+  of the size next to it, see above), so the coach values exactly what was done.
 - **Sampled runouts:** a set of turn cards and a few rivers per turn (heads-up flops: 16 turns x 8 rivers for
   reviews, 12 x 6 for Practice), the same sample everywhere in the tree. They're chosen, not drawn at random:
   spread evenly over the four suits and over the ranks, so every flush and straight draw sees its share of
@@ -181,11 +208,22 @@ What keeps it fast enough for a phone:
     (Run for hundreds of passes, sampling would leave a little noise that visiting every river doesn't; a
     solve in the app never gets that far.)
 - **Budgets:** about 7 s per street for reviews ("full"), 2.5 s for Practice opponents ("fast"). Less with
-  fewer iterations on slow devices.
+  fewer iterations on slow devices. A river solve has no cards to come, so it gets 1,200 passes (600 in
+  Practice) in well under a second; it used to stop at 260, after 50 ms.
+- **Steady solves:** with `steady: true` (`analyzeHand`, `createGtoHand`, `solvePostflop`) a solve runs the
+  number of passes it typically gets, with no time limit, so the answer is the same on every run and machine.
+  The time limit makes a close verdict depend on how busy the CPU is; comparisons and tests use steady solves.
 
 Heads-up and 3-way pots are solved (4-way solves don't converge in a phone's time budget; decisions in bigger
 pots are marked "not graded"). In 3-way pots each player's opponents are treated as independent of each other
 (their blockers on each other are left out), and ties are split exactly.
+
+A street with four or more players still narrows the ranges (`postflop/unsolved.js`): each real action
+multiplies the actor's range by how often a player of their kind takes it with each hand (their read's model,
+or a typical player's with no read; see "Player models"), keeping a tenth of every hand whatever the action.
+So when the pot gets down to three players, the solve starts from ranges that fit the flop: the player who
+bet into three opponents on K-7-2 has a king far more often than their preflop range does. Before 2026-11-12
+such a street narrowed nothing and the next one started again from the preflop ranges.
 
 Checks against theory (`tests/gto/postflop.test.mjs`):
 - **River, polarized range against a bluff-catcher:** solved to under 1% of the pot from equilibrium (0.15% in
@@ -312,22 +350,104 @@ sheet: player types with their usual numbers, a line on how to adjust, and a ski
 are against that player, and every label says so (the report's "Graded against your reads" box, "Best" for "GTO");
 the leak report ignores reads and always compares you with GTO.
 
-- **Preflop:** the seat plays the charts bent toward its tendency (`players/models.js`): it plays more or fewer
-  hands by its width (strongest first), and more calls or more raises by its raise ratio, mixed with the chart
-  by its skill. That shapes the range it brings to the flop.
-- **Postflop:** at each of its decisions the seat plays its tendency's policy (`players/policy.js`) mixed with
-  its own CFR strategy: `(1 - weight) x CFR + weight x policy`, with weight = 1 - skill. The policy works from
-  each hand's effective strength on the board (made hand plus draws):
-  - facing a bet it continues with the share of its range minimum defence asks for, divided by its fold
-    multiplier (a nit folds about 20% more than correct, a calling station about half as often), raises the
-    top of its range by aggression, and bluff-raises now and then;
-  - checked to, it bets the top of its range (wider when aggressive) and bluffs weak hands (less with big
-    sizes for recreational players); aggressive players pick bigger sizes;
-  - noise blurs every threshold and adds random play (a drunk is mostly noise).
-- **Everyone else** keeps solving with CFR, so their strategy becomes the best answer to that mix: against a
-  calling station the bluffs disappear and thin value bets appear; against a nit the bluffs go up
-  (`tests/gto/models.test.mjs`). This is node-locking with a soft lock (a restricted Nash response), so a
-  wrong read costs less than a full exploit would.
+A model is part tendency, part GTO. The tendency's share (its **weight**) is `1 - skill^2`: 97% for a
+beginner, 95% for a recreational player, three quarters for a regular, 44% for a strong regular, 10% for a
+pro.
+
+- **Preflop** (`players/models.js`): the seat plays the charts bent toward its tendency, mixed with the chart
+  by its weight. That shapes the range it brings to the flop.
+  - *How many hands:* strongest first. A tighter player plays that share of the chart's hands. A looser one
+    folds that much less of what the chart folds, and at least the chart's hands plus the extra ones they
+    play overall (their VPIP above an average player's): the chart calls a raise cold with 6% of hands, a
+    loose-passive player with about a quarter.
+  - *Opening:* the share raised moves toward the profile's raise ratio.
+  - *Facing a raise:* the top share of all hands re-raises (2% for a calling station, 4% for a recreational
+    player, 7% for a TAG, 14% for a maniac; less than half of that again against a 3-bet) and the rest of the
+    hands played call. So a passive player's flatting range holds the hands a solver 3-bets (AQ, AT in the
+    blinds) and, now and then, the big pairs.
+  - *Limping:* a limper with a read limps as wide as their model plays the seat the limp range comes from.
+- **Postflop** (`players/policy.js`): a policy for every hand at every decision, from what the hand is on the
+  board: its made strength among all the hands possible there (so "the top 3%" is sets on a dry board and
+  the big flushes on a four-flush one) and its draws.
+  - *Calling:* by price. The strength a call needs rises with the equity the bet asks for, so the same player
+    calls a third of the pot with any pair and folds top pair to four pots. A sticky player's bar is lower, a
+    nit's higher; it's higher against a raise, or a bet from the player who raised the street before. Strong
+    draws call.
+  - *Raising for value:* only near the top of what's possible: about the top 7% on the flop, 5% on the turn
+    and 3% on the river against a small bet, less against a big bet or with a big raise, more for an
+    aggressive player. So a turn or river raise is two pair or better, and a check-raise all in over a
+    pot-sized river bet is the nuts. Passive players slowplay those hands a third of the time or more, so
+    their calling range keeps its monsters.
+  - *Other raises* come as a share of the value raises: a few bluffs per hundred value raises for a
+    recreational player on the river, about one for every two for a maniac; raises with a draw mostly on the
+    flop, and mostly by players who play draws fast.
+  - *Betting:* for value when the hand is strong enough for the size (bigger bets need stronger hands, and
+    unskilled players size by strength: the nuts go big, a thin value bet small). Weak hands bluff at the
+    player's rate, small when they're shy of big bluffs. A lead into the last street's aggressor needs a much
+    stronger hand; a continuation bet is looser.
+  - Noise blurs the thresholds. Only wild players (drunk, tilted) also act at random.
+- **In a solve** (`postflop/solver.js`): the street is first solved with everyone playing GTO (60% of the
+  budget). Then every modelled player is fixed, at each of their decisions, to a blend of that GTO strategy
+  and the policy: per hand, `(GTO + 0.02)^(1 - weight) x policy^weight`, scaled to add up to 1. On that scale a
+  play needs both to allow it: what the policy all but rules out (a bluff raise on the river) stays out however
+  often GTO makes it, and the 0.02 keeps GTO from ruling out what the policy does (a slowplay).
+- **Everyone else** keeps solving against that fixed player, so their strategy becomes the best answer to
+  them: against a calling station the bluffs disappear and thin value bets appear, against a nit the bluffs go
+  up, and top pair folds to a recreational player's river raise (`tests/gto/models.test.mjs`).
+
+The modelled player doesn't answer back. Until 2026-11-12 their GTO share was its own CFR strategy inside the
+same solve (a restricted Nash response), and a model was `skill x that + (1 - skill) x policy`. It was safer
+against a wrong read, but it hid the read: a player who "never bluff-raises" got the missing bluffs back from
+their adaptive share until calling was right again, so the coach never folded to them. Three more things
+drowned the read: a recreational player was still 22% GTO, 15% of every decision was random (so 5% of all
+hands jammed any river), and the value threshold was so blurry that a river raise was mostly one pair. Their
+river and turn raises came out 80% to 100% hands that a strong bluff-catcher beats. The answer is now a full
+exploit of the read, so it's only as good as the read: that's what "Graded against your reads" means.
+
+The policy's numbers are hand-written from how live low-stakes players are known to play (they call too much
+before the river, don't fold top pair to a normal bet, rarely bluff big, and raise the turn and river with
+the top of their range), not fitted to a database of hands. The hands below are the one outside check.
+
+## Checked against a live coach's hands (`tests/fixtures/hungry-horse/`)
+
+30 spots from the Hungry Horse Poker channel (live $1/$2 to $20/$40, mostly $5/$5), with the play the video
+recommends at each of 37 key decisions and the reads it gives the villains. `scripts/youtube/compareSpots.mjs`
+runs the coach on each spot twice, everyone GTO and with those reads, and compares. The coach **agrees** when
+it makes the video's play at least half the time, is **mixed** from 15%, **close** when it prefers another play
+but values the video's within 1% of the pot, and **disagrees** otherwise. Solves are steady, so the table is
+the same on every run.
+
+| | Agree | Mixed | Close | Disagree | Not graded | The video's play costs (average) |
+|---|---|---|---|---|---|---|
+| Everyone GTO, before 2026-11-12 | 9 | 3 | 1 | 23 | 1 | 14.1% of the pot |
+| Everyone GTO, now | 6 | 1 | 6 | 23 | 1 | 10.8% |
+| With the video's reads, before | 9 | 1 | 1 | 22 | 1 | 26.7% |
+| With the video's reads, now | 19 | 0 | 1 | 13 | 1 | 4.9% |
+
+(Three decisions have no reads to apply; one, a flop with four players, isn't graded.)
+
+- **With reads** the coach now makes the video's play in 19 of 33 decisions, from 9: it folds an overpair to a
+  recreational player's turn raise in a 3-bet pot, bottom set to a big river lead when the flush comes in, top
+  pair to a river raise at 5.6 to 1 and to a rec's triple barrel, and it bets big for value against players
+  who don't fold top pair. Before, the reads made things worse than no read (26.7% against 14.1%): the old
+  models read every raise as weak.
+- **Everyone GTO** it disagrees as often as before, as it should: most of these plays are exploits (folding
+  the second nut flush because a recreational player's river check-raise is never a bluff), and a GTO
+  opponent does bluff there. What changed is what the coach thinks of them. It no longer gives the second nut
+  flush 100% equity against a check-raise (it had ruled the nut flush out of the raiser's range; it's now a
+  close call, 20% equity where 22% is needed), or raises a river lead all in with bottom set. The verdicts
+  that moved are plays within a big blind or two of each other.
+- **Still disagreeing with reads** (13):
+  - six big folds of very strong hands (the nut flush on a double-paired board, a rivered set, the second nut
+    flush, a low straight). The coach now puts the raiser on the hands the video does, but still finds enough
+    worse ones to call at the price: against the second nut flush, a recreational player's river check-raise
+    is the nut flush about half the time by the model, and the video folds to it always;
+  - three value sizings (it bets 75% of the pot where the video goes small with thin value, or overbets, and
+    bets half the pot where the video jams kings in a 4-bet pot);
+  - three bluffs: two where the video expects top pair to fold to a big river raise, or to a jam after a turn
+    check-raise, and the model's players call; and one size (2 pots against a calling station where the video
+    goes 4);
+  - one bluff-catch: third pair against a half-pot river bet, a fold by 0.6 bb.
 
 ## Checked against TexasSolver (`scripts/gto-reference/`)
 
@@ -363,7 +483,17 @@ following the engine gives up against TexasSolver's best play.
 - Multiway postflop solves bet on one street and check the rest down, and side pots in multiway all-ins aren't
   modeled.
 - Values postflop are estimates within the simplified game (a few sizes, sampled runouts): about 0.3% of the
-  pot per flop decision against TexasSolver (below). Turn and river decisions haven't been checked yet.
+  pot per flop decision against TexasSolver (above; measured before 2026-11-12 and not rerun since, because
+  TexasSolver isn't built on this machine. The changes of that day were checked with exact best responses
+  inside the engine's own game instead). Turn and river decisions haven't been checked yet.
+- Player models:
+  - A read is a tendency and a level, not this player. The answer is a full exploit of the model, so a wrong
+    read costs more than it did while the model answered back.
+  - The policy doesn't remember earlier streets beyond who bet last and whether they raised: a line like
+    "check-raised the turn, jams the river" gets more credit only through that.
+  - With several players modelled (Practice gives every opponent the same read), each is fixed to their own
+    blend; they don't adjust to one another.
+  - Its numbers are hand-written, and 30 spots from one coach are the only outside check.
 
 ## Regenerating
 

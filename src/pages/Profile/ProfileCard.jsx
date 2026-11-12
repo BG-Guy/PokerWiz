@@ -12,11 +12,19 @@ function initialsOf(name) {
   return (words.length === 1 ? words[0].slice(0, 2) : words[0][0] + words.at(-1)[0]).toUpperCase();
 }
 
-export default function ProfileCard({ settings, sessions, onEdit }) {
+// scope: moneyScope(your sessions), so the result is in the unit they add up in. onOpen(kind) opens the story
+// behind one of the three numbers ('sessions' | 'hours' | 'net'); cardRef(kind) marks where it grows from.
+export default function ProfileCard({ settings, scope, onEdit, onOpen, cardRef }) {
+  const { sessions } = scope;
   const name = settings.name || settings.nickname;
   const initials = initialsOf(name);
   const net = sessions.reduce((sum, s) => sum + sessionProfit(s), 0);
   const hours = sessions.reduce((sum, s) => sum + s.durationMin, 0) / 60;
+  const record = [
+    { id: 'sessions', label: 'Sessions', value: sessions.length.toLocaleString('en-US') },
+    { id: 'hours', label: 'Hours', value: Math.round(hours).toLocaleString('en-US') },
+    { id: 'net', label: 'Result', value: <Money amount={scope.inBB ? net : Math.round(net)} bb={scope.bb} /> },
+  ];
   const subline = [settings.name && settings.nickname ? `"${settings.nickname}"` : null, settings.homeCasino].filter(Boolean).join(' · ');
 
   return (
@@ -34,24 +42,18 @@ export default function ProfileCard({ settings, sessions, onEdit }) {
         </button>
       </div>
 
-      {/* Your record so far, in three numbers (the full story lives in History and Insights) */}
+      {/* Your record so far, in three numbers: tap one for its story */}
       {sessions.length > 0 && (
-        <dl className="profile-card-record">
-          <div>
-            <dt>Sessions</dt>
-            <dd className="num">{sessions.length.toLocaleString('en-US')}</dd>
-          </div>
-          <div>
-            <dt>Hours</dt>
-            <dd className="num">{Math.round(hours).toLocaleString('en-US')}</dd>
-          </div>
-          <div>
-            <dt>Result</dt>
-            <dd>
-              <Money amount={net} />
-            </dd>
-          </div>
-        </dl>
+        <div className="profile-card-record">
+          {record.map((stat) => (
+            <button key={stat.id} type="button" className="profile-card-stat" onClick={() => onOpen(stat.id)} ref={cardRef(stat.id)} aria-haspopup="dialog">
+              <span className="profile-card-stat-label">
+                {stat.label} <Icon name="chevronRight" size={12} />
+              </span>
+              <span className="profile-card-stat-value num">{stat.value}</span>
+            </button>
+          ))}
+        </div>
       )}
     </section>
   );

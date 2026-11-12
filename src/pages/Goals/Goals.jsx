@@ -1,31 +1,28 @@
 // Goals page: an insight summary across all goals, then one card per goal with pace and trend.
 // "New goal" and each card's edit button open the goal sheet (add, change or delete a goal).
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getGoals } from '../../api/goals.js';
 import { useApi } from '../../hooks/useApi.js';
 import { useClosingValue } from '../../hooks/useClosingValue.js';
 import { todayIso } from '../../utils/format.js';
 import { analyzeGoal, findFocusGoal } from '../../utils/goalInsights.js';
+import { CATEGORY_ACTIONS, goalsOverview } from '../../utils/goalDetails.js';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import Icon from '../../components/Icon/Icon.jsx';
+import DetailSheet from '../../components/DetailSheet/DetailSheet.jsx';
+import StatDetail from '../../components/StatDetail/StatDetail.jsx';
 import GoalCard from './GoalCard.jsx';
 import GoalSheet from './GoalSheet.jsx';
 import './Goals.css';
-
-// Where to go to work on each kind of goal.
-const CATEGORY_ACTIONS = {
-  Study: { to: '/hands', label: 'Open Hand Review' },
-  Discipline: { to: '/insights', label: 'See your stats' },
-  Volume: { to: '/history', label: 'See sessions' },
-  Results: { to: '/history', label: 'See sessions' },
-};
 
 export default function Goals() {
   const { data: goals, error, reload, setData } = useApi(getGoals);
   const [sheet, setSheet] = useState(null); // 'new', the goal being edited, or null
   const [goalSheet, goalSheetOpen] = useClosingValue(sheet); // stays up while it slides closed
+  const [overview, setOverview] = useState(false); // the score's sheet: every goal at a glance
+  const scoreRef = useRef(null);
   if (!goals) return <LoadState error={error} onRetry={reload} />;
 
   // Keep the list in step with the sheet: add or replace the saved goal, or drop a deleted one.
@@ -61,13 +58,16 @@ export default function Goals() {
       {/* Summary insights across all goals */}
       {analyzed.length > 0 && (
         <section className="goals-summary">
-          <div className="goals-summary-score">
+          {/* The score: tap it for every goal at a glance */}
+          <button type="button" className="goals-summary-score" onClick={() => setOverview(true)} ref={scoreRef} aria-haspopup="dialog">
             <span className="goals-summary-number num">
               {onTrackCount}
               <span className="goals-summary-total">/{analyzed.length}</span>
             </span>
-            <span className="goals-summary-caption">goals on track</span>
-          </div>
+            <span className="goals-summary-caption">
+              goals on track <Icon name="chevronRight" size={14} />
+            </span>
+          </button>
 
           {focus && (
             <div className="goals-summary-focus">
@@ -95,6 +95,10 @@ export default function Goals() {
           <GoalCard key={goal.id} goal={goal} analysis={analysis} onEdit={() => setSheet(goal)} />
         ))}
       </div>
+
+      <DetailSheet open={overview} onClose={() => setOverview(false)} title="Goals on track" originRef={scoreRef}>
+        {analyzed.length > 0 && <StatDetail detail={goalsOverview(analyzed)} />}
+      </DetailSheet>
 
       {goalSheet && (
         <GoalSheet

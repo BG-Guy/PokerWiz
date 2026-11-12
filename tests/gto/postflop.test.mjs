@@ -3,7 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { useDiskCharts, playHand } from './helpers.mjs';
-import { solvePostflop } from '../../src/gto/postflop/solver.js';
+import { solvePostflop, TREMBLE } from '../../src/gto/postflop/solver.js';
 import { cardId, handIndex, expandClasses } from '../../src/gto/cards.js';
 import { analyzeHand } from '../../src/coach/analyzeHand.js';
 import { generateSpot, heroAct, dealStreet } from '../../src/practice/generateSpot.js';
@@ -12,6 +12,7 @@ import { createGtoHand } from '../../src/gto/hand.js';
 import { createHand, applyAction, currentPlayer } from '../../src/utils/handEngine.js';
 import { TABLE_POSITIONS } from '../../src/constants/poker.js';
 import { createRandom } from '../../src/coach/random.js';
+import { defaultProfile, applyPreset, applyLevel } from '../../src/coach/profiles.js';
 
 useDiskCharts();
 const hand = (a, b) => handIndex(cardId(a), cardId(b));
@@ -60,6 +61,43 @@ test('river: value bets, bluffs and bluff-catching follow the theory', () => {
     const calls = share(sol, response, response.actions.findIndex((x) => x.type === 'call'));
     assert.ok(calls > 0.1 && calls < 0.95, `king-queen calls a ${action.type} to ${action.to}: ${calls}`);
   }
+});
+
+test('on the real line, a hand takes an action it never plays less the more that action would cost it', () => {
+  // The same spot, and the out-of-position player really checks. The set never checks (it would give up a value
+  // bet worth a good part of the pot), so next to none of it is counted as checking; the air checks anyway.
+  const board = ['Kh', '7d', '2c', '9s', '4h'].map(cardId);
+  const sol = solvePostflop({ board, ranges: [rangeOf([['7', '7'], ['6', '5']]), rangeOf([['K', 'Q']])], pot: 10, stacks: [20, 20], path: [{ player: 0, type: 'check' }], iterations: 600, ms: 30000 });
+  const root = sol.pathNodes[0];
+  const n = sol.lists[0].count;
+  const strategy = sol.strategy(root);
+  const taken = sol.taken(root, root.realIndex);
+  // What a hand is counted as checking beyond its own strategy.
+  const extra = (h) => taken[sol.handPosition(0, h)] - strategy[root.realIndex * n + sol.handPosition(0, h)];
+  assert.ok(extra(hand('7c', '7h')) < TREMBLE / 10, `the set: ${extra(hand('7c', '7h'))}`);
+  assert.ok(extra(hand('6c', '5h')) > TREMBLE / 2, `the air: ${extra(hand('6c', '5h'))}`);
+});
+
+test('a real bet close to a standard size takes its place in the tree, one further off stands next to them', () => {
+  const board = ['Kh', '7d', '2c', '9s', '4h'].map(cardId);
+  const ranges = [rangeOf([['7', '7'], ['6', '5']]), rangeOf([['K', 'Q']])];
+  const bets = (to) => {
+    const sol = solvePostflop({ board, ranges, pot: 10, stacks: [50, 50], path: [{ player: 0, type: 'bet', to }], iterations: 5, ms: 1e9 });
+    return sol.tree.root.actions.filter((a) => a.type === 'bet').map((a) => a.to);
+  };
+  assert.deepEqual(bets(7.5), [3.3, 7.5], 'the standard sizes: a third and three quarters of the pot');
+  assert.deepEqual(bets(7.1), [3.3, 7.1], '7.1 replaces 7.5');
+  assert.deepEqual(bets(5), [3.3, 7.5, 5], '5 is its own size');
+});
+
+test('a steady review gives the same answer every time', async () => {
+  const { record } = playHand({
+    hero: { position: 'BTN', cards: ['Ah', 'Kh'] },
+    board: ['Ks', '7d', '2c', '4h', '9s'],
+    actions: [['UTG', 'fold'], ['UTG+1', 'fold'], ['LJ', 'fold'], ['HJ', 'fold'], ['CO', 'fold'], ['BTN', 'raise', 2.5], ['SB', 'fold'], ['BB', 'call'], ['BB', 'check'], ['BTN', 'bet', 1.8], ['BB', 'fold']],
+  });
+  const review = async () => (await analyzeHand(record, { detail: 'fast', steady: true })).decisions.map((d) => d.options.map((o) => [o.label, o.frequency, o.ev]));
+  assert.deepEqual(await review(), await review());
 });
 
 test('river, 3-way: strategies are proper mixes and the nuts never folds', () => {
@@ -167,6 +205,20 @@ test('practice opponents play GTO: premiums re-raise a single raise', async () =
   assert.ok(counts.facing >= 30, `enough cases: ${counts.facing}`);
   assert.equal(counts.folded, 0, 'premiums never fold to a single raise');
   assert.ok(counts.reraised / counts.facing >= 0.85, `${counts.reraised}/${counts.facing} premiums re-raised`);
+});
+
+test('a heads-up practice hand plays to the end against an opponent with a read', async () => {
+  // The opponent is a loose-passive recreational player: their model plays every street (the preflop charts
+  // bent their way, then a solve per street that fixes them to their tendency).
+  const random = createRandom(23);
+  const profile = applyLevel(applyPreset(defaultProfile(), 'fish'), 'rec');
+  let spot = await generateSpot({ game: 'cash', format: 'hu', villains: [{ stackBB: 100, profile }], hero: { stackBB: 100 } }, random);
+  assert.ok(spot, 'a heads-up spot is dealt');
+  for (let guard = 0; guard < 20 && spot.status !== 'done'; guard++) {
+    if (spot.status === 'board') spot = dealStreet(spot, null, random);
+    else spot = heroAct(spot, { type: spot.state.currentBet > 0 ? 'call' : 'check' }, random);
+  }
+  assert.equal(spot.status, 'done');
 });
 
 test('a heads-up practice hand plays to the end against GTO opponents', async () => {

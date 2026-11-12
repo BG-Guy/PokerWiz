@@ -4,6 +4,7 @@
 // with reduced motion it simply appears and disappears.
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useDialogLayer } from '../../hooks/useDialogLayer.js';
 import Icon from '../Icon/Icon.jsx';
 import './ExpandPanel.css';
 
@@ -27,8 +28,6 @@ export default function ExpandPanel({ open, onClose, title, originRef, children 
   const panelRef = useRef(null);
   const backdropRef = useRef(null);
   const contentRef = useRef(null);
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
 
   // Opening: grow from the card, fade the content in once the panel has mostly taken shape.
   useLayoutEffect(() => {
@@ -73,18 +72,9 @@ export default function ExpandPanel({ open, onClose, title, originRef, children 
     };
   }, [closing, originRef]);
 
-  // While open: Escape closes, and the page behind stops scrolling.
-  useEffect(() => {
-    if (!open) return undefined;
-    const onKey = (event) => event.key === 'Escape' && onCloseRef.current();
-    const previousOverflow = document.body.style.overflow;
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [open]);
+  // While open: Escape closes it (only when nothing is open over it, like a chart gone full screen), and the
+  // page behind stops scrolling.
+  useDialogLayer(open, onClose);
 
   if (!shown) return null;
 

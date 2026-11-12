@@ -9,7 +9,9 @@ import { useDetailView } from '../../hooks/useDetailView.js';
 import { cashGames, summarize } from '../../utils/stats.js';
 import { bankrollInsights } from '../../utils/sessionInsights.js';
 import { statDetail, longMonth, shortMonth } from '../../utils/insightDetails.js';
-import { amountFormatters, formatDate, sessionsForDisplay, todayIso } from '../../utils/format.js';
+import { formatDate, moneyScope, plural, todayIso } from '../../utils/format.js';
+import { useUnit } from '../../theme/UnitContext.jsx';
+import UnitNote from '../../components/UnitNote/UnitNote.jsx';
 import PageHeader from '../../components/PageHeader/PageHeader.jsx';
 import LoadState from '../../components/LoadState/LoadState.jsx';
 import Panel from '../../components/Panel/Panel.jsx';
@@ -25,20 +27,24 @@ const hoursText = (h) => `${Math.round(h).toLocaleString('en-US')}h`;
 export default function Insights() {
   const { data, error, reload } = useApi(getSessions);
   const detail = useDetailView();
-  // Cash games in the BB/$ unit, and everything the cards say about them (one pass, includes the simulation).
-  const sessions = useMemo(() => data && sessionsForDisplay(cashGames(data)), [data]);
-  const insights = useMemo(() => sessions?.length && bankrollInsights(sessions), [sessions]);
-  const shownDetail = useMemo(() => detail.shownKey && sessions && statDetail(detail.shownKey, sessions), [detail.shownKey, sessions]);
+  const { unit } = useUnit();
+  // Cash games in the unit their totals can be shown in (big blinds only when they share one), and everything
+  // the cards say about them (one pass, includes the simulation).
+  const scope = useMemo(() => data && moneyScope(cashGames(data)), [data, unit]);
+  const sessions = scope?.sessions;
+  const insights = useMemo(() => scope?.sessions.length && bankrollInsights(scope.sessions, scope.money), [scope]);
+  const shownDetail = useMemo(() => detail.shownKey && scope && statDetail(detail.shownKey, scope), [detail.shownKey, scope]);
 
   if (!sessions) return <LoadState error={error} onRetry={reload} />;
   if (sessions.length === 0) return <LoadState error={new Error('Finish a cash session to unlock insights.')} />;
 
-  const money = amountFormatters();
+  const { money } = scope;
   const cards = insightCards(insights, sessions, money);
 
   return (
     <div className="insights">
       <PageHeader title="Insights" subtitle="What your bankroll is telling you. Tap a card for the full story." />
+      <UnitNote scope={scope} className="insights-unit-note" />
 
       {/* The five insights and a line of encouragement */}
       <div className="insights-grid">
@@ -81,7 +87,7 @@ function insightCards({ downswing, months, played, normal }, sessions, money) {
         ? {
             value: money.full(-downswing.below),
             tone: 'negative',
-            sentence: `Below your peak${downswing.peakDate ? ` of ${formatDate(downswing.peakDate)}` : ''}, ${downswing.sessions} sessions and ${hoursText(downswing.hours)} in.${
+            sentence: `Below your peak${downswing.peakDate ? ` of ${formatDate(downswing.peakDate)}` : ''}, ${plural(downswing.sessions, 'session')} and ${hoursText(downswing.hours)} in.${
               downswing.worst > downswing.below ? ` At its deepest: ${money.full(-downswing.worst)}.` : ''
             }`,
           }

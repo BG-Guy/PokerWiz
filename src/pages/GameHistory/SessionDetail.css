@@ -1,5 +1,5 @@
-/* One session: numbers in a row of tiles, then the grade (and notes) beside the timeline on wide screens,
-   stacked on phones. */
+/* One session: numbers in a row of tiles (each a button that opens its story), then the grade (and notes) beside
+   the timeline on wide screens, stacked on phones. */
 
 .session-detail-stats {
   display: grid;
@@ -7,21 +7,42 @@
   gap: 10px;
   margin-bottom: 18px;
 }
-.session-detail-stats div {
+/* One number: a button that opens its story */
+.session-detail-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 64px;
   padding: 12px 14px;
   border-radius: var(--radius-sm);
   background: var(--surface);
   border: 1px solid var(--border);
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: border-color 0.15s ease, transform 0.15s ease;
 }
-.session-detail-stats dt {
+.session-detail-stat:hover {
+  border-color: var(--text-faint);
+}
+.session-detail-stat:active {
+  transform: scale(0.98);
+}
+.session-detail-stat-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-muted);
 }
-.session-detail-stats dd {
-  margin-top: 4px;
+.session-detail-stat-label svg {
+  color: var(--text-faint);
+}
+.session-detail-stat-value {
   font-size: 18px;
   font-weight: 700;
 }

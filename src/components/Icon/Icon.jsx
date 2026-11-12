@@ -16,6 +16,7 @@ const ICONS = {
     </>
   ),
   chart: <path d="M4 20V11M10 20V5M16 20v-6M21 20H3" />,
+  filter: <path d="M4 6h16M7 12h10M10 18h4" />,
   target: (
     <>
       <circle cx="12" cy="12" r="9" />

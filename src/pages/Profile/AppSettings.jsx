@@ -25,7 +25,8 @@ export default function AppSettings({ buyInDepth, onDepth, order }) {
       <SettingsRow icon={theme === 'dark' ? 'moon' : 'sun'} label="Appearance">
         <SettingsSegments label="Appearance" options={THEMES} value={theme} onChange={(next) => next !== theme && toggleTheme()} />
       </SettingsRow>
-      <SettingsRow icon="calculator" label="Show amounts in" detail={unit === 'bb' ? 'Big blinds' : 'Dollars'}>
+      {/* Big blinds only add up when they're the same size: totals across different blinds stay in dollars */}
+      <SettingsRow icon="calculator" label="Show amounts in" detail={unit === 'bb' ? 'Big blinds; totals across different blinds stay in dollars' : 'Dollars'}>
         <SettingsSegments label="Show amounts in" options={UNITS} value={unit} onChange={setUnit} />
       </SettingsRow>
       <SettingsRow icon="play" label="Starting buy-in" detail="Big blinds, new sessions">

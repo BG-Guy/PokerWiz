@@ -107,18 +107,37 @@
   color: var(--accent);
   letter-spacing: 0.02em;
 }
+/* The four numbers: each a button that opens its story */
 .live-view-numbers {
   display: flex;
-  gap: 28px;
-  margin: 8px 0 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin: 8px -8px 0;
 }
-.live-view-numbers dt {
+.live-view-number {
+  display: flex;
+  flex-direction: column;
+  min-height: 52px;
+  padding: 6px 9px;
+  border-radius: 12px;
+  text-align: left;
+  white-space: nowrap;
+  font: inherit;
+  color: inherit;
+  transition: background-color 0.15s ease;
+}
+.live-view-number:hover,
+.live-view-number:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+.live-view-number-label {
   font-size: 12px;
   font-weight: 700;
   opacity: 0.75;
+  white-space: nowrap;
 }
-.live-view-numbers dd {
-  margin: 0;
+.live-view-number-value {
   font-size: 20px;
   font-weight: 600;
 }

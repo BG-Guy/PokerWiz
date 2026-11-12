@@ -1,0 +1,5430 @@
+{
+ "kind": "pokerwiz-youtube-comparison",
+ "version": 2,
+ "generatedAt": "2026-11-12T14:05:19.160Z",
+ "appVersion": "0.8.0",
+ "commit": "284ac70",
+ "detail": "full",
+ "steady": true,
+ "thresholds": {
+  "agree": 0.5,
+  "mixed": 0.15,
+  "close": 0.01
+ },
+ "totals": {
+  "gto": {
+   "agree": 6,
+   "mixed": 1,
+   "close": 6,
+   "disagree": 23,
+   "not offered": 0,
+   "not graded": 1,
+   "averageLossPot": 0.1076
+  },
+  "reads": {
+   "agree": 19,
+   "mixed": 0,
+   "close": 1,
+   "disagree": 13,
+   "not offered": 0,
+   "not graded": 1,
+   "averageLossPot": 0.0487
+  }
+ },
+ "results": [
+  {
+   "id": "hh-01",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "fold",
+      "why": "On a double-paired board the jam is a full house far too often; people don't bluff here."
+     },
+     "heroDid": "fold",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 106 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 33.54,
+      "youtubeEvLossPot": 0.0757,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Fold",
+       "score": 27,
+       "grade": "Blunder"
+      },
+      "equity": 0.304,
+      "potBB": 337,
+      "toCallBB": 106,
+      "villains": [
+       {
+        "position": "SB",
+        "read": "GTO",
+        "width": 0.02,
+        "top": [
+         "22",
+         "87s",
+         "55",
+         "KTs",
+         "A5s",
+         "T9s",
+         "T8s",
+         "76s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 106 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 33.54,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Call 106 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 34.42,
+      "youtubeEvLossPot": 0.0777,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Fold",
+       "score": 26,
+       "grade": "Blunder"
+      },
+      "equity": 0.304,
+      "potBB": 337,
+      "toCallBB": 106,
+      "villains": [
+       {
+        "position": "SB",
+        "read": "LAG · Reg",
+        "width": 0.08,
+        "top": [
+         "22",
+         "T8s",
+         "T9s",
+         "KTo",
+         "QTs",
+         "JTo",
+         "QTo",
+         "JTs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 106 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 34.42,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-02",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "fold",
+      "why": "A check-jam over a pot-size bet on A-K-Q is massively under-bluffed; a bluffer would just bet."
+     },
+     "heroDid": "fold",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 158 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 226.94,
+      "youtubeEvLossPot": 0.5562,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Fold",
+       "score": 0,
+       "grade": "Blunder"
+      },
+      "equity": 0.935,
+      "potBB": 250,
+      "toCallBB": 158,
+      "villains": [
+       {
+        "position": "UTG",
+        "read": "GTO",
+        "width": 0.02,
+        "top": [
+         "66",
+         "33",
+         "Q9s",
+         "Q8s",
+         "A7o",
+         "QTo",
+         "A2s",
+         "A6o"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 158 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 226.94,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Call 158 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 23.29,
+      "youtubeEvLossPot": 0.0571,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Fold",
+       "score": 40,
+       "grade": "Mistake"
+      },
+      "equity": 0.439,
+      "potBB": 250,
+      "toCallBB": 158,
+      "villains": [
+       {
+        "position": "UTG",
+        "read": "Loose passive · Rec",
+        "width": 0.01,
+        "top": [
+         "JTs",
+         "JTo"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 158 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 23.29,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-03",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "fold",
+      "why": "Check-call, check-call, then a big lead is under-bluffed, and he has no missed draws to bluff with."
+     },
+     "heroDid": "fold",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 35 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 42.32,
+      "youtubeEvLossPot": 0.3556,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Fold",
+       "score": 5,
+       "grade": "Blunder"
+      },
+      "equity": 0.641,
+      "potBB": 84,
+      "toCallBB": 35,
+      "villains": [
+       {
+        "position": "SB",
+        "read": "GTO",
+        "width": 0.02,
+        "top": [
+         "AQs",
+         "AJo",
+         "AJs",
+         "55",
+         "QJs",
+         "88",
+         "KJs",
+         "99"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 35 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0.994,
+        "evBB": 42.32,
+        "youtube": false
+       },
+       {
+        "label": "All in 76 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0.006,
+        "evBB": 36.72,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Fold",
+       "kind": "fold"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Fold",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.106,
+      "potBB": 84,
+      "toCallBB": 35,
+      "villains": [
+       {
+        "position": "SB",
+        "read": "Recreational",
+        "width": 0.02,
+        "top": [
+         "KTs",
+         "ATs",
+         "KQs",
+         "A7s",
+         "A8s",
+         "A9s",
+         "A5s",
+         "AQs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 35 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -21.57,
+        "youtube": false
+       },
+       {
+        "label": "All in 76 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -55.86,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-04",
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "fold",
+      "why": "After a check-raise and a turn barrel, the jam is never a bluff: AT always, KQ sometimes."
+     },
+     "heroDid": "call",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 47.5 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 111.27,
+      "youtubeEvLossPot": 0.5765,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Call 47.5 bb",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.85,
+      "potBB": 145.5,
+      "toCallBB": 47.5,
+      "villains": [
+       {
+        "position": "BB",
+        "read": "GTO",
+        "width": 0.03,
+        "top": [
+         "KTo",
+         "QTo",
+         "T9o",
+         "T5s",
+         "T3s",
+         "QJo",
+         "T4s",
+         "T2s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 47.5 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 111.27,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Call 47.5 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 9.06,
+      "youtubeEvLossPot": 0.0469,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Call 47.5 bb",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.28,
+      "potBB": 145.5,
+      "toCallBB": 47.5,
+      "villains": [
+       {
+        "position": "BB",
+        "read": "Recreational",
+        "width": 0.02,
+        "top": [
+         "ATs",
+         "ATo",
+         "T9o",
+         "T9s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 47.5 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 9.06,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-05",
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "fold",
+      "why": "Recreational players don't overbet as a bluff on this board; exploit fold."
+     },
+     "heroDid": "fold",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 28 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 10.74,
+      "youtubeEvLossPot": 0.131,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Fold",
+       "score": 38,
+       "grade": "Mistake"
+      },
+      "equity": 0.607,
+      "potBB": 54,
+      "toCallBB": 28,
+      "villains": [
+       {
+        "position": "CO",
+        "read": "GTO",
+        "width": 0.02,
+        "top": [
+         "KJs",
+         "AQs",
+         "JTs",
+         "33",
+         "44",
+         "QTs",
+         "88",
+         "KQs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 28 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 10.74,
+        "youtube": false
+       },
+       {
+        "label": "Raise to 84 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 9.43,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Call 28 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0.59,
+      "youtubeEvLossPot": 0.0072,
+      "verdict": "close",
+      "hero": {
+       "did": "Fold",
+       "score": 96,
+       "grade": "Good"
+      },
+      "equity": 0.309,
+      "potBB": 54,
+      "toCallBB": 28,
+      "villains": [
+       {
+        "position": "CO",
+        "read": "Loose passive · Rec",
+        "width": 0.04,
+        "top": [
+         "AQo",
+         "Q9s",
+         "AQs",
+         "KJo",
+         "KJs",
+         "JTs",
+         "AKo",
+         "KQs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 28 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 0.59,
+        "youtube": false
+       },
+       {
+        "label": "Raise to 84 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -21.27,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-06",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "fold",
+      "why": "Recs slowplay big flushes on monotone boards and don't check-raise all in with small ones or bluffs."
+     },
+     "heroDid": "fold",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Fold",
+       "kind": "fold"
+      },
+      "youtubeFrequency": 0.401,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "mixed",
+      "hero": {
+       "did": "Fold",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.202,
+      "potBB": 235,
+      "toCallBB": 65.5,
+      "villains": [
+       {
+        "position": "BB",
+        "read": "GTO",
+        "width": 0.01,
+        "top": [
+         "A8s",
+         "A6s",
+         "A7s",
+         "A9s",
+         "A5s",
+         "A3s",
+         "AJo",
+         "AJs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0.401,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 65.5 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0.599,
+        "evBB": -0.45,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Call 65.5 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 76.9,
+      "youtubeEvLossPot": 0.2559,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Fold",
+       "score": 3,
+       "grade": "Blunder"
+      },
+      "equity": 0.472,
+      "potBB": 235,
+      "toCallBB": 65.5,
+      "villains": [
+       {
+        "position": "BB",
+        "read": "Recreational",
+        "width": 0.07,
+        "top": [
+         "K7s",
+         "K9s",
+         "KJs",
+         "K8s",
+         "KQs",
+         "K6s",
+         "K5s",
+         "A3s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 65.5 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 76.9,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-07",
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "fold",
+      "why": "Smaller flushes don't check-raise a big turn bet, so this is only the nut or second-nut flush."
+     },
+     "heroDid": "fold",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "All in 165 bb",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 124.91,
+      "youtubeEvLossPot": 0.4731,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Fold",
+       "score": 0,
+       "grade": "Blunder"
+      },
+      "equity": 0.713,
+      "potBB": 192,
+      "toCallBB": 72,
+      "villains": [
+       {
+        "position": "BB",
+        "read": "GTO",
+        "width": 0.08,
+        "top": [
+         "76o",
+         "76s",
+         "Q7s",
+         "K7s",
+         "Q6s",
+         "Q3s",
+         "Q2s",
+         "97o"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 72 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 107.73,
+        "youtube": false
+       },
+       {
+        "label": "All in 165 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 124.91,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Call 72 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 49.95,
+      "youtubeEvLossPot": 0.1892,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Fold",
+       "score": 9,
+       "grade": "Blunder"
+      },
+      "equity": 0.451,
+      "potBB": 192,
+      "toCallBB": 72,
+      "villains": [
+       {
+        "position": "BB",
+        "read": "Recreational",
+        "width": 0.09,
+        "top": [
+         "76s",
+         "A9s",
+         "A7s",
+         "A6s",
+         "A3s",
+         "A2s",
+         "KQs",
+         "K9s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 72 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0.999,
+        "evBB": 49.95,
+        "youtube": false
+       },
+       {
+        "label": "All in 165 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0.001,
+        "evBB": 43.34,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-08",
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "fold",
+      "why": "Nobody bluff-raises the turn in a 3-bet pot after you bet every street; just fold every time."
+     },
+     "heroDid": "call",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 126 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 273.06,
+      "youtubeEvLossPot": 0.586,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Call 126 bb",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.907,
+      "potBB": 340,
+      "toCallBB": 126,
+      "villains": [
+       {
+        "position": "CO",
+        "read": "GTO",
+        "width": 0.03,
+        "top": [
+         "KJs",
+         "A5s",
+         "JTs",
+         "AJs",
+         "TT",
+         "KJo",
+         "QQ",
+         "AJo"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 126 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 273.06,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Fold",
+       "kind": "fold"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Call 126 bb",
+       "score": 31,
+       "grade": "Mistake"
+      },
+      "equity": 0.171,
+      "potBB": 340,
+      "toCallBB": 126,
+      "villains": [
+       {
+        "position": "CO",
+        "read": "Recreational",
+        "width": 0.01,
+        "top": [
+         "99",
+         "J9s",
+         "QTs",
+         "44",
+         "22"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 126 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -31.06,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-09",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "fold",
+      "why": "Turn and river raises at low stakes are almost never bluffs, even at a great price."
+     },
+     "heroDid": "fold",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 12.5 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 21.89,
+      "youtubeEvLossPot": 0.2645,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Fold",
+       "score": 14,
+       "grade": "Blunder"
+      },
+      "equity": 0.414,
+      "potBB": 70.3,
+      "toCallBB": 12.5,
+      "villains": [
+       {
+        "position": "BTN",
+        "read": "GTO",
+        "width": 0.01,
+        "top": [
+         "33",
+         "88",
+         "22"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 12.5 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 21.89,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Fold",
+       "kind": "fold"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Fold",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.039,
+      "potBB": 70.3,
+      "toCallBB": 12.5,
+      "villains": [
+       {
+        "position": "BTN",
+        "read": "Recreational",
+        "width": 0.01,
+        "top": [
+         "33",
+         "A9o",
+         "A9s",
+         "44"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 12.5 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -9.44,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-10",
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "fold",
+      "why": "He won't donk two pair or a set this way, and we gave no rope, so it's a ten almost every time."
+     },
+     "heroDid": "fold",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 60 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 24.88,
+      "youtubeEvLossPot": 0.143,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Fold",
+       "score": 24,
+       "grade": "Blunder"
+      },
+      "equity": 0.599,
+      "potBB": 114,
+      "toCallBB": 60,
+      "villains": [
+       {
+        "position": "UTG+1",
+        "read": "GTO",
+        "width": 0.01,
+        "top": [
+         "TT",
+         "JJ",
+         "AKo",
+         "QQ",
+         "66",
+         "AQs",
+         "55"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 60 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0.508,
+        "evBB": 24.88,
+        "youtube": false
+       },
+       {
+        "label": "All in 174 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0.492,
+        "evBB": 24.57,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Call 60 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0.001,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 4.18,
+      "youtubeEvLossPot": 0.024,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Fold",
+       "score": 79,
+       "grade": "Inaccuracy"
+      },
+      "equity": 0.341,
+      "potBB": 114,
+      "toCallBB": 60,
+      "villains": [
+       {
+        "position": "UTG+1",
+        "read": "Recreational",
+        "width": 0.02,
+        "top": [
+         "ATs",
+         "ATo",
+         "TT",
+         "AJs",
+         "AQs",
+         "66",
+         "KTs",
+         "KQs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0.001,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 60 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0.999,
+        "evBB": 4.18,
+        "youtube": false
+       },
+       {
+        "label": "All in 174 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -40.99,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-11",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "call",
+      "why": "He calls his own fold pretty bad: after the turn check-back his pair is a fine bluff catcher on a clean river."
+     },
+     "heroDid": "fold",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Raise to 37.5 bb",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 0.051,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0.03,
+      "youtubeEvLossPot": 0.0006,
+      "verdict": "close",
+      "hero": {
+       "did": "Fold",
+       "score": 4,
+       "grade": "Blunder"
+      },
+      "equity": 0.744,
+      "potBB": 36.5,
+      "toCallBB": 15,
+      "villains": [
+       {
+        "position": "UTG+1",
+        "read": "GTO",
+        "width": 0.04,
+        "top": [
+         "44",
+         "K7s",
+         "66",
+         "A5o",
+         "A7o",
+         "J9s",
+         "T9s",
+         "K6s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Call 15 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0.051,
+        "evBB": 24.09,
+        "youtube": true
+       },
+       {
+        "label": "Raise to 37.5 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0.949,
+        "evBB": 24.12,
+        "youtube": false
+       },
+       {
+        "label": "All in 90 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 18.72,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Call 15 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Fold",
+       "score": 39,
+       "grade": "Mistake"
+      },
+      "equity": 0.449,
+      "potBB": 36.5,
+      "toCallBB": 15,
+      "villains": [
+       {
+        "position": "UTG+1",
+        "read": "Recreational",
+        "width": 0.02,
+        "top": [
+         "A2s",
+         "A2o",
+         "A8o",
+         "A8s",
+         "K8s",
+         "K9s",
+         "Q8s",
+         "KQs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Call 15 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 7.39,
+        "youtube": true
+       },
+       {
+        "label": "Raise to 37.5 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -3.53,
+        "youtube": false
+       },
+       {
+        "label": "All in 90 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -1.69,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-12",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "call",
+      "why": "Recs reach the river too wide; half pot is their bluff size, value would bet bigger."
+     },
+     "heroDid": "call",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Fold",
+       "kind": "fold"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0.86,
+      "youtubeEvLossPot": 0.0422,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Call 5 bb",
+       "score": 79,
+       "grade": "Inaccuracy"
+      },
+      "equity": 0.192,
+      "potBB": 15.4,
+      "toCallBB": 5,
+      "villains": [
+       {
+        "position": "BB",
+        "read": "GTO",
+        "width": 0.06,
+        "top": [
+         "QJo",
+         "AQo",
+         "A9o",
+         "K9s",
+         "Q9s",
+         "AJo",
+         "A8s",
+         "KQs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Call 5 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -0.86,
+        "youtube": true
+       },
+       {
+        "label": "Raise to 12.5 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -0.36,
+        "youtube": false
+       },
+       {
+        "label": "All in 95 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -0.89,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Fold",
+       "kind": "fold"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0.62,
+      "youtubeEvLossPot": 0.0304,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Call 5 bb",
+       "score": 79,
+       "grade": "Inaccuracy"
+      },
+      "equity": 0.199,
+      "potBB": 15.4,
+      "toCallBB": 5,
+      "villains": [
+       {
+        "position": "BB",
+        "read": "Recreational",
+        "width": 0.06,
+        "top": [
+         "A2s",
+         "KQs",
+         "KQo",
+         "QTs",
+         "QJo",
+         "QJs",
+         "AQo",
+         "QTo"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Call 5 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -0.62,
+        "youtube": true
+       },
+       {
+        "label": "Raise to 12.5 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -5.79,
+        "youtube": false
+       },
+       {
+        "label": "All in 95 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -0.63,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-13",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "call",
+      "why": "The CO stabbed last to act, so his range is wide; small size, good price, we gave rope."
+     },
+     "heroDid": "call",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 25 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Call 25 bb",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.329,
+      "potBB": 102,
+      "toCallBB": 25,
+      "villains": [
+       {
+        "position": "CO",
+        "read": "GTO",
+        "width": 0.01,
+        "top": [
+         "KQo",
+         "JTs",
+         "J9s",
+         "T9s",
+         "99",
+         "98s",
+         "77",
+         "76s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Call 25 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 14.39,
+        "youtube": true
+       },
+       {
+        "label": "Raise to 63.5 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -7.87,
+        "youtube": false
+       },
+       {
+        "label": "All in 167 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 8.1,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Call 25 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Call 25 bb",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.424,
+      "potBB": 102,
+      "toCallBB": 25,
+      "villains": [
+       {
+        "position": "CO",
+        "read": "Recreational",
+        "width": 0.04,
+        "top": [
+         "QJs",
+         "88",
+         "KQo",
+         "QTs",
+         "KQs",
+         "AQo",
+         "A7s",
+         "99"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Call 25 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 26.79,
+        "youtube": true
+       },
+       {
+        "label": "Raise to 63.5 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 19.32,
+        "youtube": false
+       },
+       {
+        "label": "All in 167 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 17.29,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-14",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "fold",
+      "why": "When low-stakes players pick more than 60% pot on the river they just always have it."
+     },
+     "heroDid": "call",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 18.5 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 8.51,
+      "youtubeEvLossPot": 0.127,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Call 18.5 bb",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.389,
+      "potBB": 48.5,
+      "toCallBB": 18.5,
+      "villains": [
+       {
+        "position": "BB",
+        "read": "GTO",
+        "width": 0.06,
+        "top": [
+         "QTo",
+         "K6s",
+         "K7o",
+         "K6o",
+         "K5o",
+         "K5s",
+         "J5s",
+         "K8o"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 18.5 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 8.51,
+        "youtube": false
+       },
+       {
+        "label": "Raise to 46.3 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 7.17,
+        "youtube": false
+       },
+       {
+        "label": "All in 85 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 2.83,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Fold",
+       "kind": "fold"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Call 18.5 bb",
+       "score": 27,
+       "grade": "Blunder"
+      },
+      "equity": 0.091,
+      "potBB": 48.5,
+      "toCallBB": 18.5,
+      "villains": [
+       {
+        "position": "BB",
+        "read": "Recreational",
+        "width": 0.06,
+        "top": [
+         "K8o",
+         "K8s",
+         "J8o",
+         "85s",
+         "J8s",
+         "T8o",
+         "87o",
+         "87s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 18.5 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -12.43,
+        "youtube": false
+       },
+       {
+        "label": "Raise to 46.3 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -34.81,
+        "youtube": false
+       },
+       {
+        "label": "All in 85 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -42.51,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-15",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "fold",
+      "why": "A rec who 3-bets the small blind and fires three times is under-bluffed; calling the turn doesn't commit you."
+     },
+     "heroDid": "call",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 120 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 64.94,
+      "youtubeEvLossPot": 0.1619,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Call 120 bb",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.455,
+      "potBB": 281,
+      "toCallBB": 120,
+      "villains": [
+       {
+        "position": "SB",
+        "read": "GTO",
+        "width": 0.02,
+        "top": [
+         "AA",
+         "KK",
+         "AKo",
+         "AQo",
+         "AQs",
+         "AKs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 120 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 64.94,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Fold",
+       "kind": "fold"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Call 120 bb",
+       "score": 42,
+       "grade": "Mistake"
+      },
+      "equity": 0.233,
+      "potBB": 281,
+      "toCallBB": 120,
+      "villains": [
+       {
+        "position": "SB",
+        "read": "Recreational",
+        "width": 0.02,
+        "top": [
+         "QQ",
+         "AA",
+         "KK",
+         "AQs",
+         "JJ",
+         "TT",
+         "99"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 0,
+        "youtube": true
+       },
+       {
+        "label": "Call 120 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -22.33,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-16",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "Draws missed and won't call anything, so bet small to get called by 8x and 9x.",
+      "size": {
+       "maxPot": 0.4
+      }
+     },
+     "heroDid": "bet $100 (24% pot)",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Check",
+       "kind": "check"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 1.68,
+      "youtubeEvLossPot": 0.0205,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Bet 20 bb (24% pot)",
+       "score": 79,
+       "grade": "Inaccuracy"
+      },
+      "equity": 0.755,
+      "potBB": 82,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "UTG",
+        "read": "GTO",
+        "width": 0.01,
+        "top": [
+         "A9o",
+         "K6s",
+         "K8s",
+         "JTo",
+         "87s",
+         "K5s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 62.29,
+        "youtube": false
+       },
+       {
+        "label": "Bet 27.1 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": 60.02,
+        "youtube": true
+       },
+       {
+        "label": "Bet 61.5 bb (75% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.75,
+        "frequency": 0,
+        "evBB": 58.8,
+        "youtube": false
+       },
+       {
+        "label": "Bet 103 bb (125% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1.25,
+        "frequency": 0,
+        "evBB": 53.25,
+        "youtube": false
+       },
+       {
+        "label": "All in 160 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 1.95,
+        "frequency": 0,
+        "evBB": 53.29,
+        "youtube": false
+       },
+       {
+        "label": "Bet 20 bb (24% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.24,
+        "frequency": 0,
+        "evBB": 60.61,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Bet 61.5 bb (75% pot)",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 4.94,
+      "youtubeEvLossPot": 0.0602,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Bet 20 bb (24% pot)",
+       "score": 52,
+       "grade": "Mistake"
+      },
+      "equity": 0.922,
+      "potBB": 82,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "UTG",
+        "read": "Loose passive · Rec",
+        "width": 0.15,
+        "top": [
+         "55",
+         "66",
+         "A4o",
+         "Q4s",
+         "T8s",
+         "86s",
+         "A4s",
+         "J8s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 75.62,
+        "youtube": false
+       },
+       {
+        "label": "Bet 27.1 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": 91.46,
+        "youtube": true
+       },
+       {
+        "label": "Bet 61.5 bb (75% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.75,
+        "frequency": 1,
+        "evBB": 96.4,
+        "youtube": false
+       },
+       {
+        "label": "Bet 103 bb (125% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1.25,
+        "frequency": 0,
+        "evBB": 93.57,
+        "youtube": false
+       },
+       {
+        "label": "All in 160 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 1.95,
+        "frequency": 0,
+        "evBB": 87.99,
+        "youtube": false
+       },
+       {
+        "label": "Bet 20 bb (24% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.24,
+        "frequency": 0,
+        "evBB": 89.06,
+        "youtube": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-17",
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "bet",
+      "why": "This player never folds a king, so bet big on the turn to get value from Kx and draws.",
+      "size": {
+       "minPot": 0.75
+      }
+     },
+     "heroDid": "bet $125 (45% pot)",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Bet 55 bb (100% pot)",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 0.519,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Bet 25 bb (45% pot)",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.334,
+      "potBB": 55,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "HJ",
+        "read": "GTO",
+        "width": 0.1,
+        "top": [
+         "JTo",
+         "55",
+         "97s",
+         "K8s",
+         "T9o",
+         "K6s",
+         "Q9o",
+         "J9o"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 29.73,
+        "youtube": false
+       },
+       {
+        "label": "Bet 25 bb (45% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.45,
+        "frequency": 0.48,
+        "evBB": 29.81,
+        "youtube": false
+       },
+       {
+        "label": "Bet 55 bb (100% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1,
+        "frequency": 0.519,
+        "evBB": 29.85,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Bet 55 bb (100% pot)",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Bet 25 bb (45% pot)",
+       "score": 73,
+       "grade": "Inaccuracy"
+      },
+      "equity": 0.382,
+      "potBB": 55,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "HJ",
+        "read": "Calling station · Reg",
+        "width": 0.27,
+        "top": [
+         "66",
+         "55",
+         "44",
+         "QTo",
+         "JTo",
+         "A8o",
+         "A7o",
+         "QJo"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 32.31,
+        "youtube": false
+       },
+       {
+        "label": "Bet 25 bb (45% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.45,
+        "frequency": 0,
+        "evBB": 30.22,
+        "youtube": false
+       },
+       {
+        "label": "Bet 55 bb (100% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1,
+        "frequency": 1,
+        "evBB": 32.98,
+        "youtube": true
+       }
+      ]
+     }
+    },
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "Against a sticky player who never folds a king, just jam.",
+      "size": "allin"
+     },
+     "heroDid": "bet $350 (67% pot)",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "All in 153 bb",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Bet 70 bb (67% pot)",
+       "score": 91,
+       "grade": "Good"
+      },
+      "equity": 0.923,
+      "potBB": 105,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "HJ",
+        "read": "GTO",
+        "width": 0.05,
+        "top": [
+         "K6s",
+         "K6o",
+         "K8s",
+         "K7o",
+         "A9o",
+         "K7s",
+         "K2s",
+         "K4s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 96.26,
+        "youtube": false
+       },
+       {
+        "label": "Bet 34.7 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": 118.24,
+        "youtube": false
+       },
+       {
+        "label": "All in 153 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 1.08,
+        "frequency": 1,
+        "evBB": 130.01,
+        "youtube": true
+       },
+       {
+        "label": "Bet 70 bb (67% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.67,
+        "frequency": 0,
+        "evBB": 128.25,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "All in 153 bb",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Bet 70 bb (67% pot)",
+       "score": 53,
+       "grade": "Mistake"
+      },
+      "equity": 0.99,
+      "potBB": 105,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "HJ",
+        "read": "Calling station · Reg",
+        "width": 0.16,
+        "top": [
+         "66",
+         "55",
+         "97s",
+         "A3o",
+         "98s",
+         "T9o",
+         "J9o",
+         "Q9o"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 103.89,
+        "youtube": false
+       },
+       {
+        "label": "Bet 34.7 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": 129.78,
+        "youtube": false
+       },
+       {
+        "label": "All in 153 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 1.08,
+        "frequency": 1,
+        "evBB": 151.77,
+        "youtube": true
+       },
+       {
+        "label": "Bet 70 bb (67% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.67,
+        "frequency": 0,
+        "evBB": 143.29,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-18",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "Ask how much it takes to fold an ace: egregiously large. $85 was far too small.",
+      "size": {
+       "minPot": 1
+      }
+     },
+     "heroDid": "bet $85 (26% pot)",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Bet 17 bb (26% pot)",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 1.51,
+      "youtubeEvLossPot": 0.0232,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Bet 17 bb (26% pot)",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.81,
+      "potBB": 65,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "BB",
+        "read": "GTO",
+        "width": 0.1,
+        "top": [
+         "A4o",
+         "A5o",
+         "66",
+         "A6o",
+         "T7o",
+         "A6s",
+         "A2o",
+         "99"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 52.62,
+        "youtube": false
+       },
+       {
+        "label": "Bet 21.5 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": 53.8,
+        "youtube": false
+       },
+       {
+        "label": "Bet 48.8 bb (75% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.75,
+        "frequency": 0,
+        "evBB": 53.79,
+        "youtube": false
+       },
+       {
+        "label": "Bet 81.3 bb (125% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1.25,
+        "frequency": 0,
+        "evBB": 52.35,
+        "youtube": true
+       },
+       {
+        "label": "All in 168 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 2.58,
+        "frequency": 0,
+        "evBB": 51.99,
+        "youtube": true
+       },
+       {
+        "label": "Bet 17 bb (26% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.26,
+        "frequency": 1,
+        "evBB": 53.86,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Bet 48.8 bb (75% pot)",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 5.18,
+      "youtubeEvLossPot": 0.0797,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Bet 17 bb (26% pot)",
+       "score": 73,
+       "grade": "Inaccuracy"
+      },
+      "equity": 0.963,
+      "potBB": 65,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "BB",
+        "read": "Recreational",
+        "width": 0.13,
+        "top": [
+         "43s",
+         "44",
+         "53s",
+         "55",
+         "66",
+         "88",
+         "74s",
+         "75s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 62.6,
+        "youtube": false
+       },
+       {
+        "label": "Bet 21.5 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": 79.5,
+        "youtube": false
+       },
+       {
+        "label": "Bet 48.8 bb (75% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.75,
+        "frequency": 1,
+        "evBB": 80.11,
+        "youtube": false
+       },
+       {
+        "label": "Bet 81.3 bb (125% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1.25,
+        "frequency": 0,
+        "evBB": 74.93,
+        "youtube": true
+       },
+       {
+        "label": "All in 168 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 2.58,
+        "frequency": 0,
+        "evBB": 68.81,
+        "youtube": true
+       },
+       {
+        "label": "Bet 17 bb (26% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.26,
+        "frequency": 0,
+        "evBB": 76.96,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-19",
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "bet",
+      "why": "Out of position at low SPR, minimise streets and jam: QQ, JJ and TT can't fold.",
+      "size": "allin"
+     },
+     "heroDid": "bet $300 (26% pot)",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Bet 60 bb (26% pot)",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 6.16,
+      "youtubeEvLossPot": 0.0269,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Bet 60 bb (26% pot)",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.941,
+      "potBB": 229,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "CO",
+        "read": "GTO",
+        "width": 0.01,
+        "top": [
+         "QQ",
+         "TT",
+         "KK",
+         "JJ",
+         "AKs",
+         "AQs",
+         "AKo"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0.363,
+        "evBB": 317.53,
+        "youtube": false
+       },
+       {
+        "label": "Bet 115 bb (50% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.5,
+        "frequency": 0,
+        "evBB": 310.04,
+        "youtube": false
+       },
+       {
+        "label": "All in 190 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 0.83,
+        "frequency": 0,
+        "evBB": 311.51,
+        "youtube": true
+       },
+       {
+        "label": "Bet 60 bb (26% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.26,
+        "frequency": 0.637,
+        "evBB": 317.67,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Bet 115 bb (50% pot)",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 24.44,
+      "youtubeEvLossPot": 0.1067,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Bet 60 bb (26% pot)",
+       "score": 79,
+       "grade": "Inaccuracy"
+      },
+      "equity": 0.888,
+      "potBB": 229,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "CO",
+        "read": "LAG · Strong reg",
+        "width": 0.05,
+        "top": [
+         "TT",
+         "AQs",
+         "AKo",
+         "AKs",
+         "77",
+         "QQ",
+         "JJ",
+         "99"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 217.71,
+        "youtube": false
+       },
+       {
+        "label": "Bet 115 bb (50% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.5,
+        "frequency": 1,
+        "evBB": 272.86,
+        "youtube": false
+       },
+       {
+        "label": "All in 190 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 0.83,
+        "frequency": 0,
+        "evBB": 248.42,
+        "youtube": true
+       },
+       {
+        "label": "Bet 60 bb (26% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.26,
+        "frequency": 0,
+        "evBB": 267.59,
+        "youtube": false
+       }
+      ]
+     }
+    },
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "A small or thin value bet on the ace was better than checking.",
+      "size": {
+       "maxPot": 0.5
+      }
+     },
+     "heroDid": "check",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Check",
+       "kind": "check"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 5.14,
+      "youtubeEvLossPot": 0.0147,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Check",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.891,
+      "potBB": 349,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "CO",
+        "read": "GTO",
+        "width": 0.01,
+        "top": [
+         "QQ",
+         "TT",
+         "KK",
+         "JJ",
+         "AKs",
+         "AQs",
+         "AKo"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 312.5,
+        "youtube": false
+       },
+       {
+        "label": "All in 130 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 0.37,
+        "frequency": 0,
+        "evBB": 307.36,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "All in 130 bb",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Check",
+       "score": 53,
+       "grade": "Mistake"
+      },
+      "equity": 0.616,
+      "potBB": 349,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "CO",
+        "read": "LAG · Strong reg",
+        "width": 0.04,
+        "top": [
+         "TT",
+         "QQ",
+         "77",
+         "JJ",
+         "AQs",
+         "AKo",
+         "AKs",
+         "99"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 199.04,
+        "youtube": false
+       },
+       {
+        "label": "All in 130 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 0.37,
+        "frequency": 1,
+        "evBB": 214.76,
+        "youtube": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-20",
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "bet",
+      "why": "A fish won't double-barrel his overpairs, so lead a size he calls with them."
+     },
+     "heroDid": "bet $1,200 (62% pot)",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Check",
+       "kind": "check"
+      },
+      "youtubeFrequency": 0.004,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 1.04,
+      "youtubeEvLossPot": 0.0217,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Bet 30 bb (63% pot)",
+       "score": 79,
+       "grade": "Inaccuracy"
+      },
+      "equity": 0.921,
+      "potBB": 48,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "BTN",
+        "read": "GTO",
+        "width": 0.12,
+        "top": [
+         "76s",
+         "T9o",
+         "K5s",
+         "K6s",
+         "T9s",
+         "AQo",
+         "JTs",
+         "AQs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0.995,
+        "evBB": 76.62,
+        "youtube": false
+       },
+       {
+        "label": "Bet 24 bb (50% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.5,
+        "frequency": 0.004,
+        "evBB": 75.38,
+        "youtube": true
+       },
+       {
+        "label": "Bet 30 bb (63% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.63,
+        "frequency": 0,
+        "evBB": 75.58,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Bet 30 bb (63% pot)",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Bet 30 bb (63% pot)",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.801,
+      "potBB": 48,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "BTN",
+        "read": "Loose passive · Rec",
+        "width": 0.1,
+        "top": [
+         "AA",
+         "KK",
+         "AQo",
+         "AQs",
+         "KQo",
+         "KQs",
+         "QJo",
+         "QJs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 80.27,
+        "youtube": false
+       },
+       {
+        "label": "Bet 24 bb (50% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.5,
+        "frequency": 0,
+        "evBB": 91.08,
+        "youtube": true
+       },
+       {
+        "label": "Bet 30 bb (63% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.63,
+        "frequency": 1,
+        "evBB": 92.9,
+        "youtube": true
+       }
+      ]
+     }
+    },
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "Set up by the turn lead: jam the river.",
+      "size": "allin"
+     },
+     "heroDid": "all in",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Check",
+       "kind": "check"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0.19,
+      "youtubeEvLossPot": 0.0018,
+      "verdict": "close",
+      "hero": {
+       "did": "All in 96.3 bb",
+       "score": 96,
+       "grade": "Good"
+      },
+      "equity": 0.845,
+      "potBB": 108,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "BTN",
+        "read": "GTO",
+        "width": 0.05,
+        "top": [
+         "44",
+         "K8s",
+         "A4s",
+         "A4o",
+         "55",
+         "J9s",
+         "QQ",
+         "QTs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 102.17,
+        "youtube": false
+       },
+       {
+        "label": "Bet 35.6 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": 100.27,
+        "youtube": false
+       },
+       {
+        "label": "All in 96.3 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 0.89,
+        "frequency": 0,
+        "evBB": 101.98,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "All in 96.3 bb",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "All in 96.3 bb",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.865,
+      "potBB": 108,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "BTN",
+        "read": "Loose passive · Rec",
+        "width": 0.07,
+        "top": [
+         "AA",
+         "KK",
+         "44",
+         "KQs",
+         "KQo",
+         "AQo",
+         "QJo",
+         "AQs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 129.71,
+        "youtube": false
+       },
+       {
+        "label": "Bet 35.6 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": 116.37,
+        "youtube": false
+       },
+       {
+        "label": "All in 96.3 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 0.89,
+        "frequency": 1,
+        "evBB": 155.17,
+        "youtube": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-21",
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "call",
+      "why": "A9 and A5 play this way too; you need about 30% and have 10 outs against two pair."
+     },
+     "heroDid": "call",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 107 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Call 107 bb",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.607,
+      "potBB": 391,
+      "toCallBB": 106.5,
+      "villains": [
+       {
+        "position": "LJ",
+        "read": "GTO",
+        "width": 0.06,
+        "top": [
+         "ATo",
+         "ATs",
+         "A6s",
+         "A7s",
+         "A8s",
+         "AJo",
+         "AJs",
+         "AQo"
+        ]
+       },
+       {
+        "position": "CO",
+        "read": "GTO",
+        "width": 0.02,
+        "top": [
+         "A9s",
+         "99",
+         "AQs",
+         "A4s",
+         "44",
+         "AJs",
+         "AJo",
+         "55"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 2.54,
+        "youtube": false
+       },
+       {
+        "label": "Call 107 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 228.98,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": null
+    }
+   ]
+  },
+  {
+   "id": "hh-22",
+   "decisions": [
+    {
+     "street": "Flop",
+     "youtube": {
+      "play": "bet",
+      "why": "With two fish between you and the reg raiser, donk: the reg won't stab 4-way, so target the fish."
+     },
+     "heroDid": "bet $225 (92% pot)",
+     "gto": {
+      "graded": false,
+      "reason": "Not graded: postflop GTO covers heads-up and 3-way pots; this one has 4 players.",
+      "verdict": "not graded"
+     },
+     "reads": {
+      "graded": false,
+      "reason": "Not graded: postflop GTO covers heads-up and 3-way pots; this one has 4 players.",
+      "verdict": "not graded"
+     }
+    },
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "bet",
+      "why": "Size the turn so the river jam is about half the pot.",
+      "size": {
+       "minPot": 0.6
+      }
+     },
+     "heroDid": "bet $750 (82% pot)",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Check",
+       "kind": "check"
+      },
+      "youtubeFrequency": 0.001,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 1.66,
+      "youtubeEvLossPot": 0.018,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Bet 75 bb (82% pot)",
+       "score": 90,
+       "grade": "Good"
+      },
+      "equity": 0.896,
+      "potBB": 92,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "LJ",
+        "read": "GTO",
+        "width": 0.15,
+        "top": [
+         "JTo",
+         "J9o",
+         "A7o",
+         "K7s",
+         "K7o",
+         "Q7s",
+         "T7s",
+         "J8s"
+        ]
+       },
+       {
+        "position": "CO",
+        "read": "GTO",
+        "width": 0.21,
+        "top": [
+         "A7o",
+         "K7s",
+         "K7o",
+         "Q7s",
+         "T7s",
+         "97s",
+         "87s",
+         "J9o"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0.999,
+        "evBB": 150.71,
+        "youtube": false
+       },
+       {
+        "label": "Bet 46 bb (50% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.5,
+        "frequency": 0,
+        "evBB": 149.21,
+        "youtube": false
+       },
+       {
+        "label": "Bet 75 bb (82% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.82,
+        "frequency": 0.001,
+        "evBB": 149.05,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Bet 75 bb (82% pot)",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Bet 75 bb (82% pot)",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.869,
+      "potBB": 92,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "LJ",
+        "read": "Loose passive · Rec",
+        "width": 0.35,
+        "top": [
+         "JTo",
+         "J9o",
+         "J8s",
+         "A7o",
+         "K7s",
+         "K7o",
+         "76s",
+         "Q7s"
+        ]
+       },
+       {
+        "position": "CO",
+        "read": "Loose passive · Rec",
+        "width": 0.44,
+        "top": [
+         "J9o",
+         "JTo",
+         "A7o",
+         "K7s",
+         "K7o",
+         "Q7s",
+         "T7s",
+         "J8s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 137.41,
+        "youtube": false
+       },
+       {
+        "label": "Bet 46 bb (50% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.5,
+        "frequency": 0,
+        "evBB": 131.78,
+        "youtube": false
+       },
+       {
+        "label": "Bet 75 bb (82% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.82,
+        "frequency": 1,
+        "evBB": 153.45,
+        "youtube": true
+       }
+      ]
+     }
+    },
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "Fish rarely jam their flushes for you, so jam yourself.",
+      "size": "allin"
+     },
+     "heroDid": "all in",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Check",
+       "kind": "check"
+      },
+      "youtubeFrequency": 0.007,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0.73,
+      "youtubeEvLossPot": 0.0023,
+      "verdict": "close",
+      "hero": {
+       "did": "All in 96.5 bb",
+       "score": 96,
+       "grade": "Good"
+      },
+      "equity": 1,
+      "potBB": 317,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "LJ",
+        "read": "GTO",
+        "width": 0.03,
+        "top": [
+         "J8s",
+         "J9o",
+         "JTo",
+         "J9s",
+         "K7o",
+         "K7s",
+         "65s",
+         "K5s"
+        ]
+       },
+       {
+        "position": "CO",
+        "read": "GTO",
+        "width": 0.02,
+        "top": [
+         "J9o",
+         "K9s",
+         "K8s",
+         "K5s",
+         "K2s",
+         "K3s",
+         "J9s",
+         "T8s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0.993,
+        "evBB": 400.92,
+        "youtube": false
+       },
+       {
+        "label": "All in 96.5 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 0.3,
+        "frequency": 0.007,
+        "evBB": 400.19,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "All in 96.5 bb",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "All in 96.5 bb",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.997,
+      "potBB": 317,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "LJ",
+        "read": "Loose passive · Rec",
+        "width": 0.27,
+        "top": [
+         "98s",
+         "JTo",
+         "J9o",
+         "J8s",
+         "J9s",
+         "QJo",
+         "KJo",
+         "55"
+        ]
+       },
+       {
+        "position": "CO",
+        "read": "Loose passive · Rec",
+        "width": 0.3,
+        "top": [
+         "55",
+         "98s",
+         "A5o",
+         "A5s",
+         "33",
+         "98o",
+         "J9o",
+         "JTo"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 395.45,
+        "youtube": false
+       },
+       {
+        "label": "All in 96.5 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 0.3,
+        "frequency": 1,
+        "evBB": 476.31,
+        "youtube": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-23",
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "raise",
+      "why": "The flop checked through, so both ranges are capped: check-raise the delayed c-bet as a bluff."
+     },
+     "heroDid": "raise to $350",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 5 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 1.38,
+      "youtubeEvLossPot": 0.0531,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Raise to 35 bb",
+       "score": 49,
+       "grade": "Mistake"
+      },
+      "equity": 0.224,
+      "potBB": 21,
+      "toCallBB": 5,
+      "villains": [
+       {
+        "position": "BTN",
+        "read": "GTO",
+        "width": 0.01,
+        "top": [
+         "JTs",
+         "T9s",
+         "KTs",
+         "K9s",
+         "76s",
+         "KJs",
+         "K7s",
+         "K6s"
+        ]
+       },
+       {
+        "position": "CO",
+        "read": "GTO",
+        "width": 0.14,
+        "top": [
+         "KTo",
+         "JTs",
+         "K7s",
+         "JTo",
+         "22",
+         "KK",
+         "KTs",
+         "KJo"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Call 5 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 1.14,
+        "youtube": false
+       },
+       {
+        "label": "Raise to 15 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -0.24,
+        "youtube": true
+       },
+       {
+        "label": "Raise to 35 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -2.06,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": null
+    },
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "Keep bluffing when the flush comes; a big size folds AJ.",
+      "size": {
+       "minPot": 0.75
+      }
+     },
+     "heroDid": "bet $1,050 (122% pot)",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Bet 105 bb (122% pot)",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Bet 105 bb (122% pot)",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.087,
+      "potBB": 86,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "CO",
+        "read": "GTO",
+        "width": 0.09,
+        "top": [
+         "A9o",
+         "AJo",
+         "A3s",
+         "ATo",
+         "A6o",
+         "A5s",
+         "AJs",
+         "ATs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 1.66,
+        "youtube": false
+       },
+       {
+        "label": "Bet 28.4 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": 5.92,
+        "youtube": false
+       },
+       {
+        "label": "Bet 64.5 bb (75% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.75,
+        "frequency": 0.001,
+        "evBB": 6.32,
+        "youtube": true
+       },
+       {
+        "label": "All in 162 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 1.88,
+        "frequency": 0,
+        "evBB": 3.42,
+        "youtube": true
+       },
+       {
+        "label": "Bet 105 bb (122% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1.22,
+        "frequency": 0.999,
+        "evBB": 7.44,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": null
+    }
+   ]
+  },
+  {
+   "id": "hh-24",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "His best hand is weak Ax; to make AT call he'd bet 400-450, so the jam folds it.",
+      "size": "allin"
+     },
+     "heroDid": "all in ($765 into $365)",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "All in 76.5 bb",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "All in 76.5 bb",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0,
+      "potBB": 36.5,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "CO",
+        "read": "GTO",
+        "width": 0.03,
+        "top": [
+         "A6o",
+         "A3o",
+         "A4o",
+         "A7o",
+         "A2s",
+         "J9s",
+         "K9s",
+         "A2o"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Bet 12.1 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": 0.31,
+        "youtube": false
+       },
+       {
+        "label": "Bet 27.4 bb (75% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.75,
+        "frequency": 0,
+        "evBB": 0.7,
+        "youtube": false
+       },
+       {
+        "label": "Bet 45.6 bb (125% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1.25,
+        "frequency": 0,
+        "evBB": 1.29,
+        "youtube": false
+       },
+       {
+        "label": "All in 76.5 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 2.1,
+        "frequency": 1,
+        "evBB": 1.98,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "All in 76.5 bb",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "All in 76.5 bb",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.164,
+      "potBB": 36.5,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "CO",
+        "read": "Loose passive · Rec",
+        "width": 0.16,
+        "top": [
+         "T9o",
+         "J9o",
+         "44",
+         "Q9o",
+         "T9s",
+         "33",
+         "98s",
+         "98o"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 6.85,
+        "youtube": false
+       },
+       {
+        "label": "Bet 12.1 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": -0.65,
+        "youtube": false
+       },
+       {
+        "label": "Bet 27.4 bb (75% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.75,
+        "frequency": 0,
+        "evBB": -1.05,
+        "youtube": false
+       },
+       {
+        "label": "Bet 45.6 bb (125% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1.25,
+        "frequency": 0,
+        "evBB": 3.38,
+        "youtube": false
+       },
+       {
+        "label": "All in 76.5 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 2.1,
+        "frequency": 1,
+        "evBB": 9.3,
+        "youtube": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-25",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "The turn check-raise looks very strong: jam and about 90% of his range folds, every Ax included.",
+      "size": "allin"
+     },
+     "heroDid": "check",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Check",
+       "kind": "check"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0.91,
+      "youtubeEvLossPot": 0.0062,
+      "verdict": "close",
+      "hero": {
+       "did": "Check",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0,
+      "potBB": 146,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "UTG",
+        "read": "GTO",
+        "width": 0.08,
+        "top": [
+         "ATo",
+         "TT",
+         "AA",
+         "QTs",
+         "55",
+         "A5s",
+         "AQs",
+         "AQo"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Bet 48.2 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": -0.38,
+        "youtube": false
+       },
+       {
+        "label": "All in 136 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 0.93,
+        "frequency": 0,
+        "evBB": -0.91,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Check",
+       "kind": "check"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 27.4,
+      "youtubeEvLossPot": 0.1877,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Check",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0,
+      "potBB": 146,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "UTG",
+        "read": "TAG · Reg",
+        "width": 0.07,
+        "top": [
+         "ATo",
+         "TT",
+         "AA",
+         "AQs",
+         "55",
+         "AQo",
+         "KQs",
+         "ATs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Bet 48.2 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": -41.37,
+        "youtube": false
+       },
+       {
+        "label": "All in 136 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 0.93,
+        "frequency": 0,
+        "evBB": -27.4,
+        "youtube": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-26",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "$410 isn't scary enough for a sticky player: go egregious, about 4x pot, to fold his whole range.",
+      "size": {
+       "minPot": 3.5
+      }
+     },
+     "heroDid": "bet $410 (190% pot)",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Bet 53.8 bb (125% pot)",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 0.122,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "close",
+      "hero": {
+       "did": "Bet 82 bb (191% pot)",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0,
+      "potBB": 43,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "SB",
+        "read": "GTO",
+        "width": 0.04,
+        "top": [
+         "Q9s",
+         "KTo",
+         "K8s",
+         "J9s",
+         "K7s",
+         "KTs",
+         "KJo",
+         "T9s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Bet 14.2 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": 0.72,
+        "youtube": false
+       },
+       {
+        "label": "Bet 32.3 bb (75% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.75,
+        "frequency": 0.01,
+        "evBB": 0.79,
+        "youtube": false
+       },
+       {
+        "label": "Bet 53.8 bb (125% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1.25,
+        "frequency": 0.452,
+        "evBB": 0.83,
+        "youtube": false
+       },
+       {
+        "label": "All in 279 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 6.49,
+        "frequency": 0.122,
+        "evBB": 0.83,
+        "youtube": true
+       },
+       {
+        "label": "Bet 82 bb (191% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1.91,
+        "frequency": 0.416,
+        "evBB": 0.82,
+        "youtube": false
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Bet 82 bb (191% pot)",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 3.49,
+      "youtubeEvLossPot": 0.0812,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Bet 82 bb (191% pot)",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0,
+      "potBB": 43,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "SB",
+        "read": "Calling station · Rec",
+        "width": 0.2,
+        "top": [
+         "88",
+         "77",
+         "55",
+         "44",
+         "22",
+         "76s",
+         "65s",
+         "A6s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Bet 14.2 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": -1.32,
+        "youtube": false
+       },
+       {
+        "label": "Bet 32.3 bb (75% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.75,
+        "frequency": 0,
+        "evBB": 3.33,
+        "youtube": false
+       },
+       {
+        "label": "Bet 53.8 bb (125% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1.25,
+        "frequency": 0,
+        "evBB": 6.59,
+        "youtube": false
+       },
+       {
+        "label": "All in 279 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 6.49,
+        "frequency": 0,
+        "evBB": 4.74,
+        "youtube": true
+       },
+       {
+        "label": "Bet 82 bb (191% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1.91,
+        "frequency": 1,
+        "evBB": 8.23,
+        "youtube": false
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-27",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "His check-calls say overpair, few flushes; a big overbet folds TT-JJ.",
+      "size": {
+       "minPot": 1
+      }
+     },
+     "heroDid": "bet $650 (133% pot)",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Check",
+       "kind": "check"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 5.48,
+      "youtubeEvLossPot": 0.0559,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Bet 130 bb (133% pot)",
+       "score": 65,
+       "grade": "Inaccuracy"
+      },
+      "equity": 0,
+      "potBB": 98,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "UTG",
+        "read": "GTO",
+        "width": 0.02,
+        "top": [
+         "JJ",
+         "TT",
+         "88",
+         "99",
+         "77",
+         "55",
+         "ATs",
+         "A5s"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Bet 32.3 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": -1.56,
+        "youtube": false
+       },
+       {
+        "label": "Bet 73.5 bb (75% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.75,
+        "frequency": 0,
+        "evBB": -2.78,
+        "youtube": false
+       },
+       {
+        "label": "All in 152 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 1.55,
+        "frequency": 0,
+        "evBB": -5.48,
+        "youtube": true
+       },
+       {
+        "label": "Bet 130 bb (133% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1.33,
+        "frequency": 0,
+        "evBB": -5.65,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "All in 152 bb",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Bet 130 bb (133% pot)",
+       "score": 96,
+       "grade": "Good"
+      },
+      "equity": 0,
+      "potBB": 98,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "UTG",
+        "read": "Recreational",
+        "width": 0.05,
+        "top": [
+         "AKo",
+         "AQo",
+         "AJo",
+         "88",
+         "99",
+         "ATo",
+         "TT",
+         "AQs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0.08,
+        "youtube": false
+       },
+       {
+        "label": "Bet 32.3 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": 62.62,
+        "youtube": false
+       },
+       {
+        "label": "Bet 73.5 bb (75% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.75,
+        "frequency": 0,
+        "evBB": 72.98,
+        "youtube": false
+       },
+       {
+        "label": "All in 152 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 1.55,
+        "frequency": 1,
+        "evBB": 85.86,
+        "youtube": true
+       },
+       {
+        "label": "Bet 130 bb (133% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1.33,
+        "frequency": 0,
+        "evBB": 85.03,
+        "youtube": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-28",
+   "decisions": [
+    {
+     "street": "River",
+     "youtube": {
+      "play": "raise",
+      "why": "Small in-position river bets are thin value; a big raise folds AT and KT."
+     },
+     "heroDid": "raise to $700",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 12.5 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0.14,
+      "youtubeEvLossPot": 0.0022,
+      "verdict": "close",
+      "hero": {
+       "did": "Raise to 70 bb",
+       "score": 96,
+       "grade": "Good"
+      },
+      "equity": 0.304,
+      "potBB": 50,
+      "toCallBB": 12.5,
+      "villains": [
+       {
+        "position": "CO",
+        "read": "GTO",
+        "width": 0.03,
+        "top": [
+         "TT",
+         "KTs",
+         "KTo",
+         "ATs",
+         "ATo",
+         "QJs",
+         "QTs",
+         "QTo"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Call 12.5 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 6.09,
+        "youtube": false
+       },
+       {
+        "label": "Raise to 31 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 4.67,
+        "youtube": true
+       },
+       {
+        "label": "All in 132 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 5.77,
+        "youtube": true
+       },
+       {
+        "label": "Raise to 70 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 5.95,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Fold",
+       "kind": "fold"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 25.2,
+      "youtubeEvLossPot": 0.4032,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Raise to 70 bb",
+       "score": 1,
+       "grade": "Blunder"
+      },
+      "equity": 0.051,
+      "potBB": 50,
+      "toCallBB": 12.5,
+      "villains": [
+       {
+        "position": "CO",
+        "read": "Loose passive · Rec",
+        "width": 0.06,
+        "top": [
+         "KK",
+         "QQ",
+         "JJ",
+         "AA",
+         "ATo",
+         "ATs",
+         "KTs",
+         "KTo"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Call 12.5 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -9.02,
+        "youtube": false
+       },
+       {
+        "label": "Raise to 31 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -25.32,
+        "youtube": true
+       },
+       {
+        "label": "All in 132 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -25.2,
+        "youtube": true
+       },
+       {
+        "label": "Raise to 70 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -45.42,
+        "youtube": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-29",
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "raise",
+      "why": "His turn stab is mostly Ax; check-raise small so AJ and AT call once."
+     },
+     "heroDid": "raise to $100",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 5 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 1.45,
+      "youtubeEvLossPot": 0.0763,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Raise to 20 bb",
+       "score": 66,
+       "grade": "Inaccuracy"
+      },
+      "equity": 0.594,
+      "potBB": 14,
+      "toCallBB": 5,
+      "villains": [
+       {
+        "position": "BTN",
+        "read": "GTO",
+        "width": 0.08,
+        "top": [
+         "K6s",
+         "K8o",
+         "K8s",
+         "K2s",
+         "A5s",
+         "JTo",
+         "QTs",
+         "77"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Call 5 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 2.52,
+        "youtube": false
+       },
+       {
+        "label": "Raise to 15 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0.82,
+        "youtube": true
+       },
+       {
+        "label": "Raise to 20 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 1.07,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Raise to 20 bb",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Raise to 20 bb",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.191,
+      "potBB": 14,
+      "toCallBB": 5,
+      "villains": [
+       {
+        "position": "BTN",
+        "read": "Recreational",
+        "width": 0.16,
+        "top": [
+         "AJo",
+         "AJs",
+         "ATo",
+         "ATs",
+         "AQo",
+         "AQs",
+         "A2s",
+         "A3o"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Call 5 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -6.53,
+        "youtube": false
+       },
+       {
+        "label": "Raise to 15 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -2.21,
+        "youtube": true
+       },
+       {
+        "label": "Raise to 20 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 5.53,
+        "youtube": true
+       }
+      ]
+     }
+    },
+    {
+     "street": "River",
+     "youtube": {
+      "play": "bet",
+      "why": "Then overbet the river to fold them; he has almost no strong hands.",
+      "size": {
+       "minPot": 1
+      }
+     },
+     "heroDid": "bet $425 (173% pot)",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Check",
+       "kind": "check"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 1.7,
+      "youtubeEvLossPot": 0.0347,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Bet 85 bb (173% pot)",
+       "score": 48,
+       "grade": "Mistake"
+      },
+      "equity": 0.248,
+      "potBB": 49,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "BTN",
+        "read": "GTO",
+        "width": 0.05,
+        "top": [
+         "A5s",
+         "K8s",
+         "77",
+         "K6s",
+         "A5o",
+         "AJo",
+         "K2s",
+         "QTs"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 8.26,
+        "youtube": false
+       },
+       {
+        "label": "Bet 16.2 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": 3.72,
+        "youtube": false
+       },
+       {
+        "label": "Bet 36.8 bb (75% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.75,
+        "frequency": 0,
+        "evBB": -0.57,
+        "youtube": false
+       },
+       {
+        "label": "All in 176 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 3.59,
+        "frequency": 0,
+        "evBB": 6.56,
+        "youtube": true
+       },
+       {
+        "label": "Bet 85 bb (173% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1.73,
+        "frequency": 0,
+        "evBB": 2.63,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "All in 176 bb",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Bet 85 bb (173% pot)",
+       "score": 31,
+       "grade": "Mistake"
+      },
+      "equity": 0.101,
+      "potBB": 49,
+      "toCallBB": 0,
+      "villains": [
+       {
+        "position": "BTN",
+        "read": "Recreational",
+        "width": 0.14,
+        "top": [
+         "AJo",
+         "AJs",
+         "ATo",
+         "ATs",
+         "AQo",
+         "AQs",
+         "AKs",
+         "AKo"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Check",
+        "type": "check",
+        "kind": "check",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 9.84,
+        "youtube": false
+       },
+       {
+        "label": "Bet 16.2 bb (33% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.33,
+        "frequency": 0,
+        "evBB": -8.83,
+        "youtube": false
+       },
+       {
+        "label": "Bet 36.8 bb (75% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 0.75,
+        "frequency": 0,
+        "evBB": -13.36,
+        "youtube": false
+       },
+       {
+        "label": "All in 176 bb",
+        "type": "allin",
+        "kind": "aggressive",
+        "potShare": 3.59,
+        "frequency": 1,
+        "evBB": 21.84,
+        "youtube": true
+       },
+       {
+        "label": "Bet 85 bb (173% pot)",
+        "type": "bet",
+        "kind": "aggressive",
+        "potShare": 1.73,
+        "frequency": 0,
+        "evBB": 13.02,
+        "youtube": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "hh-30",
+   "decisions": [
+    {
+     "street": "Turn",
+     "youtube": {
+      "play": "raise",
+      "why": "Regs bet this turn too thin and know live check-raises are rarely bluffs, so they fold."
+     },
+     "heroDid": "raise to $220",
+     "gto": {
+      "graded": true,
+      "best": {
+       "label": "Call 15 bb",
+       "kind": "call"
+      },
+      "youtubeFrequency": 0,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 1.07,
+      "youtubeEvLossPot": 0.0218,
+      "verdict": "disagree",
+      "hero": {
+       "did": "Raise to 44 bb",
+       "score": 79,
+       "grade": "Inaccuracy"
+      },
+      "equity": 0.504,
+      "potBB": 34,
+      "toCallBB": 15,
+      "villains": [
+       {
+        "position": "LJ",
+        "read": "GTO",
+        "width": 0.09,
+        "top": [
+         "QJs",
+         "44",
+         "AJo",
+         "AQo",
+         "AJs",
+         "QQ",
+         "KQo",
+         "55"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Call 15 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 4.64,
+        "youtube": false
+       },
+       {
+        "label": "Raise to 44 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 3.57,
+        "youtube": true
+       }
+      ]
+     },
+     "reads": {
+      "graded": true,
+      "best": {
+       "label": "Raise to 44 bb",
+       "kind": "aggressive"
+      },
+      "youtubeFrequency": 1,
+      "youtubeOffered": true,
+      "youtubeEvLossBB": 0,
+      "youtubeEvLossPot": 0,
+      "verdict": "agree",
+      "hero": {
+       "did": "Raise to 44 bb",
+       "score": 100,
+       "grade": "Best move"
+      },
+      "equity": 0.353,
+      "potBB": 34,
+      "toCallBB": 15,
+      "villains": [
+       {
+        "position": "LJ",
+        "read": "TAG · Reg",
+        "width": 0.04,
+        "top": [
+         "QJs",
+         "JJ",
+         "KJs",
+         "TT",
+         "99",
+         "AA",
+         "JTs",
+         "QQ"
+        ]
+       }
+      ],
+      "options": [
+       {
+        "label": "Fold",
+        "type": "fold",
+        "kind": "fold",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": 0,
+        "youtube": false
+       },
+       {
+        "label": "Call 15 bb",
+        "type": "call",
+        "kind": "call",
+        "potShare": null,
+        "frequency": 0,
+        "evBB": -1.59,
+        "youtube": false
+       },
+       {
+        "label": "Raise to 44 bb",
+        "type": "raise",
+        "kind": "aggressive",
+        "potShare": null,
+        "frequency": 1,
+        "evBB": 10.8,
+        "youtube": true
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

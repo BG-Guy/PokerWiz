@@ -243,6 +243,16 @@ h1 {
 .btn-ghost:hover {
   background: var(--accent-soft);
 }
+/* The quieter second action next to a main one (the foot of a sheet): grey, outlined */
+.btn-secondary {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover {
+  box-shadow: none;
+  border-color: var(--text-faint);
+}
 /* Destructive action (delete): red, used in confirmations and danger zones */
 .btn-danger {
   background: var(--negative);
